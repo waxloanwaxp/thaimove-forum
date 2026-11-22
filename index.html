@@ -131,31 +131,45 @@
 
         <!-- Filter & Search Controls -->
         <div id="filter-controls-bar" class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 mb-6">
-            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                <!-- Category Pills -->
-                <div class="flex items-center gap-2 overflow-x-auto pb-1 lg:pb-0" id="category-filters">
-                    <button onclick="setCategoryFilter('ALL')" data-cat="ALL" class="cat-btn active px-3.5 py-1.5 rounded-xl text-sm font-medium whitespace-nowrap transition bg-blue-600 text-white">
-                        ทั้งหมด
+            <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
+                <!-- Category Pills (2-Row Balanced Grid Layout) -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2" id="category-filters">
+                    <button onclick="setCategoryFilter('ALL')" data-cat="ALL" class="cat-btn active px-3 py-2 rounded-xl text-xs sm:text-sm font-medium transition bg-blue-600 text-white flex items-center justify-center gap-1.5 text-center shadow-sm">
+                        <i class="fa-solid fa-border-all"></i>
+                        <span>ทั้งหมด</span>
                     </button>
-                    <button onclick="setCategoryFilter('รถกระบะรับจ้าง')" data-cat="รถกระบะรับจ้าง" class="cat-btn px-3.5 py-1.5 rounded-xl text-sm font-medium whitespace-nowrap transition bg-slate-100 text-slate-700 hover:bg-slate-200">
-                        <i class="fa-solid fa-truck-pickup mr-1"></i> รถกระบะรับจ้าง
+                    <button onclick="setCategoryFilter('รถกระบะรับจ้าง')" data-cat="รถกระบะรับจ้าง" class="cat-btn px-3 py-2 rounded-xl text-xs sm:text-sm font-medium transition bg-slate-100 text-slate-700 hover:bg-slate-200 flex items-center justify-center gap-1.5 text-center">
+                        <i class="fa-solid fa-truck-pickup"></i>
+                        <span>รถกระบะรับจ้าง/ขนของ</span>
                     </button>
-                    <button onclick="setCategoryFilter('รถบรรทุก 6-10 ล้อ')" data-cat="รถบรรทุก 6-10 ล้อ" class="cat-btn px-3.5 py-1.5 rounded-xl text-sm font-medium whitespace-nowrap transition bg-slate-100 text-slate-700 hover:bg-slate-200">
-                        <i class="fa-solid fa-truck mr-1"></i> รถบรรทุก 6-10 ล้อ
+                    <button onclick="setCategoryFilter('รถบรรทุก 6-10 ล้อ')" data-cat="รถบรรทุก 6-10 ล้อ" class="cat-btn px-3 py-2 rounded-xl text-xs sm:text-sm font-medium transition bg-slate-100 text-slate-700 hover:bg-slate-200 flex items-center justify-center gap-1.5 text-center">
+                        <i class="fa-solid fa-truck"></i>
+                        <span>รถบรรทุก 6-10 ล้อ</span>
                     </button>
-                    <button onclick="setCategoryFilter('รถตู้ VIP')" data-cat="รถตู้ VIP" class="cat-btn px-3.5 py-1.5 rounded-xl text-sm font-medium whitespace-nowrap transition bg-slate-100 text-slate-700 hover:bg-slate-200">
-                        <i class="fa-solid fa-van-shuttle mr-1"></i> รถตู้ VIP
+                    <button onclick="setCategoryFilter('รถตู้ VIP')" data-cat="รถตู้ VIP" class="cat-btn px-3 py-2 rounded-xl text-xs sm:text-sm font-medium transition bg-slate-100 text-slate-700 hover:bg-slate-200 flex items-center justify-center gap-1.5 text-center">
+                        <i class="fa-solid fa-van-shuttle"></i>
+                        <span>รถตู้ VIP</span>
                     </button>
-                    <button onclick="setCategoryFilter('รถสไลด์ / รถยก')" data-cat="รถสไลด์ / รถยก" class="cat-btn px-3.5 py-1.5 rounded-xl text-sm font-medium whitespace-nowrap transition bg-slate-100 text-slate-700 hover:bg-slate-200">
-                        <i class="fa-solid fa-car-burst mr-1"></i> รถสไลด์ / รถยก
+                    <button onclick="setCategoryFilter('รถสไลด์ / รถยก')" data-cat="รถสไลด์ / รถยก" class="cat-btn px-3 py-2 rounded-xl text-xs sm:text-sm font-medium transition bg-slate-100 text-slate-700 hover:bg-slate-200 flex items-center justify-center gap-1.5 text-center">
+                        <i class="fa-solid fa-car-burst"></i>
+                        <span>รถสไลด์ / รถยก</span>
                     </button>
-                    <button onclick="setCategoryFilter('อื่นๆ')" data-cat="อื่นๆ" class="cat-btn px-3.5 py-1.5 rounded-xl text-sm font-medium whitespace-nowrap transition bg-slate-100 text-slate-700 hover:bg-slate-200">
-                        อื่นๆ
+                    <button onclick="setCategoryFilter('รถเช่าขับเอง/พร้อมคนขับ')" data-cat="รถเช่าขับเอง/พร้อมคนขับ" class="cat-btn px-3 py-2 rounded-xl text-xs sm:text-sm font-medium transition bg-slate-100 text-slate-700 hover:bg-slate-200 flex items-center justify-center gap-1.5 text-center">
+                        <i class="fa-solid fa-car"></i>
+                        <span>รถเช่าพร้อมคนขับ</span>
+                    </button>
+                    <button onclick="setCategoryFilter('รถเหมานำเที่ยว/ต่างจังหวัด')" data-cat="รถเหมานำเที่ยว/ต่างจังหวัด" class="cat-btn px-3 py-2 rounded-xl text-xs sm:text-sm font-medium transition bg-slate-100 text-slate-700 hover:bg-slate-200 flex items-center justify-center gap-1.5 text-center">
+                        <i class="fa-solid fa-route"></i>
+                        <span>รถเหมานำเที่ยว</span>
+                    </button>
+                    <button onclick="setCategoryFilter('อื่นๆ')" data-cat="อื่นๆ" class="cat-btn px-3 py-2 rounded-xl text-xs sm:text-sm font-medium transition bg-slate-100 text-slate-700 hover:bg-slate-200 flex items-center justify-center gap-1.5 text-center">
+                        <i class="fa-solid fa-ellipsis"></i>
+                        <span>อื่นๆ</span>
                     </button>
                 </div>
 
                 <!-- Status Filter & Search -->
-                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+                <div class="flex flex-col sm:flex-row xl:flex-col items-stretch gap-2.5 flex-shrink-0">
                     <select id="status-filter" onchange="renderThreads()" class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
                         <option value="ALL">สถานะ: ทั้งหมด</option>
                         <option value="OPEN">🟢 เปิดรับข้อเสนอราคา</option>
@@ -164,7 +178,7 @@
 
                     <div class="relative">
                         <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
-                        <input type="text" id="search-input" oninput="renderThreads()" placeholder="ค้นหาเส้นทาง, สินค้า, จังหวัด..." class="w-full sm:w-56 pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <input type="text" id="search-input" oninput="renderThreads()" placeholder="ค้นหาเส้นทาง, สินค้า, จังหวัด..." class="w-full xl:w-56 pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
                 </div>
             </div>
@@ -323,10 +337,12 @@
                     <div>
                         <label class="block text-sm font-semibold text-slate-700 mb-1">ประเภทรถที่ต้องการ <span class="text-red-500">*</span></label>
                         <select id="post-category" required class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <option value="รถกระบะรับจ้าง">รถกระบะรับจ้าง</option>
+                            <option value="รถกระบะรับจ้าง">รถกระบะรับจ้าง/ขนของ</option>
                             <option value="รถบรรทุก 6-10 ล้อ">รถบรรทุก 6-10 ล้อ</option>
                             <option value="รถตู้ VIP">รถตู้ VIP</option>
                             <option value="รถสไลด์ / รถยก">รถสไลด์ / รถยก</option>
+                            <option value="รถเช่าขับเอง/พร้อมคนขับ">รถเช่าพร้อมคนขับ</option>
+                            <option value="รถเหมานำเที่ยว/ต่างจังหวัด">รถเหมานำเที่ยว</option>
                             <option value="อื่นๆ">อื่นๆ</option>
                         </select>
                     </div>
@@ -995,10 +1011,10 @@
             document.querySelectorAll('.cat-btn').forEach(btn => {
                 if (btn.dataset.cat === cat) {
                     btn.classList.remove('bg-slate-100', 'text-slate-700', 'hover:bg-slate-200');
-                    btn.classList.add('bg-blue-600', 'text-white');
+                    btn.classList.add('bg-blue-600', 'text-white', 'shadow-sm');
                 } else {
                     btn.classList.add('bg-slate-100', 'text-slate-700', 'hover:bg-slate-200');
-                    btn.classList.remove('bg-blue-600', 'text-white');
+                    btn.classList.remove('bg-blue-600', 'text-white', 'shadow-sm');
                 }
             });
             renderThreads();
