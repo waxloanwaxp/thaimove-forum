@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ThaiMove Forum - เว็บฟอรัมประกาศหาและเสนอราคาบริการยานพาหนะ</title>
+    <title>ThaiMove Forum - บอร์ดรวมใจ คนหารถ & เสนอราคาบริการยานพาหนะแบบเรียลไทม์</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts: Prompt for clean, modern Thai typography -->
+    <!-- Google Fonts: Prompt & Sarabun -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script>
@@ -17,17 +17,7 @@
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['Prompt', 'sans-serif'],
-                    },
-                    colors: {
-                        brand: {
-                            50: '#eff6ff',
-                            100: '#dbeafe',
-                            500: '#3b82f6',
-                            600: '#2563eb',
-                            700: '#1d4ed8',
-                            900: '#1e3a8a',
-                        }
+                        sans: ['Prompt', 'Sarabun', 'sans-serif'],
                     }
                 }
             }
@@ -36,18 +26,44 @@
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
 
+    <!-- ==================== FIREBASE REAL-TIME & DEMO SWITCHER BAR ==================== -->
+    <div id="firebase-status-bar" class="bg-slate-900 text-slate-200 text-xs py-2 px-4 border-b border-slate-800">
+        <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-2">
+            <div id="firebase-status-indicator" class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse"></span>
+                <span>โหมดทดสอบออฟไลน์ (Demo Mode) — ใส่ Firebase Config เพื่อซิงค์ข้อมูลเรียลไทม์ทุกเครื่อง</span>
+            </div>
+            <div class="flex flex-wrap items-center gap-1.5">
+                <div id="demo-quick-buttons" class="flex flex-wrap items-center gap-1.5">
+                    <button onclick="quickLogin('user_demo_1')" class="px-2.5 py-1 rounded-lg bg-sky-600 hover:bg-sky-500 text-white font-medium transition flex items-center gap-1">
+                        <i class="fa-solid fa-user"></i> ทดสอบ: คุณสมชาย (ผู้ใช้งาน)
+                    </button>
+                    <button onclick="quickLogin('provider_demo_1')" class="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-medium transition flex items-center gap-1">
+                        <i class="fa-solid fa-truck"></i> ทดสอบ: หจก. ขนส่งด่วนใจ
+                    </button>
+                    <button onclick="quickLogin('provider_demo_2')" class="px-2.5 py-1 rounded-lg bg-teal-600 hover:bg-teal-500 text-white font-medium transition flex items-center gap-1">
+                        <i class="fa-solid fa-van-shuttle"></i> ทดสอบ: พี่เอก รถตู้ VIP
+                    </button>
+                </div>
+                <button onclick="openModal('firebase-config-modal')" class="px-3 py-1 rounded-lg bg-amber-400 hover:bg-amber-300 text-slate-900 font-bold transition flex items-center gap-1.5 shadow-sm">
+                    <i class="fa-solid fa-fire text-orange-600"></i> ตั้งค่า Firebase Config
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- ==================== NAVBAR ==================== -->
     <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
-                <!-- Logo -->
+                <!-- Brand Logo -->
                 <div class="flex items-center gap-3 cursor-pointer" onclick="resetFilters()">
                     <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl flex items-center justify-center text-white shadow-md">
                         <i class="fa-solid fa-truck-fast text-lg"></i>
                     </div>
                     <div>
-                        <span class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-700 to-indigo-700">ThaiMove</span>
-                        <span class="hidden sm:inline-block text-xs font-medium bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full ml-1 border border-blue-200">ฟอรัมบริการยานพาหนะ</span>
+                        <span class="text-lg sm:text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-700 to-indigo-700">ThaiMove Forum</span>
+                        <span class="hidden md:inline-block text-xs font-medium bg-blue-50 text-blue-700 px-2.5 py-0.5 rounded-full ml-1.5 border border-blue-200">บอร์ดรวมใจ คนหารถ</span>
                     </div>
                 </div>
 
@@ -57,42 +73,18 @@
                 </div>
             </div>
         </div>
-
-        <!-- Quick Demo Switcher Bar (For easy testing of both roles) -->
-        <div class="bg-slate-900 text-slate-200 text-xs py-1.5 px-4">
-            <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-2">
-                <div class="flex items-center gap-1.5">
-                    <i class="fa-solid fa-flask text-amber-400"></i>
-                    <span>โหมดทดสอบด่วน (สลับบัญชีทันที):</span>
-                </div>
-                <div class="flex flex-wrap items-center gap-2">
-                    <button onclick="quickLogin('user_demo_1')" class="px-2.5 py-0.5 rounded bg-sky-600 hover:bg-sky-500 text-white font-medium transition flex items-center gap-1">
-                        <i class="fa-solid fa-user"></i> คุณสมชาย (ผู้ใช้งานทั่วไป)
-                    </button>
-                    <button onclick="quickLogin('provider_demo_1')" class="px-2.5 py-0.5 rounded bg-emerald-600 hover:bg-emerald-500 text-white font-medium transition flex items-center gap-1">
-                        <i class="fa-solid fa-truck"></i> หจก. ขนส่งด่วนใจ (ผู้ให้บริการ)
-                    </button>
-                    <button onclick="quickLogin('provider_demo_2')" class="px-2.5 py-0.5 rounded bg-teal-600 hover:bg-teal-500 text-white font-medium transition flex items-center gap-1">
-                        <i class="fa-solid fa-van-shuttle"></i> พี่เอก รถตู้ VIP (ผู้ให้บริการ)
-                    </button>
-                    <button onclick="resetDemoData()" title="รีเซ็ตข้อมูลตัวอย่างทั้งหมด" class="px-2 py-0.5 rounded bg-slate-700 hover:bg-slate-600 text-slate-300 transition">
-                        <i class="fa-solid fa-rotate-right"></i> รีเซ็ตข้อมูล
-                    </button>
-                </div>
-            </div>
-        </div>
     </header>
 
-    <!-- ==================== HERO & ACTION BAR ==================== -->
-    <section class="bg-gradient-to-r from-blue-700 via-blue-800 to-indigo-900 text-white py-8 sm:py-10">
+    <!-- ==================== HERO BANNER ==================== -->
+    <section class="bg-gradient-to-r from-blue-700 via-blue-800 to-indigo-900 text-white py-7 sm:py-9">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-5">
                 <div class="max-w-2xl">
                     <h1 class="text-2xl sm:text-3xl font-bold tracking-tight mb-2">
-                        ศูนย์กลางประกาศหาบริการยานพาหนะ &amp; เสนอราคาตรง
+                        บอร์ดรวมใจ คนหารถ &amp; เสนอราคาบริการยานพาหนะ
                     </h1>
                     <p class="text-blue-100 text-sm sm:text-base leading-relaxed">
-                        โพสต์รายละเอียดงานขนส่ง ย้ายของ เหมารถ พร้อมแนบรูปภาพหน้างาน ให้ผู้ให้บริการตัวจริงเข้ามาเสนอราคาแข่งขันอย่างโปร่งใส เลือกและยืนยันราคาที่ถูกใจได้ทันที
+                        โพสต์รายละเอียดงานขนส่ง เช่ารถ เหมารถ พร้อมแนบรูปภาพหน้างาน ให้ผู้ให้บริการตัวจริงเข้ามาเสนอราคาแข่งขันอย่างโปร่งใส กดยืนยันราคาที่ถูกใจได้ทันที
                     </p>
                 </div>
                 <div class="flex-shrink-0">
@@ -107,9 +99,9 @@
 
     <!-- ==================== MAIN CONTENT ==================== -->
     <main class="flex-grow max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-        
+
         <!-- Primary View Navigation Tabs -->
-        <div class="flex flex-wrap items-center gap-2 mb-5 border-b border-slate-200 pb-3" id="main-view-tabs">
+        <div class="flex flex-wrap items-center gap-2 mb-5 border-b border-slate-200 pb-3.5" id="main-view-tabs">
             <button onclick="switchMainView('ALL_THREADS')" id="tab-view-all" class="px-4 py-2.5 rounded-xl text-sm font-bold transition flex items-center gap-2 bg-blue-600 text-white shadow-sm">
                 <i class="fa-solid fa-layer-group"></i>
                 <span>กระดานประกาศบริการทั้งหมด</span>
@@ -118,7 +110,7 @@
 
             <button onclick="switchMainView('MY_BIDS')" id="tab-view-my-bids" class="px-4 py-2.5 rounded-xl text-sm font-bold transition flex items-center gap-2 bg-white text-slate-700 border border-slate-200 hover:bg-slate-50">
                 <i class="fa-solid fa-hand-holding-dollar text-amber-500"></i>
-                <span>กระทู้ที่ฉันไปเสนอราคา</span>
+                <span id="tab-my-bids-label">กระทู้ที่ฉันไปเสนอราคา</span>
                 <span id="badge-my-bids-count" class="px-2 py-0.5 text-xs rounded-full bg-amber-100 text-amber-800">0</span>
             </button>
 
@@ -129,47 +121,47 @@
             </button>
         </div>
 
-        <!-- Filter & Search Controls -->
+        <!-- Filter & Search Controls (2 Rows x 4 Columns Vehicle Category Grid) -->
         <div id="filter-controls-bar" class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 mb-6">
             <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
-                <!-- Category Pills (2-Row Balanced Grid Layout) -->
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2" id="category-filters">
-                    <button onclick="setCategoryFilter('ALL')" data-cat="ALL" class="cat-btn active px-3 py-2 rounded-xl text-xs sm:text-sm font-medium transition bg-blue-600 text-white flex items-center justify-center gap-1.5 text-center shadow-sm">
+                <!-- 8 Vehicle Categories in 2 Rows x 4 Columns -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 flex-grow" id="category-filters">
+                    <button onclick="setCategoryFilter('ALL')" data-cat="ALL" class="cat-btn active px-3 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition bg-blue-600 text-white flex items-center justify-center gap-1.5 text-center shadow-sm">
                         <i class="fa-solid fa-border-all"></i>
                         <span>ทั้งหมด</span>
                     </button>
-                    <button onclick="setCategoryFilter('รถกระบะรับจ้าง')" data-cat="รถกระบะรับจ้าง" class="cat-btn px-3 py-2 rounded-xl text-xs sm:text-sm font-medium transition bg-slate-100 text-slate-700 hover:bg-slate-200 flex items-center justify-center gap-1.5 text-center">
-                        <i class="fa-solid fa-truck-pickup"></i>
-                        <span>รถกระบะรับจ้าง/ขนของ</span>
+                    <button onclick="setCategoryFilter('รถเช่าขับเอง')" data-cat="รถเช่าขับเอง" class="cat-btn px-3 py-2.5 rounded-xl text-xs sm:text-sm font-medium transition bg-slate-100 text-slate-700 hover:bg-slate-200 flex items-center justify-center gap-1.5 text-center">
+                        <i class="fa-solid fa-car"></i>
+                        <span>รถเช่าขับเอง</span>
                     </button>
-                    <button onclick="setCategoryFilter('รถบรรทุก 6-10 ล้อ')" data-cat="รถบรรทุก 6-10 ล้อ" class="cat-btn px-3 py-2 rounded-xl text-xs sm:text-sm font-medium transition bg-slate-100 text-slate-700 hover:bg-slate-200 flex items-center justify-center gap-1.5 text-center">
-                        <i class="fa-solid fa-truck"></i>
-                        <span>รถบรรทุก 6-10 ล้อ</span>
+                    <button onclick="setCategoryFilter('รถเช่าพร้อมคนขับ')" data-cat="รถเช่าพร้อมคนขับ" class="cat-btn px-3 py-2.5 rounded-xl text-xs sm:text-sm font-medium transition bg-slate-100 text-slate-700 hover:bg-slate-200 flex items-center justify-center gap-1.5 text-center">
+                        <i class="fa-solid fa-user-tie"></i>
+                        <span>รถเช่าพร้อมคนขับ</span>
                     </button>
-                    <button onclick="setCategoryFilter('รถตู้ VIP')" data-cat="รถตู้ VIP" class="cat-btn px-3 py-2 rounded-xl text-xs sm:text-sm font-medium transition bg-slate-100 text-slate-700 hover:bg-slate-200 flex items-center justify-center gap-1.5 text-center">
+                    <button onclick="setCategoryFilter('รถตู้ VIP')" data-cat="รถตู้ VIP" class="cat-btn px-3 py-2.5 rounded-xl text-xs sm:text-sm font-medium transition bg-slate-100 text-slate-700 hover:bg-slate-200 flex items-center justify-center gap-1.5 text-center">
                         <i class="fa-solid fa-van-shuttle"></i>
                         <span>รถตู้ VIP</span>
                     </button>
-                    <button onclick="setCategoryFilter('รถสไลด์ / รถยก')" data-cat="รถสไลด์ / รถยก" class="cat-btn px-3 py-2 rounded-xl text-xs sm:text-sm font-medium transition bg-slate-100 text-slate-700 hover:bg-slate-200 flex items-center justify-center gap-1.5 text-center">
-                        <i class="fa-solid fa-car-burst"></i>
-                        <span>รถสไลด์ / รถยก</span>
+                    <button onclick="setCategoryFilter('รถรับจ้างทั่วไป')" data-cat="รถรับจ้างทั่วไป" class="cat-btn px-3 py-2.5 rounded-xl text-xs sm:text-sm font-medium transition bg-slate-100 text-slate-700 hover:bg-slate-200 flex items-center justify-center gap-1.5 text-center">
+                        <i class="fa-solid fa-taxi"></i>
+                        <span>รถรับจ้างทั่วไป</span>
                     </button>
-                    <button onclick="setCategoryFilter('รถเช่าขับเอง/พร้อมคนขับ')" data-cat="รถเช่าขับเอง/พร้อมคนขับ" class="cat-btn px-3 py-2 rounded-xl text-xs sm:text-sm font-medium transition bg-slate-100 text-slate-700 hover:bg-slate-200 flex items-center justify-center gap-1.5 text-center">
-                        <i class="fa-solid fa-car"></i>
-                        <span>รถเช่าพร้อมคนขับ</span>
+                    <button onclick="setCategoryFilter('รถรับส่งนักเรียน')" data-cat="รถรับส่งนักเรียน" class="cat-btn px-3 py-2.5 rounded-xl text-xs sm:text-sm font-medium transition bg-slate-100 text-slate-700 hover:bg-slate-200 flex items-center justify-center gap-1.5 text-center">
+                        <i class="fa-solid fa-school"></i>
+                        <span>รถรับส่งนักเรียน</span>
                     </button>
-                    <button onclick="setCategoryFilter('รถเหมานำเที่ยว/ต่างจังหวัด')" data-cat="รถเหมานำเที่ยว/ต่างจังหวัด" class="cat-btn px-3 py-2 rounded-xl text-xs sm:text-sm font-medium transition bg-slate-100 text-slate-700 hover:bg-slate-200 flex items-center justify-center gap-1.5 text-center">
-                        <i class="fa-solid fa-route"></i>
-                        <span>รถเหมานำเที่ยว</span>
+                    <button onclick="setCategoryFilter('รถกระบะ/รถบรรทุก')" data-cat="รถกระบะ/รถบรรทุก" class="cat-btn px-3 py-2.5 rounded-xl text-xs sm:text-sm font-medium transition bg-slate-100 text-slate-700 hover:bg-slate-200 flex items-center justify-center gap-1.5 text-center">
+                        <i class="fa-solid fa-truck-pickup"></i>
+                        <span>รถกระบะ/รถบรรทุก</span>
                     </button>
-                    <button onclick="setCategoryFilter('อื่นๆ')" data-cat="อื่นๆ" class="cat-btn px-3 py-2 rounded-xl text-xs sm:text-sm font-medium transition bg-slate-100 text-slate-700 hover:bg-slate-200 flex items-center justify-center gap-1.5 text-center">
-                        <i class="fa-solid fa-ellipsis"></i>
-                        <span>อื่นๆ</span>
+                    <button onclick="setCategoryFilter('บริการคนขับรถ')" data-cat="บริการคนขับรถ" class="cat-btn px-3 py-2.5 rounded-xl text-xs sm:text-sm font-medium transition bg-slate-100 text-slate-700 hover:bg-slate-200 flex items-center justify-center gap-1.5 text-center">
+                        <i class="fa-solid fa-id-card"></i>
+                        <span>บริการคนขับรถ</span>
                     </button>
                 </div>
 
                 <!-- Status Filter & Search -->
-                <div class="flex flex-col sm:flex-row xl:flex-col items-stretch gap-2.5 flex-shrink-0">
+                <div class="flex flex-col sm:flex-row xl:flex-col items-stretch gap-2 flex-shrink-0">
                     <select id="status-filter" onchange="renderThreads()" class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
                         <option value="ALL">สถานะ: ทั้งหมด</option>
                         <option value="OPEN">🟢 เปิดรับข้อเสนอราคา</option>
@@ -178,7 +170,7 @@
 
                     <div class="relative">
                         <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
-                        <input type="text" id="search-input" oninput="renderThreads()" placeholder="ค้นหาเส้นทาง, สินค้า, จังหวัด..." class="w-full xl:w-56 pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <input type="text" id="search-input" oninput="renderThreads()" placeholder="ค้นหาเส้นทาง, จังหวัด, งาน..." class="w-full xl:w-56 pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
                 </div>
             </div>
@@ -186,7 +178,7 @@
 
         <!-- Thread Feed Container -->
         <div id="threads-container" class="space-y-5">
-            <!-- Threads will be dynamically rendered here -->
+            <!-- Dynamically rendered -->
         </div>
 
     </main>
@@ -197,18 +189,66 @@
             <div class="flex items-center gap-2">
                 <i class="fa-solid fa-truck-fast text-blue-600"></i>
                 <span class="font-semibold text-slate-700">ThaiMove Forum</span>
-                <span>— ระบบกระดานสนทนาและเสนอราคาบริการยานพาหนะ</span>
+                <span>— บอร์ดรวมใจ คนหารถ &amp; เสนอราคาบริการยานพาหนะ</span>
             </div>
-            <div>ข้อมูลทั้งหมดถูกบันทึกไว้ในเบราว์เซอร์ (LocalStorage) สำหรับการทดสอบระบบ</div>
+            <div>รองรับการทำงานแบบ Real-time ผ่าน Firebase Cloud Firestore, Auth &amp; Storage</div>
         </div>
     </footer>
+
+    <!-- ==================== MODAL 0: FIREBASE CONFIG SETUP ==================== -->
+    <div id="firebase-config-modal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 hidden items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-xl w-full overflow-hidden my-8">
+            <div class="bg-slate-900 text-white px-6 py-4 flex justify-between items-center">
+                <div class="flex items-center gap-2.5">
+                    <i class="fa-solid fa-fire text-amber-400 text-lg"></i>
+                    <h3 class="text-lg font-bold">เชื่อมต่อฐานข้อมูลออนไลน์ (Firebase Config)</h3>
+                </div>
+                <button onclick="closeModal('firebase-config-modal')" class="w-8 h-8 rounded-full hover:bg-slate-700 flex items-center justify-center text-slate-300 transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="p-6 space-y-4">
+                <div class="bg-amber-50 border border-amber-200 rounded-xl p-3.5 text-xs text-amber-900 space-y-1.5">
+                    <p class="font-bold"><i class="fa-solid fa-circle-info mr-1"></i> วิธีนำค่า Config จาก Firebase Console มาเชื่อมต่อ:</p>
+                    <p>1. เข้าไปที่โปรเจกต์ของคุณใน <strong>Firebase Console &gt; Project Settings (รูปฟันเฟือง) &gt; Your apps &gt; Web (&lt;/&gt;)</strong></p>
+                    <p>2. คัดลอกโค้ด <code class="bg-amber-100 px-1 rounded">const firebaseConfig = { ... };</code> มาวางในช่องด้านล่างแล้วกดบันทึก</p>
+                    <p>3. หากต้องการให้ทุกคนที่เปิดเว็บเชื่อมต่ออัตโนมัติ ให้เปิดไฟล์ <code class="bg-amber-100 px-1 rounded">index.html</code> ค้นหา <code class="bg-amber-100 px-1 rounded">DEFAULT_FIREBASE_CONFIG = null</code> แล้ววางค่าแทนที่ <code class="bg-amber-100 px-1 rounded">null</code> ก่อนอัปโหลดขึ้น GitHub</p>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">วางโค้ด firebaseConfig ที่นี่</label>
+                    <textarea id="firebase-config-input" rows="8" placeholder='const firebaseConfig = {
+  apiKey: "AIzaSy...",
+  authDomain: "your-project.firebaseapp.com",
+  projectId: "your-project-id",
+  storageBucket: "your-project.firebasestorage.app",
+  messagingSenderId: "123456789",
+  appId: "1:123456789:web:abcdef"
+};' class="w-full p-3.5 font-mono text-xs bg-slate-900 text-emerald-300 rounded-xl border border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                </div>
+
+                <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-200">
+                    <button type="button" onclick="clearSavedFirebaseConfig()" class="px-4 py-2 rounded-xl border border-rose-200 text-rose-600 hover:bg-rose-50 text-xs font-semibold transition">
+                        ล้างค่า Config (กลับไปโหมดทดสอบ)
+                    </button>
+                    <div class="flex gap-2">
+                        <button type="button" onclick="closeModal('firebase-config-modal')" class="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 text-sm font-medium hover:bg-slate-50 transition">
+                            ปิด
+                        </button>
+                        <button type="button" onclick="saveFirebaseConfigFromModal()" class="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold shadow transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-plug"></i> บันทึกและเชื่อมต่อทันที
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- ==================== MODAL 1: AUTH (LOGIN / REGISTER) ==================== -->
     <div id="auth-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4 overflow-y-auto">
         <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden my-8">
-            <!-- Modal Header -->
             <div class="bg-slate-50 px-6 py-4 border-b border-slate-200 flex justify-between items-center">
-                <h3 class="text-lg font-bold text-slate-800" id="auth-modal-title">เข้าสู่ระบบ / สมัครสมาชิก</h3>
+                <h3 class="text-lg font-bold text-slate-800">เข้าสู่ระบบ / สมัครสมาชิก</h3>
                 <button onclick="closeModal('auth-modal')" class="w-8 h-8 rounded-full hover:bg-slate-200 flex items-center justify-center text-slate-500 transition">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
@@ -227,20 +267,20 @@
             <!-- Login Form -->
             <form id="login-form" onsubmit="handleLogin(event)" class="p-6 space-y-4">
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">ชื่อผู้ใช้งาน หรือ เบอร์โทรศัพท์</label>
-                    <input type="text" id="login-identifier" required placeholder="เช่น somchai หรือ 081-234-5678" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <label class="block text-sm font-medium text-slate-700 mb-1">อีเมล (Email)</label>
+                    <input type="email" id="login-email" required placeholder="เช่น somchai@example.com" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">รหัสผ่าน</label>
-                    <input type="password" id="login-password" required placeholder="••••••••" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <label class="block text-sm font-medium text-slate-700 mb-1">รหัสผ่าน (Password)</label>
+                    <input type="password" id="login-password" required placeholder="อย่างน้อย 6 ตัวอักษร" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
-                <button type="submit" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow transition">
+                <button type="submit" id="login-submit-btn" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow transition">
                     เข้าสู่ระบบ
                 </button>
-                <div class="text-xs text-slate-500 bg-slate-50 p-3 rounded-xl border border-slate-200">
-                    <p class="font-semibold text-slate-700 mb-1">บัญชีทดสอบ (รหัสผ่าน: 1234):</p>
-                    <p>• ผู้ใช้งานทั่วไป: <code class="text-blue-600">somchai</code> (คุณสมชาย)</p>
-                    <p>• ผู้ให้บริการ: <code class="text-emerald-600">fastmove</code> (หจก. ขนส่งด่วนใจ)</p>
+                <div id="demo-login-hint" class="text-xs text-slate-500 bg-slate-50 p-3 rounded-xl border border-slate-200">
+                    <p class="font-semibold text-slate-700 mb-1">บัญชีทดสอบออฟไลน์ (รหัสผ่าน: 123456):</p>
+                    <p>• ผู้ใช้งานทั่วไป: <code class="text-blue-600">somchai@demo.com</code></p>
+                    <p>• ผู้ให้บริการ: <code class="text-emerald-600">fastmove@demo.com</code> หรือ <code class="text-teal-600">akevip@demo.com</code></p>
                 </div>
             </form>
 
@@ -250,7 +290,7 @@
                     <label class="block text-sm font-medium text-slate-700 mb-2">เลือกประเภทบัญชีสมาชิก <span class="text-red-500">*</span></label>
                     <div class="grid grid-cols-2 gap-3">
                         <label class="cursor-pointer">
-                            <input type="radio" name="reg-role" value="customer" checked onchange="toggleProviderFields()" class="peer sr-only">
+                            <input type="radio" name="reg-role" value="CUSTOMER" checked onchange="toggleProviderFields()" class="peer sr-only">
                             <div class="p-3 rounded-xl border-2 border-slate-200 peer-checked:border-blue-600 peer-checked:bg-blue-50 transition text-center">
                                 <i class="fa-solid fa-user text-xl text-blue-600 mb-1"></i>
                                 <div class="text-sm font-bold text-slate-800">ผู้ใช้งานทั่วไป</div>
@@ -258,7 +298,7 @@
                             </div>
                         </label>
                         <label class="cursor-pointer">
-                            <input type="radio" name="reg-role" value="provider" onchange="toggleProviderFields()" class="peer sr-only">
+                            <input type="radio" name="reg-role" value="PROVIDER" onchange="toggleProviderFields()" class="peer sr-only">
                             <div class="p-3 rounded-xl border-2 border-slate-200 peer-checked:border-emerald-600 peer-checked:bg-emerald-50 transition text-center">
                                 <i class="fa-solid fa-truck text-xl text-emerald-600 mb-1"></i>
                                 <div class="text-sm font-bold text-slate-800">ผู้ให้บริการ</div>
@@ -273,10 +313,10 @@
                     <input type="text" id="reg-name" required placeholder="เช่น คุณวิชัย / บจก. สยามขนส่ง" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
 
-                <div class="grid grid-cols-2 gap-3">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">ชื่อผู้ใช้ (Username) <span class="text-red-500">*</span></label>
-                        <input type="text" id="reg-username" required placeholder="ภาษาอังกฤษ" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <label class="block text-sm font-medium text-slate-700 mb-1">อีเมล (Email) <span class="text-red-500">*</span></label>
+                        <input type="email" id="reg-email" required placeholder="name@example.com" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-1">เบอร์โทรศัพท์ติดต่อ <span class="text-red-500">*</span></label>
@@ -289,11 +329,13 @@
                     <div>
                         <label class="block text-sm font-medium text-emerald-900 mb-1">ประเภทยานพาหนะที่ให้บริการหลัก <span class="text-red-500">*</span></label>
                         <select id="reg-vehicle-type" class="w-full px-3 py-2 bg-white border border-emerald-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                            <option value="รถกระบะตู้ทึบ / คอก">รถกระบะตู้ทึบ / คอก</option>
-                            <option value="รถบรรทุก 6 ล้อ / 10 ล้อ">รถบรรทุก 6 ล้อ / 10 ล้อ</option>
-                            <option value="รถตู้ VIP พร้อมคนขับ">รถตู้ VIP พร้อมคนขับ</option>
-                            <option value="รถสไลด์ / รถยก 24 ชม.">รถสไลด์ / รถยก 24 ชม.</option>
-                            <option value="รถเฮี๊ยบ / รถเครน">รถเฮี๊ยบ / รถเครน</option>
+                            <option value="รถเช่าขับเอง">รถเช่าขับเอง</option>
+                            <option value="รถเช่าพร้อมคนขับ">รถเช่าพร้อมคนขับ</option>
+                            <option value="รถตู้ VIP">รถตู้ VIP</option>
+                            <option value="รถรับจ้างทั่วไป">รถรับจ้างทั่วไป</option>
+                            <option value="รถรับส่งนักเรียน">รถรับส่งนักเรียน</option>
+                            <option value="รถกระบะ/รถบรรทุก">รถกระบะ/รถบรรทุก</option>
+                            <option value="บริการคนขับรถ">บริการคนขับรถ</option>
                         </select>
                     </div>
                     <div>
@@ -303,11 +345,11 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">ตั้งรหัสผ่าน <span class="text-red-500">*</span></label>
-                    <input type="password" id="reg-password" required placeholder="อย่างน้อย 4 ตัวอักษร" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <label class="block text-sm font-medium text-slate-700 mb-1">ตั้งรหัสผ่าน (อย่างน้อย 6 ตัวอักษร) <span class="text-red-500">*</span></label>
+                    <input type="password" id="reg-password" minlength="6" required placeholder="••••••" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
 
-                <button type="submit" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow transition">
+                <button type="submit" id="reg-submit-btn" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow transition">
                     สมัครสมาชิกและเข้าสู่ระบบ
                 </button>
             </form>
@@ -330,20 +372,20 @@
             <form onsubmit="handleCreateThread(event)" class="p-6 space-y-4 max-h-[82vh] overflow-y-auto">
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-1">หัวข้อกระทู้ประกาศ <span class="text-red-500">*</span></label>
-                    <input type="text" id="post-title" required placeholder="เช่น ต้องการรถกระบะตู้ทึบ ย้ายหอพักจากลาดพร้าว ไป ศรีราชา" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <input type="text" id="post-title" required placeholder="เช่น ต้องการรถกระบะ/รถบรรทุก ย้ายหอพักจากพิษณุโลก ไป เชียงใหม่" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-semibold text-slate-700 mb-1">ประเภทรถที่ต้องการ <span class="text-red-500">*</span></label>
                         <select id="post-category" required class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <option value="รถกระบะรับจ้าง">รถกระบะรับจ้าง/ขนของ</option>
-                            <option value="รถบรรทุก 6-10 ล้อ">รถบรรทุก 6-10 ล้อ</option>
+                            <option value="รถเช่าขับเอง">รถเช่าขับเอง</option>
+                            <option value="รถเช่าพร้อมคนขับ">รถเช่าพร้อมคนขับ</option>
                             <option value="รถตู้ VIP">รถตู้ VIP</option>
-                            <option value="รถสไลด์ / รถยก">รถสไลด์ / รถยก</option>
-                            <option value="รถเช่าขับเอง/พร้อมคนขับ">รถเช่าพร้อมคนขับ</option>
-                            <option value="รถเหมานำเที่ยว/ต่างจังหวัด">รถเหมานำเที่ยว</option>
-                            <option value="อื่นๆ">อื่นๆ</option>
+                            <option value="รถรับจ้างทั่วไป">รถรับจ้างทั่วไป</option>
+                            <option value="รถรับส่งนักเรียน">รถรับส่งนักเรียน</option>
+                            <option value="รถกระบะ/รถบรรทุก" selected>รถกระบะ/รถบรรทุก</option>
+                            <option value="บริการคนขับรถ">บริการคนขับรถ</option>
                         </select>
                     </div>
                     <div>
@@ -355,12 +397,17 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-50 p-3.5 rounded-xl border border-slate-200">
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1"><i class="fa-solid fa-location-dot text-rose-500 mr-1"></i> ต้นทาง (จุดรับ) <span class="text-red-500">*</span></label>
-                        <input type="text" id="post-origin" required placeholder="เขต/อำเภอ, จังหวัด" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <input type="text" id="post-origin" required placeholder="อำเภอ, จังหวัด" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1"><i class="fa-solid fa-flag-checkered text-emerald-600 mr-1"></i> ปลายทาง (จุดส่ง) <span class="text-red-500">*</span></label>
-                        <input type="text" id="post-destination" required placeholder="เขต/อำเภอ, จังหวัด" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <input type="text" id="post-destination" required placeholder="อำเภอ, จังหวัด" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">เบอร์โทรติดต่อกลับ (แสดงเมื่อยืนยันราคาแล้ว) <span class="text-red-500">*</span></label>
+                    <input type="tel" id="post-phone" required placeholder="08X-XXX-XXXX" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
 
                 <div>
@@ -378,9 +425,9 @@
                             + ใช้รูปภาพตัวอย่างอัตโนมัติ
                         </button>
                     </div>
-                    
+
                     <input type="file" id="post-image-input" accept="image/*" onchange="handleImageUpload(event)" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer">
-                    
+
                     <!-- Image Preview -->
                     <div id="post-image-preview-container" class="hidden mt-3 relative inline-block">
                         <img id="post-image-preview" src="" alt="Preview" class="max-h-44 rounded-xl border border-slate-300 shadow-sm object-cover">
@@ -394,7 +441,7 @@
                     <button type="button" onclick="closeModal('create-thread-modal')" class="px-5 py-2.5 rounded-xl border border-slate-300 text-slate-700 text-sm font-medium hover:bg-slate-50 transition">
                         ยกเลิก
                     </button>
-                    <button type="submit" class="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold shadow-md transition flex items-center gap-2">
+                    <button type="submit" id="create-post-submit-btn" class="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold shadow-md transition flex items-center gap-2">
                         <i class="fa-solid fa-paper-plane"></i> โพสต์ประกาศทันที
                     </button>
                 </div>
@@ -405,7 +452,6 @@
     <!-- ==================== MODAL 3: THREAD DETAIL & BIDDING ==================== -->
     <div id="thread-detail-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden items-center justify-center p-2 sm:p-4 overflow-y-auto">
         <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full overflow-hidden my-4 sm:my-8 flex flex-col max-h-[92vh]">
-            <!-- Modal Sticky Header -->
             <div class="bg-slate-800 text-white px-5 py-3.5 flex justify-between items-center flex-shrink-0">
                 <div class="flex items-center gap-2 text-sm">
                     <span class="bg-blue-500/20 text-blue-200 border border-blue-400/30 px-2.5 py-0.5 rounded-lg font-medium" id="detail-category">หมวดหมู่</span>
@@ -416,9 +462,8 @@
                 </button>
             </div>
 
-            <!-- Scrollable Content -->
             <div id="thread-detail-body" class="p-5 sm:p-6 overflow-y-auto space-y-6 flex-grow">
-                <!-- Dynamically rendered thread details + bidding section -->
+                <!-- Dynamically rendered -->
             </div>
         </div>
     </div>
@@ -455,11 +500,85 @@
         </div>
     </div>
 
-    <!-- ==================== JAVASCRIPT LOGIC ==================== -->
-    <script>
-        // ==========================================
-        // 1. SAMPLE DATA & SVG GENERATORS
-        // ==========================================
+    <!-- ==================== JAVASCRIPT (FIREBASE v10.14.1 REAL-TIME + DEMO ENGINE) ==================== -->
+    <script type="module">
+        // ==========================================================
+        // [จุดตั้งค่าสำคัญ] วางค่า firebaseConfig จาก Firebase Console ที่นี่
+        // ตัวอย่างการใส่ค่า:
+        // const DEFAULT_FIREBASE_CONFIG = {
+        //   apiKey: "AIzaSy...",
+        //   authDomain: "your-project.firebaseapp.com",
+        //   projectId: "your-project-id",
+        //   storageBucket: "your-project.firebasestorage.app",
+        //   messagingSenderId: "123456789",
+        //   appId: "1:123456789:web:abcdef"
+        // };
+        // ==========================================================
+        const DEFAULT_FIREBASE_CONFIG = {
+    apiKey: "AIzaSyBDTU3hDb7OfKw8upnJ-TUWuQXsUYzhGpg",
+    authDomain: "thaimove-forum.firebaseapp.com",
+    projectId: "thaimove-forum",
+    storageBucket: "thaimove-forum.firebasestorage.app",
+    messagingSenderId: "815181452783",
+    appId: "1:815181452783:web:e05b13a4a75fbc0ccfd21a",
+    measurementId: "G-XS20246X05"
+  };
+
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+        import {
+            getAuth,
+            createUserWithEmailAndPassword,
+            signInWithEmailAndPassword,
+            signOut,
+            onAuthStateChanged
+        } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+        import {
+            getFirestore,
+            collection,
+            doc,
+            setDoc,
+            getDoc,
+            addDoc,
+            onSnapshot,
+            query,
+            orderBy,
+            serverTimestamp,
+            runTransaction
+        } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+        import {
+            getStorage,
+            ref as storageRef,
+            uploadBytes,
+            getDownloadURL
+        } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js";
+
+        let isFirebaseReady = false;
+        let firebaseApp = null;
+        let auth = null;
+        let db = null;
+        let storage = null;
+        let unsubscribeThreads = null;
+        let bidListeners = {};
+
+        function getActiveFirebaseConfig() {
+            if (DEFAULT_FIREBASE_CONFIG && DEFAULT_FIREBASE_CONFIG.apiKey) {
+                return DEFAULT_FIREBASE_CONFIG;
+            }
+            try {
+                const saved = localStorage.getItem('tm_firebase_config_v1');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    if (parsed && parsed.apiKey && parsed.projectId) return parsed;
+                }
+            } catch (e) {
+                console.warn('Invalid saved firebase config:', e);
+            }
+            return null;
+        }
+
+        // ==========================================================
+        // 1. DEMO DATA (4 REALISTIC THAI ROUTES + 3 TEST ACCOUNTS)
+        // ==========================================================
         function createIllustrationSVG(bg1, bg2, iconText, title, subtitle) {
             const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="450" viewBox="0 0 800 450">
                 <defs>
@@ -480,219 +599,360 @@
         }
 
         const SAMPLE_IMAGES = {
-            condo: createIllustrationSVG('#1d4ed8', '#3b82f6', '📦🛋️', 'ภาพถ่ายรายการของย้ายคอนโด', 'กล่องลัง 12 ใบ + ตู้เย็น 2 ประตู + ที่นอน 5 ฟุต'),
-            tractor: createIllustrationSVG('#b45309', '#f59e0b', '🚜🛻', 'รถไถคูโบต้า L4018 (น้ำหนัก ~1.3 ตัน)', 'จุดขึ้นรถพื้นเรียบ ถนนลาดยางเข้าถึงสะดวก'),
-            van: createIllustrationSVG('#047857', '#10b981', '🚐⛰️', 'ทริปครอบครัว 8 ท่าน + กระเป๋าเดินทาง', 'เส้นทางกรุงเทพฯ - เขาค้อ จ.เพชรบูรณ์ (3 วัน 2 คืน)')
+            condo: createIllustrationSVG('#1d4ed8', '#3b82f6', '📦🛋️', 'ย้ายหอพัก & เครื่องใช้ไฟฟ้า', 'ตู้เย็น 2 ประตู + ที่นอน 5 ฟุต + กล่องลัง 10 ใบ'),
+            van: createIllustrationSVG('#047857', '#10b981', '🚐⛰️', 'ทริปครอบครัว 9 ท่าน + สัมภาระ', 'เส้นทางพิษณุโลก - เขาค้อ - ภูทับเบิก (2 วัน 1 คืน)'),
+            truck: createIllustrationSVG('#b45309', '#f59e0b', '🚛📦', 'ขนย้ายสินค้าการเกษตรและอุปกรณ์', 'พาเลทสินค้า 6 ชุด เส้นทางพิษณุโลก - กรุงเทพฯ'),
+            school: createIllustrationSVG('#6d28d9', '#8b5cf6', '🏫🚌', 'รับ-ส่งนักเรียนประจำภาคเรียน', 'โซน ต.ปากโทก - โรงเรียนในตัวเมืองพิษณุโลก')
         };
 
-        const DEFAULT_USERS = [
+        const DEMO_USERS = [
             {
                 id: 'user_demo_1',
-                username: 'somchai',
-                password: '1234',
+                email: 'somchai@demo.com',
+                password: '123456',
                 name: 'คุณสมชาย ใจดี',
-                role: 'customer',
+                role: 'CUSTOMER',
                 phone: '081-234-5678'
             },
             {
-                id: 'user_demo_2',
-                username: 'napa',
-                password: '1234',
-                name: 'คุณนภา รักเดินทาง',
-                role: 'customer',
-                phone: '089-876-5432'
-            },
-            {
                 id: 'provider_demo_1',
-                username: 'fastmove',
-                password: '1234',
-                name: 'หจก. ขนส่งด่วนใจ ทรานสปอร์ต',
-                role: 'provider',
+                email: 'fastmove@demo.com',
+                password: '123456',
+                name: 'หจก. ขนส่งด่วนใจ',
+                role: 'PROVIDER',
                 phone: '086-555-1234',
-                vehicleType: 'รถกระบะตู้ทึบ / รถสไลด์',
+                vehicleType: 'รถกระบะ/รถบรรทุก',
                 bio: 'บริการทั่วไทย มีทีมงานช่วยยกของมืออาชีพ พร้อมประกันสินค้า'
             },
             {
                 id: 'provider_demo_2',
-                username: 'akevip',
-                password: '1234',
-                name: 'พี่เอก รถตู้ VIP & ขนส่ง',
-                role: 'provider',
-                phone: '092-444-8899',
-                vehicleType: 'รถตู้ VIP 10 ที่นั่ง / กระบะคอก',
-                bio: 'รถใหม่สะอาด แอร์เย็นฉ่ำ คนขับสุภาพ ชำนาญเส้นทางภาคเหนือ-อีสาน'
+                email: 'akevip@demo.com',
+                password: '123456',
+                name: 'พี่เอก รถตู้ VIP',
+                role: 'PROVIDER',
+                phone: '089-888-9999',
+                vehicleType: 'รถตู้ VIP',
+                bio: 'รถตู้ Commuter หลังคาสูง เบาะ VIP 9-10 ที่นั่ง ชำนาญเส้นทางภาคเหนือ'
             }
         ];
 
-        const DEFAULT_THREADS = [
+        const DEMO_THREADS = [
             {
-                id: 'thread_101',
+                id: 'demo_thread_1',
                 authorId: 'user_demo_1',
                 authorName: 'คุณสมชาย ใจดี',
                 authorPhone: '081-234-5678',
-                title: 'ต้องการรถกระบะตู้ทึบ ย้ายของคอนโดจากบางนา ไป อมตะนคร ชลบุรี (ขอคนช่วยยก 1 คน)',
-                category: 'รถกระบะรับจ้าง',
-                origin: 'เขตบางนา, กรุงเทพฯ',
-                destination: 'อ.เมือง (อมตะนคร), จ.ชลบุรี',
-                serviceDateTime: 'วันอาทิตย์ที่ 29 พ.ย. 2569 เวลา 08:30 น.',
-                description: 'ย้ายของออกจากคอนโดชั้น 4 (มีลิฟต์ขนของ) รายการหลักๆ มีตู้เย็น 7.4 คิว, เครื่องซักผ้าฝาหน้า, ที่นอน 5 ฟุต, โต๊ะทำงาน 1 ตัว และกล่องลังประมาณ 12 กล่อง ต้องการรถกระบะตู้ทึบกันฝน พร้อมคนขับช่วยยกของขึ้น-ลงครับ',
+                title: 'ต้องการรถกระบะตู้ทึบ ย้ายหอพักจาก ม.นเรศวร พิษณุโลก ไป จ.เชียงใหม่',
+                category: 'รถกระบะ/รถบรรทุก',
+                origin: 'ต.ท่าโพธิ์ อ.เมือง จ.พิษณุโลก',
+                destination: 'อ.เมือง จ.เชียงใหม่',
+                serviceDateTime: 'วันเสาร์ที่ 28 พ.ย. 2569 เวลา 08:00 น.',
+                description: 'ย้ายของออกจากหอพักชั้น 2 มีตู้เย็น 6 คิว เครื่องซักผ้าฝาบน ที่นอน 5 ฟุต และกล่องลังเสื้อผ้า 10 กล่อง ต้องการรถกระบะตู้ทึบกันฝน พร้อมคนช่วยยก 1-2 คนครับ',
                 image: SAMPLE_IMAGES.condo,
-                createdAt: '21 พ.ย. 2569 • 14:20 น.',
+                createdAt: '23 พ.ย. 2569 • 08:10 น.',
+                createdAtMs: Date.now() - 1800000,
                 status: 'OPEN',
                 acceptedBidId: null,
                 bids: [
                     {
-                        id: 'bid_201',
+                        id: 'demo_bid_101',
                         providerId: 'provider_demo_1',
-                        providerName: 'หจก. ขนส่งด่วนใจ ทรานสปอร์ต',
+                        providerName: 'หจก. ขนส่งด่วนใจ',
                         providerPhone: '086-555-1234',
                         vehicleInfo: 'รถกระบะตู้ทึบสูง 2.10 ม. + พนักงานช่วยยก 2 คน',
-                        price: 1800,
-                        note: 'ราคารวมทางด่วนและพนักงานช่วยยกขึ้น-ลงถึงห้องเรียบร้อยครับ มีผ้าใบคลุมกันรอยและสายรัดอย่างดี พร้อมเข้าหน้างานตรงเวลา 08:15 น.',
-                        createdAt: '21 พ.ย. 2569 • 15:05 น.'
-                    },
-                    {
-                        id: 'bid_202',
-                        providerId: 'provider_demo_2',
-                        providerName: 'พี่เอก รถตู้ VIP & ขนส่ง',
-                        providerPhone: '092-444-8899',
-                        vehicleInfo: 'รถกระบะคอกสูงผ้าใบปิดมิดชิด + คนขับช่วยยก',
-                        price: 1550,
-                        note: 'วิ่งเส้นบางนา-ตราด ยิงตรงถึงอมตะนครครับ พี่คนขับช่วยยกให้เต็มที่ (หากหน้างานมีคนช่วยอีก 1 แรงจะไวมากครับ) ไม่บวกเพิ่มหน้างาน',
-                        createdAt: '21 พ.ย. 2569 • 16:40 น.'
+                        price: 3800,
+                        note: 'ราคารวมค่าน้ำมันและพนักงานช่วยยกขึ้น-ลงถึงห้องเรียบร้อยครับ มีผ้าใบและสายรัดกันกระแทกอย่างดี',
+                        createdAt: '23 พ.ย. 2569 • 08:20 น.',
+                        createdAtMs: Date.now() - 900000
                     }
                 ]
             },
             {
-                id: 'thread_102',
+                id: 'demo_thread_2',
                 authorId: 'user_demo_1',
                 authorName: 'คุณสมชาย ใจดี',
                 authorPhone: '081-234-5678',
-                title: 'หารถสไลด์ออน ขนย้ายรถไถคูโบต้า L4018 จาก อ.เมืองพิษณุโลก ไป อ.วังทอง',
-                category: 'รถสไลด์ / รถยก',
-                origin: 'ต.ปากโทก อ.เมือง, จ.พิษณุโลก',
-                destination: 'ต.แก่งโสภา อ.วังทอง, จ.พิษณุโลก',
-                serviceDateTime: 'วันจันทร์ที่ 30 พ.ย. 2569 เวลา 10:00 น.',
-                description: 'ต้องการรถสไลด์ถาดกองพื้น เพื่อเคลื่อนย้ายรถไถขนาดกลาง (ไม่มีผานหลัง) ระยะทางประมาณ 45 กิโลเมตร ถนนลาดยางตลอดสาย รถสไลด์เข้าเทียบขึ้นได้ง่ายครับ',
-                image: SAMPLE_IMAGES.tractor,
-                createdAt: '20 พ.ย. 2569 • 09:15 น.',
+                title: 'เหมารถตู้ VIP 10 ที่นั่ง พร้อมคนขับ พิษณุโลก - เขาค้อ - ภูทับเบิก 2 วัน 1 คืน',
+                category: 'รถตู้ VIP',
+                origin: 'ต.ปากโทก อ.เมือง จ.พิษณุโลก',
+                destination: 'เขาค้อ - ภูทับเบิก จ.เพชรบูรณ์',
+                serviceDateTime: 'วันที่ 5 - 6 ธ.ค. 2569 (รับเวลา 06:00 น.)',
+                description: 'ผู้ใหญ่ 7 ท่าน เด็ก 2 ท่าน ต้องการรถตู้หลังคาสูง เบาะใหญ่ VIP มีแอร์เย็นฉ่ำ เครื่องเสียงคาราโอเกะ ขอคนขับชำนาญเส้นทางขึ้นภูทับเบิกครับ',
+                image: SAMPLE_IMAGES.van,
+                createdAt: '22 พ.ย. 2569 • 19:30 น.',
+                createdAtMs: Date.now() - 45000000,
                 status: 'OPEN',
                 acceptedBidId: null,
                 bids: [
                     {
-                        id: 'bid_203',
-                        providerId: 'provider_demo_1',
-                        providerName: 'หจก. ขนส่งด่วนใจ ทรานสปอร์ต',
-                        providerPhone: '086-555-1234',
-                        vehicleInfo: 'รถสไลด์ 6 ล้อ ถาดกองพื้นเต็มบาน รับน้ำหนักได้ 5 ตัน',
-                        price: 2500,
-                        note: 'รถสแตนด์บายอยู่ในตัวเมืองพิษณุโลกครับ รัดโซ่สเตย์ 4 จุดแน่นหนา ปลอดภัยแน่นอน ราคานี้รวมค่าน้ำมันไป-กลับแล้วครับ',
-                        createdAt: '20 พ.ย. 2569 • 10:30 น.'
+                        id: 'demo_bid_201',
+                        providerId: 'provider_demo_2',
+                        providerName: 'พี่เอก รถตู้ VIP',
+                        providerPhone: '089-888-9999',
+                        vehicleInfo: 'Toyota Commuter VIP 9 ที่นั่ง เบาะใหญ่ นั่งสบาย',
+                        price: 4200,
+                        note: 'วันละ 2,100 บาท x 2 วัน = 4,200 บาท (ไม่รวมน้ำมัน) คนขับไม่สูบบุหรี่ ชำนาญทางเขาค้อ-ภูทับเบิกครับ',
+                        createdAt: '22 พ.ย. 2569 • 20:05 น.',
+                        createdAtMs: Date.now() - 40000000
                     }
                 ]
             },
             {
-                id: 'thread_103',
-                authorId: 'user_demo_2',
-                authorName: 'คุณนภา รักเดินทาง',
-                authorPhone: '089-876-5432',
-                title: 'เช่ารถตู้ VIP 10 ที่นั่ง พร้อมคนขับ ทริปครอบครัวไปเขาค้อ-ภูทับเบิก 3 วัน 2 คืน',
-                category: 'รถตู้ VIP',
-                origin: 'ดอนเมือง, กรุงเทพฯ',
-                destination: 'เขาค้อ - ภูทับเบิก, จ.เพชรบูรณ์',
-                serviceDateTime: 'วันที่ 5 - 7 ธ.ค. 2569 (ออกเดินทาง 05:30 น.)',
-                description: 'ผู้ใหญ่ 6 ท่าน เด็ก 2 ท่าน อยากได้รถตู้ Commuter หลังคาสูง เบาะใหญ่ VIP มีทีวี คาราโอเกะ ช่องชาร์จ USB ทุกที่นั่ง ขอคนขับที่ชำนาญทางขึ้นเขาภูทับเบิกและไม่สูบบุหรี่ครับ',
-                image: SAMPLE_IMAGES.van,
-                createdAt: '19 พ.ย. 2569 • 18:00 น.',
+                id: 'demo_thread_3',
+                authorId: 'user_demo_1',
+                authorName: 'คุณสมชาย ใจดี',
+                authorPhone: '081-234-5678',
+                title: 'เหมารถบรรทุก 6 ล้อ ขนส่งสินค้าอุปโภคจาก พิษณุโลก ไป คลังสินค้าบางนา กทม.',
+                category: 'รถกระบะ/รถบรรทุก',
+                origin: 'อ.เมือง จ.พิษณุโลก',
+                destination: 'เขตบางนา กรุงเทพฯ',
+                serviceDateTime: 'วันจันทร์ที่ 30 พ.ย. 2569 เวลา 07:00 น.',
+                description: 'ขนส่งสินค้าบรรจุกล่องบนพาเลท 6 พาเลท น้ำหนักรวมประมาณ 2.5 ตัน มีรถโฟล์คลิฟท์ยกขึ้น-ลงที่ต้นทางและปลายทาง',
+                image: SAMPLE_IMAGES.truck,
+                createdAt: '21 พ.ย. 2569 • 14:00 น.',
+                createdAtMs: Date.now() - 120000000,
                 status: 'CONFIRMED',
-                acceptedBidId: 'bid_204',
+                acceptedBidId: 'demo_bid_301',
                 bids: [
                     {
-                        id: 'bid_204',
+                        id: 'demo_bid_301',
+                        providerId: 'provider_demo_1',
+                        providerName: 'หจก. ขนส่งด่วนใจ',
+                        providerPhone: '086-555-1234',
+                        vehicleInfo: 'รถบรรทุก 6 ล้อตู้ทึบยาว 6.5 เมตร ประกันสินค้า 200,000 บาท',
+                        price: 6500,
+                        note: 'พร้อมเข้าหน้างานตรงเวลา 06:45 น. วิ่งตรงถึงบางนาภายในวันเดียวครับ',
+                        createdAt: '21 พ.ย. 2569 • 14:40 น.',
+                        createdAtMs: Date.now() - 115000000
+                    }
+                ]
+            },
+            {
+                id: 'demo_thread_4',
+                authorId: 'user_demo_1',
+                authorName: 'คุณสมชาย ใจดี',
+                authorPhone: '081-234-5678',
+                title: 'หารถตู้รับ-ส่งนักเรียนรายเดือน โซน ต.ปากโทก - โรงเรียนในตัวเมืองพิษณุโลก',
+                category: 'รถรับส่งนักเรียน',
+                origin: 'ต.ปากโทก อ.เมือง จ.พิษณุโลก',
+                destination: 'โรงเรียนเฉลิมขวัญสตรี / พิษณุโลกพิทยาคม',
+                serviceDateTime: 'ทุกวันจันทร์ - ศุกร์ (รับเช้า 06:45 น. / ส่งเย็น 16:30 น.)',
+                description: 'ต้องการรถตู้รับ-ส่งนักเรียนจำนวน 3 คน (บ้านใกล้กัน) ขอรถสภาพดี แอร์เย็น มีประกันภัยชั้น 1 และคนขับใจเย็นครับ',
+                image: SAMPLE_IMAGES.school,
+                createdAt: '20 พ.ย. 2569 • 16:20 น.',
+                createdAtMs: Date.now() - 200000000,
+                status: 'CONFIRMED',
+                acceptedBidId: 'demo_bid_401',
+                bids: [
+                    {
+                        id: 'demo_bid_401',
                         providerId: 'provider_demo_2',
-                        providerName: 'พี่เอก รถตู้ VIP & ขนส่ง',
-                        providerPhone: '092-444-8899',
-                        vehicleInfo: 'Toyota Commuter All-New VIP 9 ที่นั่ง เบาะนวดไฟฟ้า',
-                        price: 6000,
-                        note: 'วันละ 2,000 บาท x 3 วัน = 6,000 บาท (ไม่รวมน้ำมัน) คนขับไม่สูบบุหรี่ ขึ้นภูทับเบิกเป็นประจำครับ บริการน้ำดื่มฟรีตลอดทริป',
-                        createdAt: '19 พ.ย. 2569 • 19:12 น.'
+                        providerName: 'พี่เอก รถตู้ VIP',
+                        providerPhone: '089-888-9999',
+                        vehicleInfo: 'รถตู้ Commuter มีระบบ GPS และกล้องบันทึกหน้า-หลังรถ',
+                        price: 4500,
+                        note: 'เหมาจ่ายรายเดือนสำหรับน้องๆ 3 คน (คนละ 1,500 บาท/เดือน) ส่งถึงหน้าประตูโรงเรียนครับ',
+                        createdAt: '20 พ.ย. 2569 • 17:10 น.',
+                        createdAtMs: Date.now() - 195000000
                     }
                 ]
             }
         ];
 
-        // ==========================================
-        // 2. APPLICATION STATE & STORAGE
-        // ==========================================
-        let users = [];
+        // ==========================================================
+        // 2. APPLICATION STATE
+        // ==========================================================
         let threads = [];
         let currentUser = null;
         let currentMainView = 'ALL_THREADS'; // 'ALL_THREADS' | 'MY_BIDS' | 'MY_CONFIRMED'
         let currentCategory = 'ALL';
         let activeThreadId = null;
+        let selectedImageFile = null;
         let uploadedImageDataUrl = '';
 
-        function saveState() {
-            try {
-                localStorage.setItem('tm_users', JSON.stringify(users));
-                localStorage.setItem('tm_threads', JSON.stringify(threads));
-                if (currentUser) {
-                    localStorage.setItem('tm_current_user', JSON.stringify(currentUser));
-                } else {
-                    localStorage.removeItem('tm_current_user');
-                }
-            } catch (e) {
-                console.error('Failed to save state:', e);
-            }
-        }
+        // ==========================================================
+        // 3. INITIALIZE FIREBASE OR FALLBACK DEMO
+        // ==========================================================
+        async function initApp() {
+            const config = getActiveFirebaseConfig();
+            if (config) {
+                document.getElementById('firebase-config-input').value = JSON.stringify(config, null, 2);
+                try {
+                    firebaseApp = initializeApp(config);
+                    auth = getAuth(firebaseApp);
+                    db = getFirestore(firebaseApp);
+                    storage = getStorage(firebaseApp);
+                    isFirebaseReady = true;
 
-        function initApp() {
-            try {
-                const savedUsers = localStorage.getItem('tm_users');
-                const savedThreads = localStorage.getItem('tm_threads');
-                const savedSession = localStorage.getItem('tm_current_user');
-
-                users = savedUsers ? JSON.parse(savedUsers) : [...DEFAULT_USERS];
-                if (!Array.isArray(users) || users.length === 0) {
-                    users = [...DEFAULT_USERS];
+                    updateFirebaseStatusUI(true, config.projectId);
+                    setupFirebaseAuthListener();
+                    setupFirebaseThreadsListener();
+                    return;
+                } catch (err) {
+                    console.error('Firebase initialization failed:', err);
+                    showToast('เชื่อมต่อ Firebase ไม่สำเร็จ: ' + err.message, 'error');
                 }
-                localStorage.setItem('tm_users', JSON.stringify(users));
-
-                threads = savedThreads ? JSON.parse(savedThreads) : JSON.parse(JSON.stringify(DEFAULT_THREADS));
-                if (!Array.isArray(threads) || threads.length === 0) {
-                    threads = JSON.parse(JSON.stringify(DEFAULT_THREADS));
-                }
-                localStorage.setItem('tm_threads', JSON.stringify(threads));
-
-                if (savedSession) {
-                    const parsed = JSON.parse(savedSession);
-                    currentUser = users.find(u => u && u.id === parsed.id) || null;
-                }
-            } catch (err) {
-                console.error('Storage initialization error, resetting to defaults:', err);
-                users = [...DEFAULT_USERS];
-                threads = JSON.parse(JSON.stringify(DEFAULT_THREADS));
-                currentUser = null;
             }
 
+            // Fallback to Demo Mode if no Firebase Config
+            isFirebaseReady = false;
+            updateFirebaseStatusUI(false);
+            threads = JSON.parse(JSON.stringify(DEMO_THREADS));
             renderNavbar();
             updateMainViewTabsUI();
             renderThreads();
         }
 
-        function resetDemoData() {
-            localStorage.removeItem('tm_users');
-            localStorage.removeItem('tm_threads');
-            localStorage.removeItem('tm_current_user');
-            currentUser = null;
-            currentMainView = 'ALL_THREADS';
-            initApp();
-            showToast('รีเซ็ตข้อมูลตัวอย่างกลับสู่ค่าเริ่มต้นแล้ว', 'info');
+        function updateFirebaseStatusUI(connected, projectId = '') {
+            const indicator = document.getElementById('firebase-status-indicator');
+            const demoBtns = document.getElementById('demo-quick-buttons');
+            const demoHint = document.getElementById('demo-login-hint');
+
+            if (connected) {
+                indicator.innerHTML = `
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+                    <span class="text-emerald-300 font-semibold">เชื่อมต่อ Firebase Real-time แล้ว (Project: ${escapeHTML(projectId)})</span>
+                `;
+                demoBtns.classList.add('hidden');
+                if (demoHint) demoHint.classList.add('hidden');
+            } else {
+                indicator.innerHTML = `
+                    <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+                    <span>โหมดทดสอบออฟไลน์ (Demo Mode) — ใส่ Firebase Config เพื่อซิงค์ข้อมูลเรียลไทม์ทุกเครื่อง</span>
+                `;
+                demoBtns.classList.remove('hidden');
+                if (demoHint) demoHint.classList.remove('hidden');
+            }
         }
 
-        // ==========================================
-        // 3. AUTHENTICATION & NAVBAR
-        // ==========================================
+        function saveFirebaseConfigFromModal() {
+            const raw = document.getElementById('firebase-config-input').value.trim();
+            if (!raw) {
+                showToast('กรุณาวางข้อมูล firebaseConfig ก่อนบันทึก', 'error');
+                return;
+            }
+            try {
+                let cleaned = raw
+                    .replace(/const\s+firebaseConfig\s*=\s*/g, '')
+                    .replace(/var\s+firebaseConfig\s*=\s*/g, '')
+                    .replace(/let\s+firebaseConfig\s*=\s*/g, '')
+                    .replace(/;+\s*$/g, '');
+                cleaned = cleaned.replace(/([{,]\s*)([a-zA-Z0-9_]+)\s*:/g, '$1"$2":');
+                cleaned = cleaned.replace(/,\s*}/g, '}');
+
+                const parsed = JSON.parse(cleaned);
+                if (!parsed.apiKey || !parsed.projectId) {
+                    throw new Error('ไม่พบ apiKey หรือ projectId ใน Config');
+                }
+
+                localStorage.setItem('tm_firebase_config_v1', JSON.stringify(parsed));
+                showToast('บันทึก Firebase Config เรียบร้อย กำลังเชื่อมต่อ...', 'success');
+                setTimeout(() => window.location.reload(), 800);
+            } catch (err) {
+                showToast('รูปแบบ Config ไม่ถูกต้อง: ' + err.message, 'error');
+            }
+        }
+
+        function clearSavedFirebaseConfig() {
+            localStorage.removeItem('tm_firebase_config_v1');
+            showToast('ล้างค่า Firebase Config แล้ว กำลังกลับสู่โหมดทดสอบ...', 'info');
+            setTimeout(() => window.location.reload(), 700);
+        }
+
+        // ==========================================================
+        // 4. FIREBASE REAL-TIME LISTENERS (FIRESTORE)
+        // ==========================================================
+        function setupFirebaseAuthListener() {
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    try {
+                        const userSnap = await getDoc(doc(db, 'users', user.uid));
+                        if (userSnap.exists()) {
+                            currentUser = { id: user.uid, email: user.email, ...userSnap.data() };
+                        } else {
+                            currentUser = {
+                                id: user.uid,
+                                email: user.email,
+                                name: user.email.split('@')[0],
+                                role: 'CUSTOMER',
+                                phone: '-'
+                            };
+                        }
+                    } catch (e) {
+                        console.error('Error fetching user profile:', e);
+                    }
+                } else {
+                    currentUser = null;
+                }
+                renderNavbar();
+                updateMainViewTabsUI();
+                renderThreads();
+                if (activeThreadId && !document.getElementById('thread-detail-modal').classList.contains('hidden')) {
+                    openThreadDetail(activeThreadId);
+                }
+            });
+        }
+
+        function setupFirebaseThreadsListener() {
+            if (unsubscribeThreads) unsubscribeThreads();
+
+            const q = query(collection(db, 'threads'), orderBy('createdAtMs', 'desc'));
+            unsubscribeThreads = onSnapshot(q, (snapshot) => {
+                const updatedThreads = [];
+                snapshot.forEach((docSnap) => {
+                    const data = docSnap.data();
+                    const existing = threads.find(t => t.id === docSnap.id);
+                    updatedThreads.push({
+                        id: docSnap.id,
+                        ...data,
+                        bids: existing ? existing.bids : (data.bids || [])
+                    });
+                    ensureBidSubcollectionListener(docSnap.id);
+                });
+
+                threads = updatedThreads;
+                updateMainViewTabsUI();
+                renderThreads();
+                if (activeThreadId && !document.getElementById('thread-detail-modal').classList.contains('hidden')) {
+                    openThreadDetail(activeThreadId);
+                }
+            }, (error) => {
+                console.error('Firestore threads onSnapshot error:', error);
+                showToast('เกิดข้อผิดพลาดในการซิงค์ข้อมูล: ' + error.message, 'error');
+            });
+        }
+
+        function ensureBidSubcollectionListener(threadId) {
+            if (bidListeners[threadId]) return;
+
+            const bidsQ = query(collection(db, 'threads', threadId, 'bids'), orderBy('createdAtMs', 'asc'));
+            bidListeners[threadId] = onSnapshot(bidsQ, (bidSnap) => {
+                const bidsList = [];
+                bidSnap.forEach((bDoc) => {
+                    bidsList.push({ id: bDoc.id, ...bDoc.data() });
+                });
+
+                const targetThread = threads.find(t => t.id === threadId);
+                if (targetThread) {
+                    targetThread.bids = bidsList;
+                    updateMainViewTabsUI();
+                    renderThreads();
+                    if (activeThreadId === threadId && !document.getElementById('thread-detail-modal').classList.contains('hidden')) {
+                        openThreadDetail(threadId);
+                    }
+                }
+            }, (err) => {
+                console.warn(`Bid listener error for ${threadId}:`, err);
+            });
+        }
+
+        // ==========================================================
+        // 5. AUTHENTICATION & NAVBAR
+        // ==========================================================
+        function isProviderRole(role) {
+            return String(role || '').toUpperCase() === 'PROVIDER';
+        }
+
         function renderNavbar() {
             const navContainer = document.getElementById('nav-auth-section');
             if (!currentUser) {
@@ -707,7 +967,7 @@
                 return;
             }
 
-            const isProvider = currentUser.role === 'provider';
+            const isProvider = isProviderRole(currentUser.role);
             const badgeClass = isProvider
                 ? 'bg-emerald-100 text-emerald-800 border-emerald-200'
                 : 'bg-sky-100 text-sky-800 border-sky-200';
@@ -717,7 +977,7 @@
             navContainer.innerHTML = `
                 <div class="flex items-center gap-2.5 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-xl">
                     <div class="w-8 h-8 rounded-lg ${isProvider ? 'bg-emerald-600' : 'bg-blue-600'} text-white flex items-center justify-center font-bold text-sm">
-                        ${escapeHTML(currentUser.name.charAt(0))}
+                        ${escapeHTML((currentUser.name || 'U').charAt(0))}
                     </div>
                     <div class="text-left">
                         <div class="text-xs sm:text-sm font-bold text-slate-800 leading-tight max-w-[130px] sm:max-w-[200px] truncate">
@@ -766,97 +1026,131 @@
         function toggleProviderFields() {
             const role = document.querySelector('input[name="reg-role"]:checked').value;
             const extraFields = document.getElementById('provider-extra-fields');
-            if (role === 'provider') {
+            if (isProviderRole(role)) {
                 extraFields.classList.remove('hidden');
             } else {
                 extraFields.classList.add('hidden');
             }
         }
 
-        function handleLogin(e) {
+        async function handleLogin(e) {
             e.preventDefault();
-            const identifier = document.getElementById('login-identifier').value.trim().toLowerCase();
+            const email = document.getElementById('login-email').value.trim().toLowerCase();
             const password = document.getElementById('login-password').value;
+            const btn = document.getElementById('login-submit-btn');
 
-            const found = users.find(u =>
-                (u.username.toLowerCase() === identifier || u.phone === identifier) &&
-                u.password === password
-            );
-
-            if (!found) {
-                showToast('ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง', 'error');
+            if (!isFirebaseReady) {
+                const found = DEMO_USERS.find(u => u.email === email && u.password === password);
+                if (!found) {
+                    showToast('โหมดทดสอบ: อีเมลหรือรหัสผ่านไม่ถูกต้อง (ใช้ somchai@demo.com / 123456)', 'error');
+                    return;
+                }
+                currentUser = found;
+                closeModal('auth-modal');
+                renderNavbar();
+                updateMainViewTabsUI();
+                renderThreads();
+                showToast(`เข้าสู่ระบบทดสอบในนาม ${currentUser.name}`, 'success');
                 return;
             }
 
-            currentUser = found;
-            saveState();
-            closeModal('auth-modal');
-            renderNavbar();
-            updateMainViewTabsUI();
-            renderThreads();
-            if (activeThreadId && !document.getElementById('thread-detail-modal').classList.contains('hidden')) {
-                openThreadDetail(activeThreadId);
+            try {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> กำลังเข้าสู่ระบบ...';
+                await signInWithEmailAndPassword(auth, email, password);
+                closeModal('auth-modal');
+                showToast('เข้าสู่ระบบสำเร็จ!', 'success');
+            } catch (err) {
+                console.error(err);
+                showToast('เข้าสู่ระบบไม่สำเร็จ: ' + mapFirebaseAuthError(err.code), 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'เข้าสู่ระบบ';
             }
-            showToast(`ยินดีต้อนรับคุณ ${currentUser.name}`, 'success');
         }
 
         function quickLogin(userId) {
-            const found = users.find(u => u.id === userId);
+            const found = DEMO_USERS.find(u => u.id === userId);
             if (found) {
                 currentUser = found;
-                saveState();
                 renderNavbar();
                 updateMainViewTabsUI();
                 renderThreads();
                 if (activeThreadId && !document.getElementById('thread-detail-modal').classList.contains('hidden')) {
                     openThreadDetail(activeThreadId);
                 }
-                const roleText = found.role === 'provider' ? 'ผู้ให้บริการ' : 'ผู้ใช้งานทั่วไป';
-                showToast(`สลับบัญชีเป็น "${found.name}" (${roleText})`, 'success');
+                const roleText = isProviderRole(found.role) ? 'ผู้ให้บริการ' : 'ผู้ใช้งานทั่วไป';
+                showToast(`สลับบัญชีทดสอบเป็น "${found.name}" (${roleText})`, 'success');
             }
         }
 
-        function handleRegister(e) {
+        async function handleRegister(e) {
             e.preventDefault();
             const role = document.querySelector('input[name="reg-role"]:checked').value;
             const name = document.getElementById('reg-name').value.trim();
-            const username = document.getElementById('reg-username').value.trim().toLowerCase();
+            const email = document.getElementById('reg-email').value.trim().toLowerCase();
             const phone = document.getElementById('reg-phone').value.trim();
             const password = document.getElementById('reg-password').value;
+            const vehicleType = document.getElementById('reg-vehicle-type').value;
+            const bio = document.getElementById('reg-provider-bio').value.trim() || 'บริการรับจ้างขนส่งทั่วไทย';
+            const btn = document.getElementById('reg-submit-btn');
 
-            if (users.some(u => u.username.toLowerCase() === username)) {
-                showToast('ชื่อผู้ใช้ (Username) นี้ถูกใช้งานแล้ว กรุณาเปลี่ยนใหม่', 'error');
+            if (!isFirebaseReady) {
+                const newUser = {
+                    id: 'demo_user_' + Date.now(),
+                    email,
+                    password,
+                    name,
+                    role,
+                    phone,
+                    ...(isProviderRole(role) ? { vehicleType, bio } : {})
+                };
+                DEMO_USERS.push(newUser);
+                currentUser = newUser;
+                closeModal('auth-modal');
+                renderNavbar();
+                updateMainViewTabsUI();
+                renderThreads();
+                showToast(`สมัครสมาชิกโหมดทดสอบสำเร็จ! ยินดีต้อนรับ ${name}`, 'success');
                 return;
             }
 
-            const newUser = {
-                id: 'user_' + Date.now(),
-                username,
-                password,
-                name,
-                role,
-                phone
-            };
+            try {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> กำลังสร้างบัญชี...';
+                const userCred = await createUserWithEmailAndPassword(auth, email, password);
+                const profileData = {
+                    name,
+                    email,
+                    role,
+                    phone,
+                    createdAt: serverTimestamp(),
+                    ...(isProviderRole(role) ? { vehicleType, bio } : {})
+                };
 
-            if (role === 'provider') {
-                newUser.vehicleType = document.getElementById('reg-vehicle-type').value;
-                newUser.bio = document.getElementById('reg-provider-bio').value.trim() || 'บริการรับจ้างขนส่งทั่วไทย';
+                await setDoc(doc(db, 'users', userCred.user.uid), profileData);
+                currentUser = { id: userCred.user.uid, ...profileData };
+
+                closeModal('auth-modal');
+                renderNavbar();
+                updateMainViewTabsUI();
+                renderThreads();
+                showToast(`สมัครสมาชิกสำเร็จ! ยินดีต้อนรับ ${name}`, 'success');
+            } catch (err) {
+                console.error(err);
+                showToast('สมัครสมาชิกไม่สำเร็จ: ' + mapFirebaseAuthError(err.code), 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'สมัครสมาชิกและเข้าสู่ระบบ';
             }
-
-            users.push(newUser);
-            currentUser = newUser;
-            saveState();
-            closeModal('auth-modal');
-            renderNavbar();
-            updateMainViewTabsUI();
-            renderThreads();
-            showToast(`สมัครสมาชิกสำเร็จ! ยินดีต้อนรับ ${name}`, 'success');
         }
 
-        function logout() {
+        async function logout() {
+            if (isFirebaseReady && auth) {
+                await signOut(auth);
+            }
             currentUser = null;
             currentMainView = 'ALL_THREADS';
-            saveState();
             renderNavbar();
             updateMainViewTabsUI();
             renderThreads();
@@ -866,18 +1160,34 @@
             showToast('ออกจากระบบเรียบร้อยแล้ว', 'info');
         }
 
-        // ==========================================
-        // 4. CREATE THREAD & IMAGE UPLOAD
-        // ==========================================
+        function mapFirebaseAuthError(code) {
+            switch (code) {
+                case 'auth/email-already-in-use': return 'อีเมลนี้ถูกใช้งานแล้ว';
+                case 'auth/invalid-email': return 'รูปแบบอีเมลไม่ถูกต้อง';
+                case 'auth/weak-password': return 'รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร';
+                case 'auth/user-not-found':
+                case 'auth/wrong-password':
+                case 'auth/invalid-credential': return 'อีเมลหรือรหัสผ่านไม่ถูกต้อง';
+                default: return code || 'เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ';
+            }
+        }
+
+        // ==========================================================
+        // 6. CREATE THREAD & FIREBASE STORAGE / COMPRESSED FALLBACK
+        // ==========================================================
         function handleCreatePostClick() {
             if (!currentUser) {
                 showToast('กรุณาเข้าสู่ระบบหรือสมัครสมาชิกก่อนตั้งกระทู้', 'info');
                 openAuthModal('login');
                 return;
             }
-            if (currentUser.role !== 'customer') {
+            if (isProviderRole(currentUser.role)) {
                 showToast('บัญชี "ผู้ให้บริการ" สำหรับเสนอราคาเท่านั้น หากต้องการหาบริการกรุณาใช้บัญชี "ผู้ใช้งานทั่วไป"', 'error');
                 return;
+            }
+            const phoneInput = document.getElementById('post-phone');
+            if (phoneInput && currentUser.phone && currentUser.phone !== '-') {
+                phoneInput.value = currentUser.phone;
             }
             openModal('create-thread-modal');
         }
@@ -885,6 +1195,7 @@
         function handleImageUpload(e) {
             const file = e.target.files[0];
             if (!file) return;
+            selectedImageFile = file;
 
             const reader = new FileReader();
             reader.onload = function(event) {
@@ -896,6 +1207,7 @@
         }
 
         function useSamplePostImage() {
+            selectedImageFile = null;
             const samples = Object.values(SAMPLE_IMAGES);
             uploadedImageDataUrl = samples[Math.floor(Math.random() * samples.length)];
             document.getElementById('post-image-preview').src = uploadedImageDataUrl;
@@ -904,48 +1216,111 @@
         }
 
         function clearPostImage() {
+            selectedImageFile = null;
             uploadedImageDataUrl = '';
             document.getElementById('post-image-input').value = '';
             document.getElementById('post-image-preview').src = '';
             document.getElementById('post-image-preview-container').classList.add('hidden');
         }
 
-        function handleCreateThread(e) {
-            e.preventDefault();
-            if (!currentUser || currentUser.role !== 'customer') return;
-
-            const newThread = {
-                id: 'thread_' + Date.now(),
-                authorId: currentUser.id,
-                authorName: currentUser.name,
-                authorPhone: currentUser.phone,
-                title: document.getElementById('post-title').value.trim(),
-                category: document.getElementById('post-category').value,
-                origin: document.getElementById('post-origin').value.trim(),
-                destination: document.getElementById('post-destination').value.trim(),
-                serviceDateTime: document.getElementById('post-datetime').value.trim(),
-                description: document.getElementById('post-description').value.trim(),
-                image: uploadedImageDataUrl || '',
-                createdAt: getCurrentThaiDateTime(),
-                status: 'OPEN',
-                acceptedBidId: null,
-                bids: []
-            };
-
-            threads.unshift(newThread);
-            saveState();
-            e.target.reset();
-            clearPostImage();
-            closeModal('create-thread-modal');
-            currentMainView = 'ALL_THREADS';
-            updateMainViewTabsUI();
-            renderThreads();
-            showToast('โพสต์กระทู้หาบริการเรียบร้อยแล้ว!', 'success');
+        function compressImageToDataURL(file, maxWidth = 800, quality = 0.7) {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        let width = img.width;
+                        let height = img.height;
+                        if (width > maxWidth) {
+                            height = Math.round((height * maxWidth) / width);
+                            width = maxWidth;
+                        }
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        resolve(canvas.toDataURL('image/jpeg', quality));
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
         }
 
-        // ==========================================
-        // 5. THREAD FEED RENDERING & FILTERING
-        // ==========================================
+        async function handleCreateThread(e) {
+            e.preventDefault();
+            if (!currentUser || isProviderRole(currentUser.role)) return;
+
+            const submitBtn = document.getElementById('create-post-submit-btn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> กำลังบันทึกประกาศ...';
+
+            try {
+                let finalImageUrl = uploadedImageDataUrl || '';
+
+                if (isFirebaseReady && selectedImageFile) {
+                    try {
+                        const filePath = `threads/${currentUser.id}/${Date.now()}_${selectedImageFile.name}`;
+                        const fileRef = storageRef(storage, filePath);
+                        await uploadBytes(fileRef, selectedImageFile);
+                        finalImageUrl = await getDownloadURL(fileRef);
+                    } catch (storageErr) {
+                        console.warn('Firebase Storage upload failed, using compressed image fallback:', storageErr);
+                        finalImageUrl = await compressImageToDataURL(selectedImageFile, 800, 0.65);
+                    }
+                } else if (selectedImageFile) {
+                    finalImageUrl = await compressImageToDataURL(selectedImageFile, 800, 0.7);
+                }
+
+                const contactPhone = document.getElementById('post-phone').value.trim() || currentUser.phone || '-';
+
+                const newThreadData = {
+                    authorId: currentUser.id,
+                    authorName: currentUser.name,
+                    authorPhone: contactPhone,
+                    title: document.getElementById('post-title').value.trim(),
+                    category: document.getElementById('post-category').value,
+                    origin: document.getElementById('post-origin').value.trim(),
+                    destination: document.getElementById('post-destination').value.trim(),
+                    serviceDateTime: document.getElementById('post-datetime').value.trim(),
+                    description: document.getElementById('post-description').value.trim(),
+                    image: finalImageUrl,
+                    createdAt: getCurrentThaiDateTime(),
+                    createdAtMs: Date.now(),
+                    status: 'OPEN',
+                    acceptedBidId: null
+                };
+
+                if (isFirebaseReady) {
+                    await addDoc(collection(db, 'threads'), newThreadData);
+                } else {
+                    threads.unshift({
+                        id: 'demo_thread_' + Date.now(),
+                        ...newThreadData,
+                        bids: []
+                    });
+                    renderThreads();
+                }
+
+                e.target.reset();
+                clearPostImage();
+                closeModal('create-thread-modal');
+                currentMainView = 'ALL_THREADS';
+                updateMainViewTabsUI();
+                showToast('โพสต์ประกาศหาบริการเรียบร้อยแล้ว!', 'success');
+            } catch (err) {
+                console.error('Error creating thread:', err);
+                showToast('เกิดข้อผิดพลาดในการโพสต์: ' + err.message, 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> โพสต์ประกาศทันที';
+            }
+        }
+
+        // ==========================================================
+        // 7. THREAD FEED RENDERING & FILTERING
+        // ==========================================================
         function switchMainView(view) {
             currentMainView = view;
             updateMainViewTabsUI();
@@ -956,24 +1331,25 @@
             const tabAll = document.getElementById('tab-view-all');
             const tabMyBids = document.getElementById('tab-view-my-bids');
             const tabMyConfirmed = document.getElementById('tab-view-my-confirmed');
+            const tabMyBidsLabel = document.getElementById('tab-my-bids-label');
             const filterBar = document.getElementById('filter-controls-bar');
 
-            // Update counts
             document.getElementById('badge-all-count').textContent = threads.length;
 
             let myBidsCount = 0;
             let myConfirmedCount = 0;
 
             if (currentUser) {
-                if (currentUser.role === 'provider') {
-                    myBidsCount = threads.filter(t => t.status !== 'CONFIRMED' && t.bids.some(b => b.providerId === currentUser.id)).length;
+                if (isProviderRole(currentUser.role)) {
+                    // แสดงเฉพาะกระทู้ที่เสนอราคาไว้และยังไม่ได้ยืนยันราคา (status !== 'CONFIRMED')
+                    myBidsCount = threads.filter(t => t.status !== 'CONFIRMED' && (t.bids || []).some(b => b.providerId === currentUser.id)).length;
                     myConfirmedCount = threads.filter(t => {
                         if (t.status !== 'CONFIRMED') return false;
-                        const winBid = t.bids.find(b => b.id === t.acceptedBidId);
+                        const winBid = (t.bids || []).find(b => b.id === t.acceptedBidId);
                         return winBid && winBid.providerId === currentUser.id;
                     }).length;
                 } else {
-                    myBidsCount = threads.filter(t => t.status !== 'CONFIRMED' && t.authorId === currentUser.id && t.bids.length > 0).length;
+                    myBidsCount = threads.filter(t => t.status !== 'CONFIRMED' && t.authorId === currentUser.id && (t.bids || []).length > 0).length;
                     myConfirmedCount = threads.filter(t => t.authorId === currentUser.id && t.status === 'CONFIRMED').length;
                 }
             }
@@ -981,14 +1357,12 @@
             document.getElementById('badge-my-bids-count').textContent = myBidsCount;
             document.getElementById('badge-my-confirmed-count').textContent = myConfirmedCount;
 
-            // Update tab button label based on role
-            if (currentUser && currentUser.role === 'customer') {
-                tabMyBids.querySelector('span:nth-child(2)').textContent = 'กระทู้ของฉันที่มีผู้เสนอราคา';
+            if (currentUser && !isProviderRole(currentUser.role)) {
+                tabMyBidsLabel.textContent = 'กระทู้ของฉันที่มีผู้เสนอราคา';
             } else {
-                tabMyBids.querySelector('span:nth-child(2)').textContent = 'กระทู้ที่ฉันไปเสนอราคา';
+                tabMyBidsLabel.textContent = 'กระทู้ที่ฉันไปเสนอราคา';
             }
 
-            // Reset tab styles
             const inactiveClass = 'px-4 py-2.5 rounded-xl text-sm font-bold transition flex items-center gap-2 bg-white text-slate-700 border border-slate-200 hover:bg-slate-50';
             tabAll.className = inactiveClass;
             tabMyBids.className = inactiveClass;
@@ -1032,7 +1406,7 @@
             const container = document.getElementById('threads-container');
             updateMainViewTabsUI();
 
-            // 1. View: MY_BIDS (กระทู้ที่ผู้ให้บริการไปเสนอราคา / กระทู้ของลูกค้าที่มีคนเสนอราคา)
+            // 1. View: MY_BIDS (เฉพาะรายการที่ยังไม่ยืนยันราคา)
             if (currentMainView === 'MY_BIDS') {
                 if (!currentUser) {
                     container.innerHTML = `
@@ -1041,7 +1415,7 @@
                                 <i class="fa-solid fa-user-lock"></i>
                             </div>
                             <h3 class="text-lg font-bold text-slate-800">กรุณาเข้าสู่ระบบเพื่อดูรายการเสนอราคาของคุณ</h3>
-                            <p class="text-sm text-slate-500">เข้าสู่ระบบในฐานะ "ผู้ให้บริการ" เพื่อติดตามสถานะกระทู้ทั้งหมดที่คุณได้เข้าไปเสนอราคาไว้</p>
+                            <p class="text-sm text-slate-500">เข้าสู่ระบบในฐานะ "ผู้ให้บริการ" เพื่อติดตามสถานะกระทู้ที่คุณได้เข้าไปเสนอราคาไว้</p>
                             <div class="pt-2">
                                 <button onclick="openAuthModal('login')" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl shadow transition">
                                     เข้าสู่ระบบตอนนี้
@@ -1052,10 +1426,10 @@
                     return;
                 }
 
-                const isProvider = currentUser.role === 'provider';
+                const isProvider = isProviderRole(currentUser.role);
                 const targetThreads = isProvider
-                    ? threads.filter(t => t.status !== 'CONFIRMED' && t.bids.some(b => b.providerId === currentUser.id))
-                    : threads.filter(t => t.status !== 'CONFIRMED' && t.authorId === currentUser.id && t.bids.length > 0);
+                    ? threads.filter(t => t.status !== 'CONFIRMED' && (t.bids || []).some(b => b.providerId === currentUser.id))
+                    : threads.filter(t => t.status !== 'CONFIRMED' && t.authorId === currentUser.id && (t.bids || []).length > 0);
 
                 if (targetThreads.length === 0) {
                     container.innerHTML = `
@@ -1067,7 +1441,7 @@
                                 ${isProvider ? 'ไม่มีกระทู้ที่เสนอราคาและรอการยืนยันในขณะนี้' : 'ไม่มีกระทู้ที่รอคุณยืนยันราคาในขณะนี้'}
                             </h3>
                             <p class="text-sm text-slate-500">
-                                ${isProvider ? 'กระทู้ที่ได้รับการยืนยันแล้วจะย้ายไปอยู่ในแท็บ "งานที่ยืนยันแล้วของฉัน" หรือคุณสามารถเข้าไปเสนอราคาในประกาศใหม่ๆ ได้' : 'เมื่อมีผู้ให้บริการเสนอราคาเข้ามาและยังไม่ถูกยืนยัน รายการจะปรากฏในหน้านี้ทันที'}
+                                ${isProvider ? 'กระทู้ที่ได้รับการยืนยันแล้วจะย้ายไปอยู่ในแท็บ "งานที่ยืนยันแล้วของฉัน"' : 'เมื่อมีผู้ให้บริการเสนอราคาเข้ามาและยังไม่ถูกยืนยัน รายการจะปรากฏในหน้านี้ทันที'}
                             </p>
                             <div class="pt-2">
                                 <button onclick="switchMainView('ALL_THREADS')" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl shadow transition">
@@ -1087,29 +1461,16 @@
                         </div>
                     </div>
                 ` + targetThreads.map(thread => {
-                    const isConfirmed = thread.status === 'CONFIRMED';
-                    const myBids = isProvider ? thread.bids.filter(b => b.providerId === currentUser.id) : thread.bids;
+                    const bids = thread.bids || [];
+                    const myBids = isProvider ? bids.filter(b => b.providerId === currentUser.id) : bids;
                     const latestMyBid = myBids[myBids.length - 1];
-                    const isWonByMe = isConfirmed && isProvider && myBids.some(b => b.id === thread.acceptedBidId);
-                    const isWonByOther = isConfirmed && isProvider && !isWonByMe;
 
-                    let bidResultBadge = '';
-                    if (isProvider) {
-                        if (isWonByMe) {
-                            bidResultBadge = `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300"><i class="fa-solid fa-award"></i> ได้รับเลือกงานนี้แล้ว!</span>`;
-                        } else if (isWonByOther) {
-                            bidResultBadge = `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-slate-200 text-slate-700"><i class="fa-solid fa-lock"></i> ลูกค้าเลือกผู้ให้บริการรายอื่นแล้ว</span>`;
-                        } else {
-                            bidResultBadge = `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300"><span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span> รอผู้โพสต์พิจารณา/ยืนยันราคา</span>`;
-                        }
-                    } else {
-                        bidResultBadge = isConfirmed
-                            ? `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300"><i class="fa-solid fa-circle-check"></i> ยืนยันราคาแล้ว</span>`
-                            : `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800 border border-blue-200">มี ${thread.bids.length} ข้อเสนอ รอคุณยืนยัน</span>`;
-                    }
+                    const bidResultBadge = isProvider
+                        ? `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300"><span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span> รอผู้โพสต์พิจารณา/ยืนยันราคา</span>`
+                        : `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800 border border-blue-200">มี ${bids.length} ข้อเสนอ รอคุณยืนยัน</span>`;
 
                     return `
-                        <article onclick="openThreadDetail('${thread.id}')" class="bg-white rounded-2xl border-2 ${isWonByMe ? 'border-emerald-400' : 'border-slate-200'} shadow-sm hover:shadow-md hover:border-blue-400 transition cursor-pointer overflow-hidden p-5 sm:p-6">
+                        <article onclick="openThreadDetail('${thread.id}')" class="bg-white rounded-2xl border-2 border-slate-200 shadow-sm hover:shadow-md hover:border-blue-400 transition cursor-pointer overflow-hidden p-5 sm:p-6">
                             <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
                                 <div class="flex flex-wrap items-center gap-2">
                                     <span class="px-3 py-1 rounded-lg text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200">${escapeHTML(thread.category)}</span>
@@ -1137,14 +1498,14 @@
                                     <div class="flex items-center justify-between sm:justify-end gap-3 flex-shrink-0">
                                         <div class="text-right">
                                             <span class="text-[11px] text-slate-500 block">ราคาที่คุณเสนอ</span>
-                                            <span class="text-xl font-extrabold text-blue-700">฿${latestMyBid.price.toLocaleString()}</span>
+                                            <span class="text-xl font-extrabold text-blue-700">฿${Number(latestMyBid.price).toLocaleString()}</span>
                                         </div>
                                         <span class="px-3.5 py-2 rounded-xl bg-blue-600 text-white text-xs font-bold">เปิดดูกระทู้ <i class="fa-solid fa-arrow-right ml-1"></i></span>
                                     </div>
                                 </div>
                             ` : `
                                 <div class="flex justify-end">
-                                    <span class="px-4 py-2 rounded-xl bg-blue-600 text-white text-xs font-bold">ดูข้อเสนอราคาทั้งหมด (${thread.bids.length}) <i class="fa-solid fa-arrow-right ml-1"></i></span>
+                                    <span class="px-4 py-2 rounded-xl bg-blue-600 text-white text-xs font-bold">ดูข้อเสนอราคาทั้งหมด (${bids.length}) <i class="fa-solid fa-arrow-right ml-1"></i></span>
                                 </div>
                             `}
                         </article>
@@ -1153,7 +1514,7 @@
                 return;
             }
 
-            // 2. View: MY_CONFIRMED (งานที่ยืนยันแล้วของฉัน)
+            // 2. View: MY_CONFIRMED (งานที่ยืนยันแล้วของฉัน แยกตามบทบาท)
             if (currentMainView === 'MY_CONFIRMED') {
                 if (!currentUser) {
                     container.innerHTML = `
@@ -1173,11 +1534,11 @@
                     return;
                 }
 
-                const isProvider = currentUser.role === 'provider';
+                const isProvider = isProviderRole(currentUser.role);
                 const confirmedThreads = threads.filter(t => {
                     if (t.status !== 'CONFIRMED') return false;
                     if (isProvider) {
-                        const winBid = t.bids.find(b => b.id === t.acceptedBidId);
+                        const winBid = (t.bids || []).find(b => b.id === t.acceptedBidId);
                         return winBid && winBid.providerId === currentUser.id;
                     }
                     return t.authorId === currentUser.id;
@@ -1206,10 +1567,10 @@
                 container.innerHTML = `
                     <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 flex items-center gap-2.5 text-sm font-semibold text-emerald-900">
                         <i class="fa-solid fa-circle-check text-emerald-600 text-lg"></i>
-                        <span>งานที่ยืนยันตกลงใช้บริการเรียบร้อยแล้ว (${confirmedThreads.length} รายการ)</span>
+                        <span>งานที่ยืนยันตกลงใช้บริการเรียบร้อยแล้ว (${confirmedThreads.length} รายการ) — ${isProvider ? 'มุมมองผู้ให้บริการ' : 'มุมมองผู้ว่าจ้าง'}</span>
                     </div>
                 ` + confirmedThreads.map(thread => {
-                    const winBid = thread.bids.find(b => b.id === thread.acceptedBidId) || {};
+                    const winBid = (thread.bids || []).find(b => b.id === thread.acceptedBidId) || {};
                     return `
                         <article onclick="openThreadDetail('${thread.id}')" class="bg-white rounded-2xl border-2 border-emerald-400 shadow-sm hover:shadow-md transition cursor-pointer p-5 sm:p-6 space-y-4">
                             <div class="flex flex-wrap items-center justify-between gap-2">
@@ -1217,7 +1578,7 @@
                                     <span class="px-3 py-1 rounded-lg text-xs font-bold bg-emerald-600 text-white"><i class="fa-solid fa-check mr-1"></i> ยืนยันงานแล้ว</span>
                                     <span class="px-3 py-1 rounded-lg text-xs font-bold bg-blue-50 text-blue-700">${escapeHTML(thread.category)}</span>
                                 </div>
-                                <div class="text-lg font-extrabold text-emerald-700">ราคาที่ตกลง: ฿${(winBid.price || 0).toLocaleString()}</div>
+                                <div class="text-lg font-extrabold text-emerald-700">ราคาที่ตกลง: ฿${Number(winBid.price || 0).toLocaleString()}</div>
                             </div>
 
                             <h3 class="text-lg font-bold text-slate-800">${escapeHTML(thread.title)}</h3>
@@ -1237,7 +1598,7 @@
 
                             <div class="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-600 pt-1">
                                 <div><i class="fa-solid fa-route text-blue-600 mr-1"></i> <strong>${escapeHTML(thread.origin)}</strong> <i class="fa-solid fa-arrow-right mx-1 text-slate-400"></i> <strong>${escapeHTML(thread.destination)}</strong> (${escapeHTML(thread.serviceDateTime)})</div>
-                                <span class="text-blue-600 font-bold">ดูรายละเอียดกระทู้ <i class="fa-solid fa-chevron-right ml-0.5"></i></span>
+                                <span class="text-blue-600 font-bold">ดูรายละเอียดกระทู้ &amp; รูปหน้างาน <i class="fa-solid fa-chevron-right ml-0.5"></i></span>
                             </div>
                         </article>
                     `;
@@ -1245,7 +1606,7 @@
                 return;
             }
 
-            // 3. View: ALL_THREADS (กระดานประกาศบริการทั้งหมด)
+            // 3. View: ALL_THREADS
             const statusFilter = document.getElementById('status-filter').value;
             const searchQuery = document.getElementById('search-input').value.trim().toLowerCase();
 
@@ -1253,10 +1614,10 @@
                 const matchCat = currentCategory === 'ALL' || t.category === currentCategory;
                 const matchStatus = statusFilter === 'ALL' || t.status === statusFilter;
                 const matchSearch = !searchQuery ||
-                    t.title.toLowerCase().includes(searchQuery) ||
-                    t.origin.toLowerCase().includes(searchQuery) ||
-                    t.destination.toLowerCase().includes(searchQuery) ||
-                    t.description.toLowerCase().includes(searchQuery);
+                    (t.title || '').toLowerCase().includes(searchQuery) ||
+                    (t.origin || '').toLowerCase().includes(searchQuery) ||
+                    (t.destination || '').toLowerCase().includes(searchQuery) ||
+                    (t.description || '').toLowerCase().includes(searchQuery);
                 return matchCat && matchStatus && matchSearch;
             });
 
@@ -1277,12 +1638,13 @@
             }
 
             container.innerHTML = filtered.map(thread => {
+                const bids = thread.bids || [];
                 const isConfirmed = thread.status === 'CONFIRMED';
-                const lowestBid = thread.bids.length > 0
-                    ? Math.min(...thread.bids.map(b => b.price))
+                const lowestBid = bids.length > 0
+                    ? Math.min(...bids.map(b => Number(b.price)))
                     : null;
                 const acceptedBid = isConfirmed
-                    ? thread.bids.find(b => b.id === thread.acceptedBidId)
+                    ? bids.find(b => b.id === thread.acceptedBidId)
                     : null;
 
                 return `
@@ -1290,7 +1652,6 @@
                         <div class="p-5 sm:p-6 flex flex-col md:flex-row gap-5">
                             <!-- Left Content -->
                             <div class="flex-grow space-y-3">
-                                <!-- Badges & Meta -->
                                 <div class="flex flex-wrap items-center justify-between gap-2">
                                     <div class="flex flex-wrap items-center gap-2">
                                         <span class="px-3 py-1 rounded-lg text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200">
@@ -1298,7 +1659,7 @@
                                         </span>
                                         ${isConfirmed ? `
                                             <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
-                                                <i class="fa-solid fa-circle-check"></i> ยืนยันราคาแล้ว (${escapeHTML(acceptedBid ? acceptedBid.providerName : '')})
+                                                <i class="fa-solid fa-circle-check"></i> ยืนยันราคาแล้ว ${acceptedBid ? '(' + escapeHTML(acceptedBid.providerName) + ')' : ''}
                                             </span>
                                         ` : `
                                             <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200">
@@ -1311,12 +1672,10 @@
                                     </span>
                                 </div>
 
-                                <!-- Title -->
                                 <h2 class="text-lg sm:text-xl font-bold text-slate-800 hover:text-blue-700 transition leading-snug">
                                     ${escapeHTML(thread.title)}
                                 </h2>
 
-                                <!-- Route & Time Box -->
                                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 bg-slate-50 p-3 rounded-xl border border-slate-200/80 text-xs sm:text-sm">
                                     <div class="flex items-start gap-2">
                                         <i class="fa-solid fa-location-dot text-rose-500 mt-0.5"></i>
@@ -1341,16 +1700,14 @@
                                     </div>
                                 </div>
 
-                                <!-- Description Excerpt -->
                                 <p class="text-sm text-slate-600 line-clamp-2 leading-relaxed">
                                     ${escapeHTML(thread.description)}
                                 </p>
 
-                                <!-- Footer Info -->
                                 <div class="pt-2 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100">
                                     <div class="flex items-center gap-2 text-xs text-slate-500">
                                         <div class="w-6 h-6 rounded-full bg-slate-200 text-slate-700 font-bold flex items-center justify-center text-[11px]">
-                                            ${escapeHTML(thread.authorName.charAt(0))}
+                                            ${escapeHTML((thread.authorName || 'U').charAt(0))}
                                         </div>
                                         <span>ผู้ประกาศ: <strong class="text-slate-700">${escapeHTML(thread.authorName)}</strong></span>
                                     </div>
@@ -1360,20 +1717,20 @@
                                             <div class="text-right">
                                                 <span class="text-[11px] text-slate-400 block">${isConfirmed ? 'ราคาที่ยืนยัน' : 'ราคาเสนอเริ่มต้น'}</span>
                                                 <span class="text-base font-bold ${isConfirmed ? 'text-emerald-600' : 'text-blue-600'}">
-                                                    ฿${(isConfirmed && acceptedBid ? acceptedBid.price : lowestBid).toLocaleString()}
+                                                    ฿${Number(isConfirmed && acceptedBid ? acceptedBid.price : lowestBid).toLocaleString()}
                                                 </span>
                                             </div>
                                         ` : ''}
                                         <span class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold ${isConfirmed ? 'bg-slate-100 text-slate-700' : 'bg-blue-600 text-white shadow-sm'}">
                                             <i class="fa-solid fa-comments-dollar"></i>
-                                            ${thread.bids.length} ข้อเสนอราคา
+                                            ${bids.length} ข้อเสนอราคา
                                             <i class="fa-solid fa-chevron-right text-[10px] ml-0.5"></i>
                                         </span>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Right Thumbnail (if image exists) -->
+                            <!-- Right Thumbnail -->
                             ${thread.image ? `
                                 <div class="md:w-52 flex-shrink-0">
                                     <div class="relative h-40 md:h-full w-full rounded-xl overflow-hidden border border-slate-200 bg-slate-100 group">
@@ -1390,39 +1747,37 @@
             }).join('');
         }
 
-        // ==========================================
-        // 6. THREAD DETAIL & BIDDING SYSTEM
-        // ==========================================
+        // ==========================================================
+        // 8. THREAD DETAIL & REAL-TIME BIDDING
+        // ==========================================================
         function openThreadDetail(threadId) {
             activeThreadId = threadId;
             const thread = threads.find(t => t.id === threadId);
             if (!thread) return;
 
+            const bids = thread.bids || [];
             const isConfirmed = thread.status === 'CONFIRMED';
             const isAuthor = currentUser && currentUser.id === thread.authorId;
-            const isProvider = currentUser && currentUser.role === 'provider';
+            const isProvider = currentUser && isProviderRole(currentUser.role);
 
-            // Header Info
             document.getElementById('detail-category').textContent = thread.category;
             document.getElementById('detail-status-badge').innerHTML = isConfirmed
                 ? `<span class="bg-emerald-500 text-white px-2.5 py-0.5 rounded-lg font-bold text-xs"><i class="fa-solid fa-check mr-1"></i> ปิดรับข้อเสนอ (ยืนยันแล้ว)</span>`
                 : `<span class="bg-amber-400 text-slate-900 px-2.5 py-0.5 rounded-lg font-bold text-xs">กำลังเปิดรับเสนอราคา</span>`;
 
-            // Sort bids: Accepted bid first, then lowest price first
-            const sortedBids = [...thread.bids].sort((a, b) => {
+            const sortedBids = [...bids].sort((a, b) => {
                 if (a.id === thread.acceptedBidId) return -1;
                 if (b.id === thread.acceptedBidId) return 1;
-                return a.price - b.price;
+                return Number(a.price) - Number(b.price);
             });
 
             const bodyEl = document.getElementById('thread-detail-body');
             bodyEl.innerHTML = `
-                <!-- Thread Main Post -->
                 <div class="space-y-4">
                     <div class="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500">
                         <div class="flex items-center gap-2">
                             <div class="w-8 h-8 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center text-sm">
-                                ${escapeHTML(thread.authorName.charAt(0))}
+                                ${escapeHTML((thread.authorName || 'U').charAt(0))}
                             </div>
                             <div>
                                 <div class="font-bold text-slate-800 text-sm">${escapeHTML(thread.authorName)}</div>
@@ -1440,7 +1795,6 @@
                         ${escapeHTML(thread.title)}
                     </h2>
 
-                    <!-- Route & Schedule Summary -->
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-blue-50/60 p-4 rounded-2xl border border-blue-100 text-sm">
                         <div>
                             <span class="text-xs text-blue-600 font-semibold block mb-0.5"><i class="fa-solid fa-location-dot text-rose-500 mr-1"></i> ต้นทาง (จุดรับ)</span>
@@ -1456,12 +1810,10 @@
                         </div>
                     </div>
 
-                    <!-- Full Description -->
                     <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200/80 text-sm text-slate-700 whitespace-pre-line leading-relaxed">
                         ${escapeHTML(thread.description)}
                     </div>
 
-                    <!-- Attached Image -->
                     ${thread.image ? `
                         <div class="space-y-1.5">
                             <span class="text-xs font-semibold text-slate-500"><i class="fa-regular fa-image mr-1"></i> รูปภาพประกอบหน้างาน/สิ่งของ (คลิกเพื่อขยายใหญ่):</span>
@@ -1516,7 +1868,7 @@
                                     <textarea id="bid-note" rows="2" required placeholder="ระบุสิ่งที่รวมในราคา เช่น รวมค่าน้ำมัน ทางด่วน คนช่วยยกของ หรือเวลาที่สามารถเข้าหน้างานได้..." class="w-full px-3.5 py-2 bg-white border border-emerald-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"></textarea>
                                 </div>
                                 <div class="flex justify-end">
-                                    <button type="submit" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl shadow-md transition flex items-center gap-2">
+                                    <button type="submit" id="bid-submit-btn" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl shadow-md transition flex items-center gap-2">
                                         <i class="fa-solid fa-paper-plane"></i> ส่งข้อเสนอราคาทันที
                                     </button>
                                 </div>
@@ -1564,7 +1916,6 @@
                                 return `
                                     <div class="rounded-2xl p-4 sm:p-5 border-2 transition ${isAccepted ? 'border-emerald-500 bg-emerald-50/40 shadow-md' : 'border-slate-200 bg-white'}">
                                         <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-                                            <!-- Provider Info & Details -->
                                             <div class="space-y-2 flex-grow">
                                                 <div class="flex flex-wrap items-center gap-2">
                                                     <div class="w-8 h-8 rounded-lg ${isAccepted ? 'bg-emerald-600' : 'bg-slate-700'} text-white font-bold flex items-center justify-center text-sm">
@@ -1594,19 +1945,18 @@
                                                 ` : ''}
                                             </div>
 
-                                            <!-- Price & Confirm Action Button -->
                                             <div class="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-3 pt-3 sm:pt-0 border-t sm:border-t-0 border-slate-100 flex-shrink-0 sm:min-w-[175px]">
                                                 <div class="sm:text-right">
                                                     <span class="text-xs text-slate-400 block">ราคาที่เสนอ</span>
                                                     <span class="text-2xl font-extrabold ${isAccepted ? 'text-emerald-600' : 'text-blue-700'}">
-                                                        ฿${bid.price.toLocaleString()}
+                                                        ฿${Number(bid.price).toLocaleString()}
                                                     </span>
                                                 </div>
 
                                                 ${!isConfirmed && isAuthor ? `
                                                     <button onclick="promptConfirmBid('${thread.id}', '${bid.id}')" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md hover:shadow-lg transition flex items-center gap-1.5 cursor-pointer">
                                                         <i class="fa-solid fa-circle-check"></i>
-                                                        <span>ยืนยันราคา ฿${bid.price.toLocaleString()}</span>
+                                                        <span>ยืนยันราคา ฿${Number(bid.price).toLocaleString()}</span>
                                                     </button>
                                                 ` : isAccepted ? `
                                                     <span class="px-3.5 py-2 bg-emerald-600 text-white text-xs font-bold rounded-xl flex items-center gap-1.5">
@@ -1626,9 +1976,9 @@
             openModal('thread-detail-modal');
         }
 
-        function handleBidSubmit(e, threadId) {
+        async function handleBidSubmit(e, threadId) {
             e.preventDefault();
-            if (!currentUser || currentUser.role !== 'provider') {
+            if (!currentUser || !isProviderRole(currentUser.role)) {
                 showToast('กรุณาเข้าสู่ระบบด้วยบัญชีผู้ให้บริการก่อนเสนอราคา', 'error');
                 return;
             }
@@ -1645,34 +1995,55 @@
                 return;
             }
 
-            const newBid = {
-                id: 'bid_' + Date.now(),
-                providerId: currentUser.id,
-                providerName: currentUser.name,
-                providerPhone: currentUser.phone,
-                vehicleInfo,
-                price,
-                note,
-                createdAt: getCurrentThaiDateTime()
-            };
+            const submitBtn = document.getElementById('bid-submit-btn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> กำลังส่งข้อเสนอ...';
 
-            thread.bids.push(newBid);
-            saveState();
-            updateMainViewTabsUI();
-            renderThreads();
-            openThreadDetail(threadId);
-            showToast('ส่งข้อเสนอราคาเรียบร้อยแล้ว!', 'success');
+            try {
+                const newBidData = {
+                    providerId: currentUser.id,
+                    providerName: currentUser.name,
+                    providerPhone: currentUser.phone,
+                    vehicleInfo,
+                    price,
+                    note,
+                    createdAt: getCurrentThaiDateTime(),
+                    createdAtMs: Date.now()
+                };
+
+                if (isFirebaseReady) {
+                    await addDoc(collection(db, 'threads', threadId, 'bids'), newBidData);
+                } else {
+                    thread.bids.push({
+                        id: 'demo_bid_' + Date.now(),
+                        ...newBidData
+                    });
+                    updateMainViewTabsUI();
+                    renderThreads();
+                    openThreadDetail(threadId);
+                }
+
+                showToast('ส่งข้อเสนอราคาเรียบร้อยแล้ว!', 'success');
+            } catch (err) {
+                console.error('Error submitting bid:', err);
+                showToast('ส่งข้อเสนอไม่สำเร็จ: ' + err.message, 'error');
+            } finally {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> ส่งข้อเสนอราคาทันที';
+                }
+            }
         }
 
         function promptConfirmBid(threadId, bidId) {
             const thread = threads.find(t => t.id === threadId);
             if (!thread) return;
-            const bid = thread.bids.find(b => b.id === bidId);
+            const bid = (thread.bids || []).find(b => b.id === bidId);
             if (!bid) return;
 
             document.getElementById('confirm-modal-text').innerHTML = `
                 คุณต้องการยืนยันเลือกราคาของ <strong>"${escapeHTML(bid.providerName)}"</strong><br>
-                ในราคาสุทธิ <strong class="text-emerald-600 text-lg">฿${bid.price.toLocaleString()}</strong> ใช่หรือไม่?<br>
+                ในราคาสุทธิ <strong class="text-emerald-600 text-lg">฿${Number(bid.price).toLocaleString()}</strong> ใช่หรือไม่?<br>
                 <span class="text-xs text-slate-400 mt-1 block">(เมื่อยืนยันแล้ว กระทู้นี้จะปิดรับข้อเสนอราคาอื่นทันที)</span>
             `;
 
@@ -1684,24 +2055,51 @@
             openModal('confirm-modal');
         }
 
-        function confirmBid(threadId, bidId) {
+        async function confirmBid(threadId, bidId) {
             const thread = threads.find(t => t.id === threadId);
             if (!thread) return;
 
-            thread.status = 'CONFIRMED';
-            thread.acceptedBidId = bidId;
-            saveState();
+            const yesBtn = document.getElementById('confirm-modal-yes-btn');
+            yesBtn.disabled = true;
+            yesBtn.textContent = 'กำลังบันทึก...';
 
-            closeModal('confirm-modal');
-            updateMainViewTabsUI();
-            renderThreads();
-            openThreadDetail(threadId);
-            showToast('ยืนยันราคาผู้ให้บริการเรียบร้อยแล้ว!', 'success');
+            try {
+                if (isFirebaseReady) {
+                    const threadRef = doc(db, 'threads', threadId);
+                    await runTransaction(db, async (transaction) => {
+                        const freshSnap = await transaction.get(threadRef);
+                        if (!freshSnap.exists()) throw new Error('ไม่พบกระทู้นี้ในระบบ');
+                        if (freshSnap.data().status === 'CONFIRMED') {
+                            throw new Error('กระทู้นี้ได้รับการยืนยันไปก่อนหน้านี้แล้ว');
+                        }
+                        transaction.update(threadRef, {
+                            status: 'CONFIRMED',
+                            acceptedBidId: bidId,
+                            confirmedAt: serverTimestamp()
+                        });
+                    });
+                } else {
+                    thread.status = 'CONFIRMED';
+                    thread.acceptedBidId = bidId;
+                    updateMainViewTabsUI();
+                    renderThreads();
+                    openThreadDetail(threadId);
+                }
+
+                closeModal('confirm-modal');
+                showToast('ยืนยันราคาผู้ให้บริการเรียบร้อยแล้ว!', 'success');
+            } catch (err) {
+                console.error('Confirm bid error:', err);
+                showToast('ไม่สามารถยืนยันราคาได้: ' + err.message, 'error');
+            } finally {
+                yesBtn.disabled = false;
+                yesBtn.textContent = 'ยืนยันราคานี้';
+            }
         }
 
-        // ==========================================
-        // 7. UTILITIES (MODALS, TOAST, DATE, ESCAPE)
-        // ==========================================
+        // ==========================================================
+        // 9. UTILITIES & GLOBAL EXPORTS
+        // ==========================================================
         function openModal(id) {
             const el = document.getElementById(id);
             el.classList.remove('hidden');
@@ -1762,7 +2160,34 @@
                 .replace(/'/g, '&#039;');
         }
 
-        // Initialize on page load
+        Object.assign(window, {
+            openModal,
+            closeModal,
+            openLightbox,
+            openAuthModal,
+            switchAuthTab,
+            toggleProviderFields,
+            handleLogin,
+            quickLogin,
+            handleRegister,
+            logout,
+            handleCreatePostClick,
+            handleImageUpload,
+            useSamplePostImage,
+            clearPostImage,
+            handleCreateThread,
+            switchMainView,
+            setCategoryFilter,
+            resetFilters,
+            renderThreads,
+            openThreadDetail,
+            handleBidSubmit,
+            promptConfirmBid,
+            confirmBid,
+            saveFirebaseConfigFromModal,
+            clearSavedFirebaseConfig
+        });
+
         window.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
