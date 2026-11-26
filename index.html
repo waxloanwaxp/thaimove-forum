@@ -37,7 +37,7 @@
 </head>
 <body class="text-slate-800 antialiased min-h-screen flex flex-col">
 
-  <!-- Top Status & Quick Switch Bar -->
+  <!-- Top Status & Mode Switcher Bar -->
   <div id="topStatusBar" class="bg-slate-900 text-slate-200 text-xs py-2 px-4 border-b border-slate-700">
     <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-2">
       <div id="connectionStatusArea" class="flex items-center gap-2"></div>
@@ -251,7 +251,79 @@
     </div>
   </div>
 
-  <!-- 2. Create New Thread Modal -->
+  <!-- 2. Edit Profile Modal -->
+  <div id="editProfileModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden animate-fade-in">
+      <div class="px-6 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+        <h3 class="font-bold text-lg text-slate-800 flex items-center gap-2">
+          <i class="fa-solid fa-user-pen text-blue-600"></i> แก้ไขข้อมูลสมาชิก
+        </h3>
+        <button onclick="closeModal('editProfileModal')" class="text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full flex items-center justify-center hover:bg-slate-200/60 cursor-pointer">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form onsubmit="handleSaveProfile(event)" class="p-6 space-y-3.5 max-h-[82vh] overflow-y-auto custom-scrollbar">
+        <div>
+          <label class="block text-xs font-semibold text-slate-500 mb-1">อีเมลบัญชี (ไม่สามารถแก้ไขได้)</label>
+          <input type="email" id="editEmail" disabled class="w-full px-3.5 py-2 border border-slate-200 bg-slate-100 text-slate-500 rounded-xl text-sm cursor-not-allowed">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1.5">ประเภทบัญชีผู้ใช้งาน *</label>
+          <div class="grid grid-cols-2 gap-2.5">
+            <label class="cursor-pointer">
+              <input type="radio" name="editRole" value="CUSTOMER" onchange="toggleEditProviderFields()" class="peer sr-only">
+              <div class="p-2.5 rounded-xl border-2 border-slate-200 peer-checked:border-blue-600 peer-checked:bg-blue-50 transition text-center">
+                <i class="fa-solid fa-user text-blue-600 text-base mb-0.5 block"></i>
+                <div class="text-xs font-bold text-slate-800">ผู้ใช้งานทั่วไป</div>
+              </div>
+            </label>
+            <label class="cursor-pointer">
+              <input type="radio" name="editRole" value="PROVIDER" onchange="toggleEditProviderFields()" class="peer sr-only">
+              <div class="p-2.5 rounded-xl border-2 border-slate-200 peer-checked:border-emerald-600 peer-checked:bg-emerald-50 transition text-center">
+                <i class="fa-solid fa-truck-pickup text-emerald-600 text-base mb-0.5 block"></i>
+                <div class="text-xs font-bold text-slate-800">ผู้ให้บริการรถ</div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">ชื่อผู้ติดต่อ / ชื่อบริษัทหรือทีมงาน *</label>
+          <input type="text" id="editName" required class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">เบอร์โทรศัพท์ติดต่อ *</label>
+          <input type="tel" id="editPhone" required class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+        </div>
+
+        <div id="editProviderExtraFields" class="hidden space-y-3 pt-2 border-t border-slate-200">
+          <div class="text-xs font-bold text-emerald-700 flex items-center gap-1.5">
+            <i class="fa-solid fa-id-card"></i> ข้อมูลเฉพาะผู้ให้บริการยานพาหนะ
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">ประเภทรถที่ให้บริการหลัก *</label>
+            <input type="text" id="editVehicleType" placeholder="เช่น รถกระบะตู้ทึบ, รถตู้ VIP 10 ที่นั่ง" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">พื้นที่ให้บริการ / รายละเอียดเพิ่มเติม</label>
+            <input type="text" id="editServiceArea" placeholder="เช่น กรุงเทพฯ-ปริมณฑล และวิ่งต่างจังหวัดทั่วไทย" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+          </div>
+        </div>
+
+        <div class="pt-2 flex items-center justify-end gap-2 border-t border-slate-100">
+          <button type="button" onclick="closeModal('editProfileModal')" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 cursor-pointer">ยกเลิก</button>
+          <button type="submit" id="saveProfileBtn" class="px-5 py-2 rounded-xl text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition cursor-pointer">
+            <i class="fa-solid fa-floppy-disk mr-1"></i> บันทึกการเปลี่ยนแปลง
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 3. Create New Thread Modal -->
   <div id="newThreadModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
     <div class="bg-white rounded-2xl max-w-2xl w-full shadow-2xl overflow-hidden animate-fade-in flex flex-col max-h-[90vh]">
       <div class="px-6 py-4 bg-blue-600 text-white flex items-center justify-between shrink-0">
@@ -321,7 +393,7 @@
     </div>
   </div>
 
-  <!-- 3. Thread Detail & Bidding Modal -->
+  <!-- 4. Thread Detail & Bidding Modal -->
   <div id="threadDetailModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
     <div class="bg-white rounded-2xl max-w-3xl w-full shadow-2xl overflow-hidden animate-fade-in flex flex-col max-h-[92vh]">
       <div class="px-6 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between shrink-0">
@@ -338,113 +410,39 @@
     </div>
   </div>
 
-  <!-- 4. Custom Confirmation Modal (Replaces confirm()) -->
-  <div id="confirmBidModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden animate-fade-in p-6 space-y-4">
-      <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-2xl mx-auto">
-        <i class="fa-solid fa-handshake"></i>
+  <!-- 5. Firebase Config Modal (สำหรับสลับ/ตั้งค่าบนหน้าเว็บ) -->
+  <div id="firebaseConfigModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl overflow-hidden animate-fade-in">
+      <div class="px-6 py-4 bg-slate-900 text-white flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-fire text-amber-400"></i>
+          <h3 class="font-bold text-base">ตั้งค่าเชื่อมต่อ Firebase Real-time</h3>
+        </div>
+        <button onclick="closeModal('firebaseConfigModal')" class="text-slate-400 hover:text-white w-8 h-8 rounded-full flex items-center justify-center cursor-pointer">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
       </div>
-      <div class="text-center space-y-1.5">
-        <h3 class="font-bold text-lg text-slate-900">ยืนยันเลือกราคาผู้ให้บริการ?</h3>
-        <p id="confirmBidSummaryText" class="text-xs sm:text-sm text-slate-600 leading-relaxed"></p>
-      </div>
-      <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 text-[11px] text-amber-800">
-        <i class="fa-solid fa-circle-info mr-1"></i> เมื่อยืนยันแล้ว ระบบจะปิดรับข้อเสนอราคาอื่นทันที และเปิดเผยเบอร์โทรศัพท์ติดต่อให้ทั้งสองฝ่าย
-      </div>
-      <div class="flex items-center gap-2.5 pt-2">
-        <button type="button" onclick="closeModal('confirmBidModal')" class="flex-1 py-2.5 rounded-xl text-sm font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 transition cursor-pointer">ยกเลิก</button>
-        <button type="button" id="confirmBidActionBtn" class="flex-1 py-2.5 rounded-xl text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 shadow-md transition cursor-pointer">ยืนยันราคานี้</button>
-      </div>
+      <form onsubmit="saveFirebaseConfigFromUI(event)" class="p-6 space-y-4">
+        <p class="text-xs text-slate-600 leading-relaxed">
+          วางโค้ด <strong>firebaseConfig</strong> จากหน้า Project Settings ของ Firebase Console (ระบบฝังค่าเริ่มต้นของโปรเจกต์ <code>thaimove-forum</code> ไว้ให้แล้ว)
+        </p>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Firebase Config (JSON / JS Object) *</label>
+          <textarea id="firebaseConfigInput" rows="8" required class="w-full p-3 border border-slate-300 rounded-xl text-xs font-mono bg-slate-50 focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+        </div>
+        <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+          <button type="button" onclick="closeModal('firebaseConfigModal')" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 cursor-pointer">ยกเลิก</button>
+          <button type="submit" class="px-5 py-2 rounded-xl text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm transition cursor-pointer">
+            <i class="fa-solid fa-plug mr-1"></i> บันทึกและสลับไปโหมด Firebase
+          </button>
+        </div>
+      </form>
     </div>
-  </div>
-
-  <!-- 5. Custom Toast Notification (Replaces alert()) -->
-  <div id="toastNotification" class="fixed bottom-5 right-5 z-50 hidden items-center gap-3 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl border border-slate-700 text-xs sm:text-sm animate-fade-in max-w-sm">
-    <i id="toastIcon" class="fa-solid fa-circle-info text-blue-400 text-base"></i>
-    <span id="toastMessage"></span>
   </div>
 
   <!-- 6. Lightbox Image Modal -->
   <div id="lightboxModal" onclick="closeModal('lightboxModal')" class="fixed inset-0 bg-black/85 z-50 hidden items-center justify-center p-4 cursor-zoom-out">
     <img id="lightboxImage" src="" alt="Preview" class="max-w-full max-h-[90vh] rounded-xl shadow-2xl object-contain">
-  </div>
-
-  <!-- 7. Edit Member Profile Modal -->
-  <div id="editProfileModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden animate-fade-in flex flex-col max-h-[90vh]">
-      <div class="px-6 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between shrink-0">
-        <div class="flex items-center gap-2">
-          <div class="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center">
-            <i class="fa-solid fa-user-pen"></i>
-          </div>
-          <h3 class="font-bold text-lg text-slate-800">แก้ไขข้อมูลสมาชิก</h3>
-        </div>
-        <button onclick="closeModal('editProfileModal')" class="text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full flex items-center justify-center hover:bg-slate-200/60 cursor-pointer">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-      </div>
-
-      <form onsubmit="handleUpdateProfile(event)" class="p-6 space-y-4 overflow-y-auto custom-scrollbar">
-        <div>
-          <label class="block text-xs font-semibold text-slate-500 mb-1">อีเมลบัญชีผู้ใช้ (ไม่สามารถแก้ไขได้)</label>
-          <input type="email" id="editEmail" disabled class="w-full px-3.5 py-2 bg-slate-100 border border-slate-200 rounded-xl text-sm text-slate-500 cursor-not-allowed">
-        </div>
-
-        <div>
-          <label class="block text-xs font-semibold text-slate-700 mb-1.5">ประเภทบัญชีผู้ใช้งาน *</label>
-          <div class="grid grid-cols-2 gap-2.5">
-            <label class="cursor-pointer">
-              <input type="radio" name="editRole" value="CUSTOMER" onchange="toggleEditProviderFields()" class="peer sr-only">
-              <div class="p-3 rounded-xl border-2 border-slate-200 peer-checked:border-blue-600 peer-checked:bg-blue-50 transition text-center">
-                <i class="fa-solid fa-user text-blue-600 text-lg mb-1 block"></i>
-                <div class="text-xs font-bold text-slate-800">ผู้ใช้งานทั่วไป</div>
-                <div class="text-[10px] text-slate-500">โพสต์ประกาศหารถ</div>
-              </div>
-            </label>
-            <label class="cursor-pointer">
-              <input type="radio" name="editRole" value="PROVIDER" onchange="toggleEditProviderFields()" class="peer sr-only">
-              <div class="p-3 rounded-xl border-2 border-slate-200 peer-checked:border-emerald-600 peer-checked:bg-emerald-50 transition text-center">
-                <i class="fa-solid fa-truck-pickup text-emerald-600 text-lg mb-1 block"></i>
-                <div class="text-xs font-bold text-slate-800">ผู้ให้บริการรถ</div>
-                <div class="text-[10px] text-slate-500">เสนอราคารับงาน</div>
-              </div>
-            </label>
-          </div>
-        </div>
-
-        <div>
-          <label class="block text-xs font-semibold text-slate-700 mb-1">ชื่อผู้ติดต่อ / ชื่อบริษัทหรือทีมงาน *</label>
-          <input type="text" id="editName" required placeholder="เช่น คุณสมชาย หรือ หจก. ขนส่งด่วนใจ" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
-        </div>
-
-        <div>
-          <label class="block text-xs font-semibold text-slate-700 mb-1">เบอร์โทรศัพท์ติดต่อ *</label>
-          <input type="tel" id="editPhone" required placeholder="08X-XXX-XXXX" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
-        </div>
-
-        <!-- Provider Extra Fields -->
-        <div id="editProviderExtraFields" class="hidden space-y-3 pt-2 border-t border-slate-200">
-          <div class="text-xs font-bold text-emerald-700 flex items-center gap-1.5">
-            <i class="fa-solid fa-id-card"></i> ข้อมูลเฉพาะผู้ให้บริการยานพาหนะ
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-slate-700 mb-1">ประเภทรถที่ให้บริการหลัก *</label>
-            <input type="text" id="editVehicleType" placeholder="เช่น รถกระบะตู้ทึบ, รถตู้ VIP 10 ที่นั่ง, รถ 6 ล้อ" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-slate-700 mb-1">พื้นที่ให้บริการ / รายละเอียดเพิ่มเติม</label>
-            <input type="text" id="editServiceArea" placeholder="เช่น กรุงเทพฯ-ปริมณฑล และวิ่งต่างจังหวัดทั่วไทย" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
-          </div>
-        </div>
-
-        <div class="pt-2 flex items-center justify-end gap-2.5 border-t border-slate-100">
-          <button type="button" onclick="closeModal('editProfileModal')" class="px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 cursor-pointer">ยกเลิก</button>
-          <button type="submit" id="saveProfileSubmitBtn" class="px-5 py-2.5 rounded-xl text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white shadow-md transition cursor-pointer flex items-center gap-1.5">
-            <i class="fa-solid fa-floppy-disk"></i> บันทึกข้อมูล
-          </button>
-        </div>
-      </form>
-    </div>
   </div>
 
   <!-- ==================== APPLICATION SCRIPT ==================== -->
@@ -455,19 +453,17 @@
     import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
     // =========================================================================
-    // [สำคัญ] วางค่า Firebase Config ของคุณแทนที่ null ด้านล่างนี้เพื่อใช้งานแบบ Real-time
+    // ค่า Firebase Config ของโปรเจกต์ thaimove-forum (เชื่อมต่อ Real-time อัตโนมัติ)
     // =========================================================================
-    const DEFAULT_FIREBASE_CONFIG = null;
-    /* ตัวอย่างการวางค่า:
     const DEFAULT_FIREBASE_CONFIG = {
-      apiKey: "AIzaSy...",
-      authDomain: "your-app.firebaseapp.com",
-      projectId: "your-app",
-      storageBucket: "your-app.firebasestorage.app",
-      messagingSenderId: "123456789",
-      appId: "1:123456789:web:abcdef"
+      apiKey: "AIzaSyBDTU3hDb7OfKw8upnJ-TUWuQXsUYzhGpg",
+      authDomain: "thaimove-forum.firebaseapp.com",
+      projectId: "thaimove-forum",
+      storageBucket: "thaimove-forum.firebasestorage.app",
+      messagingSenderId: "815181452783",
+      appId: "1:815181452783:web:e05b13a4a75fbc0ccfd21a",
+      measurementId: "G-XS20246X05"
     };
-    */
 
     const CATEGORIES = [
       { id: 'ALL', name: 'ทั้งหมด', icon: 'fa-border-all' },
@@ -609,37 +605,13 @@
     let db = null;
     let storage = null;
     let currentUser = null;
+    let demoUsersList = [];
     let threads = [];
     let selectedCategory = 'ALL';
     let currentMainTab = 'ALL';
     let selectedImagesBase64 = [];
     let selectedImageFiles = [];
     let activeDetailThreadId = null;
-    let toastTimeout = null;
-
-    // ==================== TOAST NOTIFICATION ====================
-    function showToast(message, type = 'info') {
-      const toast = document.getElementById('toastNotification');
-      const icon = document.getElementById('toastIcon');
-      const msg = document.getElementById('toastMessage');
-      if (!toast || !icon || !msg) return;
-
-      msg.textContent = message;
-      icon.className = type === 'error'
-        ? 'fa-solid fa-circle-exclamation text-rose-400 text-base'
-        : type === 'success'
-        ? 'fa-solid fa-circle-check text-emerald-400 text-base'
-        : 'fa-solid fa-circle-info text-blue-400 text-base';
-
-      toast.classList.remove('hidden');
-      toast.classList.add('flex');
-
-      if (toastTimeout) clearTimeout(toastTimeout);
-      toastTimeout = setTimeout(() => {
-        toast.classList.add('hidden');
-        toast.classList.remove('flex');
-      }, 3500);
-    }
 
     // ==================== PASSWORD VISIBILITY TOGGLE ====================
     window.togglePasswordVisibility = function(inputId, btn) {
@@ -658,13 +630,77 @@
       }
     };
 
+    // ==================== MODE & CONFIG MANAGEMENT ====================
+    function getActiveFirebaseConfig() {
+      try {
+        const saved = JSON.parse(localStorage.getItem('thaimove_firebase_config'));
+        if (saved && saved.apiKey) return saved;
+      } catch {}
+      if (DEFAULT_FIREBASE_CONFIG && DEFAULT_FIREBASE_CONFIG.apiKey) {
+        return DEFAULT_FIREBASE_CONFIG;
+      }
+      return null;
+    }
+
+    window.toggleAppMode = function(targetMode) {
+      if (targetMode === 'FIREBASE') {
+        const fbConfig = getActiveFirebaseConfig();
+        if (!fbConfig) {
+          openFirebaseConfigModal();
+          return;
+        }
+        localStorage.setItem('thaimove_mode', 'FIREBASE');
+        location.reload();
+      } else {
+        localStorage.setItem('thaimove_mode', 'DEMO');
+        location.reload();
+      }
+    };
+
+    window.openFirebaseConfigModal = function() {
+      const existing = getActiveFirebaseConfig();
+      if (existing) {
+        document.getElementById('firebaseConfigInput').value = JSON.stringify(existing, null, 2);
+      }
+      const modal = document.getElementById('firebaseConfigModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    };
+
+    window.saveFirebaseConfigFromUI = function(e) {
+      e.preventDefault();
+      let raw = document.getElementById('firebaseConfigInput').value.trim();
+
+      try {
+        const startIdx = raw.indexOf('{');
+        const endIdx = raw.lastIndexOf('}');
+        if (startIdx === -1 || endIdx === -1) {
+          throw new Error('ไม่พบรูปแบบ Object { ... }');
+        }
+        const objStr = raw.slice(startIdx, endIdx + 1);
+        const parsedConfig = new Function(`return (${objStr});`)();
+
+        if (!parsedConfig.apiKey || !parsedConfig.projectId) {
+          throw new Error('ข้อมูลไม่ครบถ้วน (ต้องมี apiKey และ projectId)');
+        }
+
+        localStorage.setItem('thaimove_firebase_config', JSON.stringify(parsedConfig));
+        localStorage.setItem('thaimove_mode', 'FIREBASE');
+        location.reload();
+      } catch (err) {
+        alert('รูปแบบ Firebase Config ไม่ถูกต้อง: ' + err.message);
+      }
+    };
+
     // ==================== INITIALIZATION ====================
     function initApp() {
       renderCategoryMenu();
+      const preferredMode = localStorage.getItem('thaimove_mode') || 'FIREBASE';
+      const fbConfig = getActiveFirebaseConfig();
 
-      if (DEFAULT_FIREBASE_CONFIG && DEFAULT_FIREBASE_CONFIG.apiKey) {
+      if (preferredMode !== 'DEMO' && fbConfig) {
         try {
-          const app = initializeApp(DEFAULT_FIREBASE_CONFIG);
+          const app = initializeApp(fbConfig);
           auth = getAuth(app);
           db = getFirestore(app);
           storage = getStorage(app);
@@ -672,6 +708,7 @@
           setupFirebaseListeners();
         } catch (err) {
           console.error('Firebase Init Error:', err);
+          localStorage.setItem('thaimove_mode', 'DEMO');
           initDemoMode();
         }
       } else {
@@ -682,6 +719,13 @@
     function initDemoMode() {
       isFirebaseMode = false;
       try {
+        const savedDemoUsers = JSON.parse(localStorage.getItem('thaimove_demo_users_v2'));
+        demoUsersList = Array.isArray(savedDemoUsers) && savedDemoUsers.length > 0 ? savedDemoUsers : JSON.parse(JSON.stringify(DEMO_USERS));
+      } catch {
+        demoUsersList = JSON.parse(JSON.stringify(DEMO_USERS));
+      }
+
+      try {
         const savedThreads = JSON.parse(localStorage.getItem('thaimove_threads_v2'));
         threads = Array.isArray(savedThreads) && savedThreads.length > 0 ? savedThreads : JSON.parse(JSON.stringify(DEMO_THREADS));
       } catch {
@@ -690,9 +734,14 @@
 
       try {
         const savedUser = JSON.parse(localStorage.getItem('thaimove_user_v2'));
-        currentUser = savedUser || DEMO_USERS[0];
+        if (savedUser) {
+          const synced = demoUsersList.find(u => u.uid === savedUser.uid);
+          currentUser = synced || savedUser;
+        } else {
+          currentUser = demoUsersList[0];
+        }
       } catch {
-        currentUser = DEMO_USERS[0];
+        currentUser = demoUsersList[0];
       }
 
       saveDemoState();
@@ -705,6 +754,7 @@
     function saveDemoState() {
       if (isFirebaseMode) return;
       try {
+        localStorage.setItem('thaimove_demo_users_v2', JSON.stringify(demoUsersList));
         localStorage.setItem('thaimove_threads_v2', JSON.stringify(threads));
         localStorage.setItem('thaimove_user_v2', JSON.stringify(currentUser));
       } catch (e) {
@@ -714,13 +764,21 @@
 
     function setupFirebaseListeners() {
       renderTopBar();
+      renderNavbar();
+      updateTabCounts();
+      renderThreads();
 
       onAuthStateChanged(auth, async (user) => {
         if (user) {
-          const userSnap = await getDoc(doc(db, 'users', user.uid));
-          if (userSnap.exists()) {
-            currentUser = { uid: user.uid, ...userSnap.data() };
-          } else {
+          try {
+            const userSnap = await getDoc(doc(db, 'users', user.uid));
+            if (userSnap.exists()) {
+              currentUser = { uid: user.uid, ...userSnap.data() };
+            } else {
+              currentUser = { uid: user.uid, name: user.email.split('@')[0], email: user.email, role: 'CUSTOMER', phone: '-' };
+            }
+          } catch (err) {
+            console.warn('Fetch profile warning:', err);
             currentUser = { uid: user.uid, name: user.email.split('@')[0], email: user.email, role: 'CUSTOMER', phone: '-' };
           }
         } else {
@@ -739,6 +797,8 @@
         if (activeDetailThreadId) {
           renderThreadDetailModal(activeDetailThreadId);
         }
+      }, (err) => {
+        console.error('Firestore Snapshot Error:', err);
       });
     }
 
@@ -750,19 +810,29 @@
       if (isFirebaseMode) {
         statusArea.innerHTML = `
           <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-          <span class="text-emerald-300 font-medium">เชื่อมต่อฐานข้อมูลออนไลน์ Real-time เรียบร้อยแล้ว</span>
+          <span class="text-emerald-300 font-medium">โหมดออนไลน์ Firebase Real-time (thaimove-forum)</span>
+          <button onclick="openFirebaseConfigModal()" class="ml-2 px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] border border-slate-600 cursor-pointer">
+            <i class="fa-solid fa-gear mr-1"></i>Config
+          </button>
         `;
-        switchArea.innerHTML = '';
+        switchArea.innerHTML = `
+          <button onclick="toggleAppMode('DEMO')" class="px-2.5 py-1 rounded-md bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-[11px] font-semibold transition cursor-pointer">
+            <i class="fa-solid fa-flask mr-1"></i> สลับไปโหมดทดสอบ (Demo)
+          </button>
+        `;
       } else {
         statusArea.innerHTML = `
           <span class="w-2 h-2 rounded-full bg-amber-400"></span>
-          <span class="text-amber-300 font-medium">โหมดทดสอบระบบ (Demo Mode)</span>
+          <span class="text-amber-300 font-medium">โหมดทดสอบ (Demo Mode)</span>
+          <button onclick="toggleAppMode('FIREBASE')" class="ml-2 px-2.5 py-0.5 rounded-md bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-semibold transition cursor-pointer">
+            <i class="fa-solid fa-cloud mr-1"></i> สลับไปโหมด Firebase Real-time
+          </button>
         `;
         switchArea.innerHTML = `
           <span class="text-slate-400 mr-1">สลับบัญชีทดสอบ:</span>
-          ${DEMO_USERS.map(u => `
+          ${demoUsersList.map(u => `
             <button onclick="switchDemoUser('${u.uid}')" class="px-2 py-0.5 rounded text-[11px] font-medium transition cursor-pointer ${currentUser && currentUser.uid === u.uid ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'}">
-              ${u.role === 'CUSTOMER' ? '👤' : '🚚'} ${u.name}
+              ${u.role === 'CUSTOMER' ? '👤' : '🚚'} ${escapeHtml(u.name)}
             </button>
           `).join('')}
         `;
@@ -770,7 +840,7 @@
     }
 
     window.switchDemoUser = function(uid) {
-      const found = DEMO_USERS.find(u => u.uid === uid);
+      const found = demoUsersList.find(u => u.uid === uid);
       if (found) {
         currentUser = found;
         saveDemoState();
@@ -778,7 +848,6 @@
         renderNavbar();
         updateTabCounts();
         renderThreads();
-        showToast(`สลับบัญชีเป็น "${found.name}" เรียบร้อยแล้ว`, 'success');
       }
     };
 
@@ -802,18 +871,18 @@
 
       const isProvider = currentUser.role === 'PROVIDER';
       navArea.innerHTML = `
-        <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 px-2.5 sm:px-3 py-1.5 rounded-xl">
+        <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-xl">
           <div class="w-8 h-8 rounded-lg ${isProvider ? 'bg-emerald-100 text-emerald-700' : 'bg-blue-100 text-blue-700'} flex items-center justify-center font-bold text-sm shrink-0">
             <i class="fa-solid ${isProvider ? 'fa-truck-pickup' : 'fa-user'}"></i>
           </div>
           <div class="hidden sm:block text-left">
-            <div class="text-xs font-bold text-slate-800 leading-tight max-w-[140px] truncate">${escapeHtml(currentUser.name)}</div>
+            <div class="text-xs font-bold text-slate-800 leading-tight">${escapeHtml(currentUser.name)}</div>
             <div class="text-[10px] font-medium ${isProvider ? 'text-emerald-600' : 'text-blue-600'}">
               ${isProvider ? 'ผู้ให้บริการยานพาหนะ' : 'ผู้ใช้งานทั่วไป'}
             </div>
           </div>
-          <button onclick="openEditProfileModal()" title="แก้ไขข้อมูลสมาชิก" class="ml-1 inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-white border border-slate-200 text-slate-700 hover:text-blue-600 hover:border-blue-300 hover:bg-blue-50/60 transition cursor-pointer">
-            <i class="fa-solid fa-user-pen text-blue-600"></i>
+          <button onclick="openEditProfileModal()" title="แก้ไขข้อมูลสมาชิก" class="ml-1 px-2.5 py-1.5 rounded-lg bg-white border border-slate-200 hover:border-blue-400 text-slate-700 hover:text-blue-600 text-xs font-semibold transition flex items-center gap-1 cursor-pointer">
+            <i class="fa-solid fa-user-pen"></i>
             <span class="hidden md:inline">แก้ไขข้อมูล</span>
           </button>
           <button onclick="handleLogout()" title="ออกจากระบบ" class="text-slate-400 hover:text-rose-600 p-1.5 rounded-lg hover:bg-rose-50 transition cursor-pointer">
@@ -822,6 +891,98 @@
         </div>
       `;
     }
+
+    // ==================== EDIT PROFILE ====================
+    window.openEditProfileModal = function() {
+      if (!currentUser) return;
+
+      document.getElementById('editEmail').value = currentUser.email || '';
+      document.getElementById('editName').value = currentUser.name || '';
+      document.getElementById('editPhone').value = currentUser.phone || '';
+      document.getElementById('editVehicleType').value = currentUser.vehicleType || '';
+      document.getElementById('editServiceArea').value = currentUser.serviceArea || '';
+
+      const roleRadios = document.querySelectorAll('input[name="editRole"]');
+      roleRadios.forEach(r => {
+        r.checked = (r.value === (currentUser.role || 'CUSTOMER'));
+      });
+      toggleEditProviderFields();
+
+      const modal = document.getElementById('editProfileModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    };
+
+    window.toggleEditProviderFields = function() {
+      const selected = document.querySelector('input[name="editRole"]:checked');
+      const role = selected ? selected.value : 'CUSTOMER';
+      const extra = document.getElementById('editProviderExtraFields');
+      const vehicleInput = document.getElementById('editVehicleType');
+      if (role === 'PROVIDER') {
+        extra.classList.remove('hidden');
+        vehicleInput.required = true;
+      } else {
+        extra.classList.add('hidden');
+        vehicleInput.required = false;
+      }
+    };
+
+    window.handleSaveProfile = async function(e) {
+      e.preventDefault();
+      if (!currentUser) return;
+
+      const btn = document.getElementById('saveProfileBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> กำลังบันทึก...';
+
+      const role = document.querySelector('input[name="editRole"]:checked').value;
+      const name = document.getElementById('editName').value.trim();
+      const phone = document.getElementById('editPhone').value.trim();
+      const vehicleType = role === 'PROVIDER' ? document.getElementById('editVehicleType').value.trim() : '';
+      const serviceArea = role === 'PROVIDER' ? document.getElementById('editServiceArea').value.trim() : '';
+
+      const updatedFields = { name, phone, role, vehicleType, serviceArea };
+
+      try {
+        if (isFirebaseMode) {
+          await setDoc(doc(db, 'users', currentUser.uid), {
+            email: currentUser.email,
+            ...updatedFields
+          }, { merge: true });
+          currentUser = { ...currentUser, ...updatedFields };
+        } else {
+          currentUser = { ...currentUser, ...updatedFields };
+          const idx = demoUsersList.findIndex(u => u.uid === currentUser.uid);
+          if (idx !== -1) {
+            demoUsersList[idx] = { ...demoUsersList[idx], ...updatedFields };
+          }
+          threads.forEach(t => {
+            if (t.authorId === currentUser.uid) {
+              t.authorName = name;
+              t.authorPhone = phone;
+            }
+            (t.bids || []).forEach(b => {
+              if (b.providerId === currentUser.uid) {
+                b.providerName = name;
+                b.providerPhone = phone;
+              }
+            });
+          });
+          saveDemoState();
+          renderTopBar();
+        }
+
+        renderNavbar();
+        updateTabCounts();
+        renderThreads();
+        closeModal('editProfileModal');
+      } catch (err) {
+        alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-floppy-disk mr-1"></i> บันทึกการเปลี่ยนแปลง';
+      }
+    };
 
     // ==================== CATEGORY MENU ====================
     function renderCategoryMenu() {
@@ -1153,12 +1314,11 @@
         try {
           await signInWithEmailAndPassword(auth, email, password);
           closeModal('authModal');
-          showToast('เข้าสู่ระบบสำเร็จ', 'success');
         } catch (err) {
-          showToast('เข้าสู่ระบบไม่สำเร็จ: ' + err.message, 'error');
+          alert('เข้าสู่ระบบไม่สำเร็จ: ' + err.message);
         }
       } else {
-        const demoFound = DEMO_USERS.find(u => u.email.toLowerCase() === email.toLowerCase());
+        const demoFound = demoUsersList.find(u => u.email.toLowerCase() === email.toLowerCase());
         currentUser = demoFound || {
           uid: 'demo_' + Date.now(),
           name: email.split('@')[0],
@@ -1172,7 +1332,6 @@
         updateTabCounts();
         renderThreads();
         closeModal('authModal');
-        showToast(`เข้าสู่ระบบสำเร็จ (${currentUser.name})`, 'success');
       }
     };
 
@@ -1202,13 +1361,12 @@
           currentUser = { uid: cred.user.uid, ...profileData };
           renderNavbar();
           closeModal('authModal');
-          showToast('สมัครสมาชิกและเข้าสู่ระบบสำเร็จ', 'success');
         } catch (err) {
-          showToast('สมัครสมาชิกไม่สำเร็จ: ' + err.message, 'error');
+          alert('สมัครสมาชิกไม่สำเร็จ: ' + err.message);
         }
       } else {
         const newUser = { uid: 'user_' + Date.now(), ...profileData };
-        DEMO_USERS.push(newUser);
+        demoUsersList.push(newUser);
         currentUser = newUser;
         saveDemoState();
         renderTopBar();
@@ -1216,7 +1374,6 @@
         updateTabCounts();
         renderThreads();
         closeModal('authModal');
-        showToast(`สมัครสมาชิกสำเร็จ (${newUser.name})`, 'success');
       }
     };
 
@@ -1230,106 +1387,12 @@
       renderNavbar();
       updateTabCounts();
       renderThreads();
-      showToast('ออกจากระบบแล้ว', 'info');
-    };
-
-    // ==================== EDIT MEMBER PROFILE ====================
-    window.toggleEditProviderFields = function() {
-      const checkedRole = document.querySelector('input[name="editRole"]:checked');
-      const role = checkedRole ? checkedRole.value : 'CUSTOMER';
-      const extra = document.getElementById('editProviderExtraFields');
-      const vehicleInput = document.getElementById('editVehicleType');
-      if (role === 'PROVIDER') {
-        extra.classList.remove('hidden');
-        vehicleInput.required = true;
-      } else {
-        extra.classList.add('hidden');
-        vehicleInput.required = false;
-      }
-    };
-
-    window.openEditProfileModal = function() {
-      if (!currentUser) {
-        showToast('กรุณาเข้าสู่ระบบก่อนแก้ไขข้อมูลสมาชิก', 'info');
-        openAuthModal('login');
-        return;
-      }
-
-      document.getElementById('editEmail').value = currentUser.email || '';
-      document.getElementById('editName').value = currentUser.name || '';
-      document.getElementById('editPhone').value = currentUser.phone || '';
-      document.getElementById('editVehicleType').value = currentUser.vehicleType || '';
-      document.getElementById('editServiceArea').value = currentUser.serviceArea || '';
-
-      const roleRadios = document.querySelectorAll('input[name="editRole"]');
-      roleRadios.forEach(radio => {
-        radio.checked = (radio.value === (currentUser.role || 'CUSTOMER'));
-      });
-      toggleEditProviderFields();
-
-      const modal = document.getElementById('editProfileModal');
-      modal.classList.remove('hidden');
-      modal.classList.add('flex');
-    };
-
-    window.handleUpdateProfile = async function(e) {
-      e.preventDefault();
-      if (!currentUser) return;
-
-      const btn = document.getElementById('saveProfileSubmitBtn');
-      btn.disabled = true;
-      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> กำลังบันทึก...';
-
-      const role = document.querySelector('input[name="editRole"]:checked').value;
-      const name = document.getElementById('editName').value.trim();
-      const phone = document.getElementById('editPhone').value.trim();
-      const vehicleType = document.getElementById('editVehicleType').value.trim();
-      const serviceArea = document.getElementById('editServiceArea').value.trim();
-
-      const updatedData = {
-        name,
-        phone,
-        role,
-        vehicleType: role === 'PROVIDER' ? vehicleType : '',
-        serviceArea: role === 'PROVIDER' ? serviceArea : ''
-      };
-
-      try {
-        if (isFirebaseMode) {
-          await setDoc(doc(db, 'users', currentUser.uid), updatedData, { merge: true });
-          currentUser = { ...currentUser, ...updatedData };
-        } else {
-          currentUser = { ...currentUser, ...updatedData };
-          const demoIdx = DEMO_USERS.findIndex(u => u.uid === currentUser.uid);
-          if (demoIdx !== -1) {
-            DEMO_USERS[demoIdx] = { ...DEMO_USERS[demoIdx], ...updatedData };
-          }
-          saveDemoState();
-          renderTopBar();
-        }
-
-        renderNavbar();
-        updateTabCounts();
-        renderThreads();
-        if (activeDetailThreadId) {
-          renderThreadDetailModal(activeDetailThreadId);
-        }
-
-        closeModal('editProfileModal');
-        showToast('บันทึกข้อมูลสมาชิกเรียบร้อยแล้ว', 'success');
-      } catch (err) {
-        console.error('Update Profile Error:', err);
-        showToast('ไม่สามารถบันทึกข้อมูลได้: ' + err.message, 'error');
-      } finally {
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> บันทึกข้อมูล';
-      }
     };
 
     // ==================== CREATE THREAD ====================
     window.handleOpenNewThreadModal = function() {
       if (!currentUser) {
-        showToast('กรุณาเข้าสู่ระบบหรือสมัครสมาชิกก่อนตั้งกระทู้ประกาศ', 'info');
+        alert('กรุณาเข้าสู่ระบบหรือสมัครสมาชิกก่อนตั้งกระทู้ประกาศครับ');
         openAuthModal('login');
         return;
       }
@@ -1413,9 +1476,8 @@
         }
         e.target.reset();
         closeModal('newThreadModal');
-        showToast('โพสต์ประกาศเรียบร้อยแล้ว!', 'success');
       } catch (err) {
-        showToast('เกิดข้อผิดพลาดในการโพสต์: ' + err.message, 'error');
+        alert('เกิดข้อผิดพลาดในการโพสต์: ' + err.message);
       } finally {
         btn.disabled = false;
         btn.innerHTML = '<i class="fa-solid fa-paper-plane mr-1"></i> โพสต์ประกาศทันที';
@@ -1511,7 +1573,7 @@
               <div class="flex sm:flex-col items-center sm:items-end justify-between gap-2 shrink-0">
                 <div class="text-xl font-bold text-emerald-700">฿${Number(bid.price).toLocaleString()}</div>
                 ${(!isConfirmed && isAuthor) ? `
-                  <button onclick="openConfirmBidModal('${thread.id}', '${bid.id}')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-xl text-xs shadow-sm transition flex items-center gap-1.5 cursor-pointer">
+                  <button onclick="confirmBid('${thread.id}', '${bid.id}')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-xl text-xs shadow-sm transition flex items-center gap-1.5 cursor-pointer">
                     <i class="fa-solid fa-circle-check"></i> ยืนยันราคา ฿${Number(bid.price).toLocaleString()}
                   </button>
                 ` : ''}
@@ -1599,31 +1661,17 @@
         renderThreads();
         renderThreadDetailModal(threadId);
       }
-      showToast('ส่งข้อเสนอราคาเรียบร้อยแล้ว!', 'success');
     };
 
-    window.openConfirmBidModal = function(threadId, bidId) {
+    window.confirmBid = async function(threadId, bidId) {
       const thread = threads.find(t => t.id === threadId);
       if (!thread) return;
       const bid = (thread.bids || []).find(b => b.id === bidId);
       if (!bid) return;
 
-      document.getElementById('confirmBidSummaryText').innerHTML = `
-        ยืนยันเลือกราคา <strong class="text-emerald-700 text-base">฿${Number(bid.price).toLocaleString()}</strong><br>
-        จากผู้ให้บริการ <strong>"${escapeHtml(bid.providerName)}"</strong>
-      `;
-
-      const actionBtn = document.getElementById('confirmBidActionBtn');
-      actionBtn.onclick = () => executeConfirmBid(threadId, bidId);
-
-      const modal = document.getElementById('confirmBidModal');
-      modal.classList.remove('hidden');
-      modal.classList.add('flex');
-    };
-
-    async function executeConfirmBid(threadId, bidId) {
-      const thread = threads.find(t => t.id === threadId);
-      if (!thread) return;
+      if (!confirm(`ยืนยันเลือกราคา ฿${Number(bid.price).toLocaleString()} จาก "${bid.providerName}" ใช่หรือไม่?\nเมื่อยืนยันแล้วระบบจะปิดรับข้อเสนออื่นและแสดงเบอร์ติดต่อให้ทั้งสองฝ่าย`)) {
+        return;
+      }
 
       const confirmedAt = formatThaiDateTime(new Date());
 
@@ -1642,10 +1690,7 @@
         renderThreads();
         renderThreadDetailModal(threadId);
       }
-
-      closeModal('confirmBidModal');
-      showToast('ยืนยันราคาผู้ให้บริการเรียบร้อยแล้ว!', 'success');
-    }
+    };
 
     // ==================== UTILITIES ====================
     window.closeModal = function(modalId) {
