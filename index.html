@@ -1,199 +1,251 @@
 <!DOCTYPE html>
-<html lang="th" class="light">
+<html lang="th">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ThaiMove Forum - กระดานประกาศและเสนอราคาบริการยานพาหนะ</title>
-  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Prompt', 'sans-serif'],
-          }
-        }
-      }
-    };
-  </script>
-  <!-- Google Fonts: Prompt -->
   <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <!-- Font Awesome 6.5.1 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <style>
+    :root {
+      --bg-page: #f1f5f9;
+      --bg-card: #ffffff;
+      --bg-subtle: #f8fafc;
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --border-color: #e2e8f0;
+    }
+    html.dark {
+      --bg-page: #0b1120;
+      --bg-card: #111827;
+      --bg-subtle: #1e293b;
+      --text-main: #f8fafc;
+      --text-muted: #cbd5e1;
+      --border-color: #334155;
+    }
     body {
       font-family: 'Prompt', sans-serif;
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      transition: background-color 0.2s ease, color 0.2s ease;
     }
-    .hero-banner-gradient {
-      background: linear-gradient(135deg, #0369A1 0%, #0EA5E9 55%, #1D4ED8 100%);
+    html.dark .bg-white {
+      background-color: #111827 !important;
+    }
+    html.dark .bg-slate-50,
+    html.dark .bg-slate-50\/70,
+    html.dark .bg-slate-50\/60 {
+      background-color: #1e293b !important;
+    }
+    html.dark .bg-slate-100 {
+      background-color: #1f2937 !important;
+    }
+    html.dark .text-slate-900,
+    html.dark .text-slate-800 {
+      color: #f8fafc !important;
+    }
+    html.dark .text-slate-700,
+    html.dark .text-slate-600 {
+      color: #cbd5e1 !important;
+    }
+    html.dark .text-slate-500,
+    html.dark .text-slate-400 {
+      color: #94a3b8 !important;
+    }
+    html.dark .border-slate-200,
+    html.dark .border-slate-100,
+    html.dark .border-slate-300 {
+      border-color: #334155 !important;
+    }
+    html.dark input,
+    html.dark textarea,
+    html.dark select {
+      background-color: #0f172a !important;
+      color: #f8fafc !important;
+      border-color: #334155 !important;
     }
     .custom-scrollbar::-webkit-scrollbar {
       width: 6px;
       height: 6px;
     }
     .custom-scrollbar::-webkit-scrollbar-track {
-      background: transparent;
+      background: #f1f5f9;
     }
     .custom-scrollbar::-webkit-scrollbar-thumb {
       background: #cbd5e1;
-      border-radius: 9999px;
+      border-radius: 3px;
     }
-    .dark .custom-scrollbar::-webkit-scrollbar-thumb {
-      background: #475569;
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
     }
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(6px); }
       to { opacity: 1; transform: translateY(0); }
     }
     .animate-fade-in {
-      animation: fadeIn 0.22s ease-out forwards;
+      animation: fadeIn 0.25s ease-out forwards;
     }
   </style>
 </head>
-<body class="bg-slate-100 text-slate-900 dark:bg-slate-950 dark:text-slate-100 antialiased min-h-screen flex flex-col transition-colors duration-200">
+<body class="antialiased min-h-screen flex flex-col">
 
-  <!-- ==================== 1. HIDDEN ADMIN STATUS & MODE SWITCHER BAR ==================== -->
-  <!-- ซ่อนไว้เป็นค่าเริ่มต้น (hidden) เปิด/ปิดได้ด้วย Ctrl+Shift+A (หรือ Cmd+Shift+A) หรือ ?admin=1 -->
-  <div id="topStatusBar" class="hidden bg-slate-900 text-slate-200 text-xs py-2 px-4 border-b border-slate-700 z-40">
+  <!-- Top Status & Mode Switcher Bar (ซ่อนไว้เป็นค่าเริ่มต้นสำหรับผู้ใช้ทั่วไป เปิดด้วย ?admin=1 หรือ Ctrl+Shift+A) -->
+  <div id="topStatusBar" class="hidden bg-slate-900 text-slate-200 text-xs py-2 px-4 border-b border-slate-700">
     <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-2">
-      <div id="connectionStatusArea" class="flex flex-wrap items-center gap-2"></div>
+      <div id="connectionStatusArea" class="flex items-center gap-2"></div>
       <div id="demoQuickSwitchArea" class="flex flex-wrap items-center gap-1.5"></div>
     </div>
   </div>
 
-  <!-- ==================== 2. MAIN NAVIGATION BAR ==================== -->
-  <header class="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md shadow-xs sticky top-0 z-30 border-b border-slate-200 dark:border-slate-800 transition-colors">
-    <div class="max-w-6xl mx-auto px-4 py-2.5 flex flex-wrap items-center justify-between gap-3">
-      <!-- Left: Brand Logo + Member Live Stats -->
-      <div class="flex flex-wrap items-center gap-3 sm:gap-4">
-        <a href="#" onclick="resetToHome(event)" class="flex items-center gap-2.5 group shrink-0">
-          <div class="w-10 h-10 bg-sky-600 rounded-xl flex items-center justify-center text-white shadow-md shadow-sky-600/25 group-hover:bg-sky-700 transition">
+  <!-- Main Navigation Bar -->
+  <header class="bg-white shadow-sm sticky top-0 z-30 border-b border-slate-200">
+    <div class="max-w-6xl mx-auto px-4 min-h-16 py-2 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex flex-wrap items-center gap-3">
+        <a href="#" onclick="resetToHome(event)" class="flex items-center gap-2.5 group">
+          <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-md shadow-blue-600/20 group-hover:bg-blue-700 transition">
             <i class="fa-solid fa-truck-fast text-lg"></i>
           </div>
-          <span class="font-bold text-lg sm:text-xl text-slate-900 dark:text-white tracking-tight">
-            ThaiMove <span class="text-sky-600 dark:text-sky-400">Forum</span>
-          </span>
+          <div>
+            <span class="font-bold text-lg text-slate-900 tracking-tight block leading-none">ThaiMove <span class="text-blue-600">Forum</span></span>
+          </div>
         </a>
 
-        <!-- Member Statistics Badges (4 รายการ) -->
-        <div id="memberStatsBadges" class="flex flex-wrap items-center gap-1.5 text-[11px] font-semibold">
-          <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-sky-50 text-sky-800 border border-sky-200 dark:bg-sky-950/70 dark:text-sky-300 dark:border-sky-800" title="จำนวนสมาชิกผู้ใช้งานทั่วไป">
-            <i class="fa-solid fa-user text-sky-600 dark:text-sky-400"></i>
-            <span>ผู้ใช้งานทั่วไป: <strong id="statCustomers">0</strong></span>
-          </span>
-          <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 dark:bg-emerald-950/70 dark:text-emerald-300 dark:border-emerald-800" title="จำนวนสมาชิกผู้ให้บริการรถ">
-            <i class="fa-solid fa-truck-pickup text-emerald-600 dark:text-emerald-400"></i>
-            <span>ผู้ให้บริการรถ: <strong id="statProviders">0</strong></span>
-          </span>
-          <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-slate-100 text-slate-800 border border-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700" title="สมาชิกทั้งหมด">
-            <i class="fa-solid fa-users text-slate-600 dark:text-slate-400"></i>
-            <span>ทั้งหมด: <strong id="statTotal">0</strong></span>
-          </span>
-          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-50 text-green-800 border border-green-200 dark:bg-green-950/70 dark:text-green-300 dark:border-green-800" title="กำลังออนไลน์ขณะนี้">
-            <span class="relative flex h-2 w-2">
-              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-            </span>
-            <span>ออนไลน์: <strong id="statOnline">1</strong></span>
+        <!-- สถิติจำนวนสมาชิกและจำนวนที่ออนไลน์ -->
+        <div id="memberStatsArea" class="flex flex-wrap items-center gap-1.5 text-[11px] bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-xl">
+          <span class="text-slate-600">ผู้ใช้งานทั่วไป: <strong id="statCustomers" class="text-blue-700">0</strong></span>
+          <span class="text-slate-300">|</span>
+          <span class="text-slate-600">ผู้ให้บริการรถ: <strong id="statProviders" class="text-emerald-700">0</strong></span>
+          <span class="text-slate-300">|</span>
+          <span class="text-slate-600">ทั้งหมด: <strong id="statTotalMembers" class="text-slate-900">0</strong></span>
+          <span class="text-slate-300">|</span>
+          <span class="inline-flex items-center gap-1 text-emerald-700 font-semibold">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            ออนไลน์: <strong id="statOnlineCount">1</strong>
           </span>
         </div>
       </div>
 
-      <!-- Right: User Controls & Theme Switcher -->
-      <div class="flex items-center gap-2 ml-auto">
-        <div id="navbarUserArea" class="flex items-center gap-2"></div>
-
-        <!-- Light / Dark Mode Toggle Button -->
-        <button id="themeToggleBtn" onclick="toggleTheme()" title="สลับโหมดสว่าง / โหมดมืด" class="w-9 h-9 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-amber-300 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center justify-center transition cursor-pointer shrink-0">
-          <i id="themeToggleIcon" class="fa-solid fa-moon text-sm"></i>
+      <div class="flex items-center gap-2">
+        <button type="button" onclick="toggleTheme()" id="themeToggleBtn" title="สลับโหมดสว่าง / โหมดมืด" class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center transition cursor-pointer">
+          <i id="themeToggleIcon" class="fa-solid fa-moon"></i>
         </button>
+        <div id="navbarUserArea" class="flex items-center gap-2.5"></div>
       </div>
     </div>
   </header>
 
-  <!-- ==================== 3. MAIN CONTENT CONTAINER ==================== -->
+  <!-- Main Content Container -->
   <main class="flex-grow max-w-6xl w-full mx-auto px-4 py-6">
+    
+    <!-- Hero / Action Banner พร้อมหน้าต่าง Preview รถผู้ให้บริการแบบไดนามิกด้านซ้าย -->
+    <div class="hero-banner rounded-2xl p-5 md:p-6 shadow-lg mb-6 flex flex-col lg:flex-row items-center gap-6"
+         style="background: linear-gradient(135deg, #0369A1 0%, #0284C7 55%, #1D4ED8 100%); color: #FFFFFF;">
 
-    <!-- Hero Banner -->
-    <section class="hero-banner-gradient rounded-2xl p-6 sm:p-7 text-white shadow-lg shadow-sky-900/15 mb-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
-      <div class="space-y-2 max-w-2xl">
-        <div class="inline-flex items-center gap-2 bg-white/15 backdrop-blur-xs border border-white/25 px-3 py-1 rounded-full text-xs font-semibold text-white">
-          <i class="fa-solid fa-bolt text-amber-300"></i>
-          <span>ระบบจับคู่ผู้ว่าจ้างและผู้ให้บริการรถรับจ้างทั่วไทย</span>
+      <!-- ด้านซ้าย: หน้าต่าง Preview รถผู้ให้บริการแบบไดนามิก เลื่อนซ้ายไปขวา วนอัตโนมัติ -->
+      <div class="w-full lg:w-[340px] shrink-0">
+        <div id="providerCarouselBox"
+             class="relative overflow-hidden rounded-xl bg-slate-900/40 border border-white/25 shadow-md backdrop-blur-xs select-none"
+             onmouseenter="pauseProviderCarousel()"
+             onmouseleave="resumeProviderCarousel()">
+
+          <!-- แทร็กภาพสไลด์ (เลื่อนซ้ายไปขวา) -->
+          <div id="providerCarouselTrack" class="flex transition-transform duration-500 ease-out"></div>
+
+          <!-- ป้ายกำกับมุมบนซ้าย -->
+          <div class="absolute top-2.5 left-2.5 bg-slate-900/75 text-white text-[10px] font-semibold px-2.5 py-1 rounded-full flex items-center gap-1.5 pointer-events-none">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>รถผู้ให้บริการพร้อมรับงาน</span>
+          </div>
+
+          <!-- จุดบอกตำแหน่ง (Pagination Dots) ด้านล่าง -->
+          <div id="providerCarouselDots"
+               class="absolute bottom-2.5 left-0 right-0 flex items-center justify-center gap-1.5 z-10">
+          </div>
         </div>
-        <h1 class="text-xl sm:text-2xl md:text-[26px] font-bold text-white leading-snug tracking-tight">
-          ต้องการหารถขนส่ง เหมารถตู้ หรือบริการยานพาหนะ?
-        </h1>
-        <p class="text-white/95 text-sm sm:text-[15px] font-normal leading-relaxed">
-          โพสต์รายละเอียดงานพร้อมรูปภาพ เพื่อให้ผู้ให้บริการเข้ามาเสนอราคาแข่งขันกันใต้กระทู้
-        </p>
       </div>
-      <div class="shrink-0 w-full md:w-auto">
-        <button onclick="handleOpenNewThreadModal()" class="w-full md:w-auto bg-amber-400 hover:bg-amber-300 active:scale-[0.99] text-slate-950 font-bold px-5 py-3.5 rounded-xl shadow-md transition flex items-center justify-center gap-2 cursor-pointer text-sm sm:text-base">
-          <i class="fa-solid fa-plus-circle text-lg"></i>
-          <span>ตั้งกระทู้ประกาศหาบริการ</span>
-        </button>
-      </div>
-    </section>
 
-    <!-- Primary Navigation Tabs (3 Tabs with Real-time Badges) -->
-    <nav class="bg-white dark:bg-slate-900 rounded-2xl p-1.5 shadow-xs border border-slate-200 dark:border-slate-800 mb-5 flex flex-wrap gap-1.5">
-      <button id="mainTabAll" onclick="switchMainTab('ALL')" class="flex-1 min-w-[160px] py-2.5 px-4 rounded-xl text-sm font-semibold transition flex items-center justify-center gap-2 bg-sky-600 text-white shadow-xs cursor-pointer">
+      <!-- ด้านขวา: กรอบข้อความ "ต้องการหารถขนส่ง..." และปุ่มตั้งกระทู้ -->
+      <div class="flex-1 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 w-full">
+        <div>
+          <div class="inline-flex items-center gap-1.5 bg-white/15 backdrop-blur-xs px-3 py-1 rounded-full text-xs font-medium mb-2" style="color: #FFFFFF;">
+            <i class="fa-solid fa-bolt text-amber-300"></i> ระบบจับคู่ผู้ว่าจ้างและผู้ให้บริการรถรับจ้างทั่วไทย
+          </div>
+          <h1 class="text-xl md:text-2xl font-bold mb-1.5" style="color: #FFFFFF;">
+            ต้องการหารถขนส่ง เหมารถตู้ หรือบริการยานพาหนะ?
+          </h1>
+          <p class="text-sm leading-relaxed" style="color: rgba(255,255,255,0.95);">
+            โพสต์รายละเอียดงานพร้อมรูปภาพ เพื่อให้ผู้ให้บริการเข้ามาเสนอราคาแข่งขันกันใต้กระทู้
+          </p>
+        </div>
+
+        <div class="shrink-0 w-full md:w-auto">
+          <button onclick="handleOpenNewThreadModal()"
+                  style="background-color: #FBBF24; color: #0F172A;"
+                  class="w-full md:w-auto hover:brightness-105 font-bold px-5 py-3 rounded-xl shadow-md transition flex items-center justify-center gap-2 cursor-pointer">
+            <i class="fa-solid fa-plus-circle text-lg"></i>
+            <span>ตั้งกระทู้ประกาศหาบริการ</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Primary Navigation Tabs -->
+    <div class="bg-white rounded-xl p-1.5 shadow-sm border border-slate-200 mb-5 flex flex-wrap gap-1.5">
+      <button id="mainTabAll" onclick="switchMainTab('ALL')" class="flex-1 min-w-[150px] py-2.5 px-4 rounded-lg text-sm font-semibold transition flex items-center justify-center gap-2 bg-blue-600 text-white shadow-sm cursor-pointer">
         <i class="fa-solid fa-list-ul"></i>
         <span>กระดานประกาศทั้งหมด</span>
-        <span id="badgeAllCount" class="bg-white/25 text-white text-xs px-2 py-0.5 rounded-full font-bold">0</span>
+        <span id="badgeAllCount" class="bg-white/20 text-white text-xs px-2 py-0.5 rounded-full">0</span>
       </button>
 
-      <button id="mainTabProposals" onclick="switchMainTab('MY_PROPOSALS')" class="flex-1 min-w-[190px] py-2.5 px-4 rounded-xl text-sm font-semibold transition flex items-center justify-center gap-2 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer">
+      <button id="mainTabProposals" onclick="switchMainTab('MY_PROPOSALS')" class="flex-1 min-w-[170px] py-2.5 px-4 rounded-lg text-sm font-semibold transition flex items-center justify-center gap-2 text-slate-600 hover:bg-slate-100 cursor-pointer">
         <i class="fa-solid fa-comments-dollar"></i>
         <span id="labelTabProposals">กระทู้ที่ฉันไปเสนอราคา</span>
-        <span id="badgeProposalsCount" class="bg-amber-100 text-amber-900 dark:bg-amber-900/60 dark:text-amber-200 text-xs px-2 py-0.5 rounded-full font-bold">0</span>
+        <span id="badgeProposalsCount" class="bg-amber-100 text-amber-800 text-xs px-2 py-0.5 rounded-full font-bold">0</span>
       </button>
 
-      <button id="mainTabConfirmed" onclick="switchMainTab('MY_CONFIRMED')" class="flex-1 min-w-[180px] py-2.5 px-4 rounded-xl text-sm font-semibold transition flex items-center justify-center gap-2 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer">
+      <button id="mainTabConfirmed" onclick="switchMainTab('MY_CONFIRMED')" class="flex-1 min-w-[170px] py-2.5 px-4 rounded-lg text-sm font-semibold transition flex items-center justify-center gap-2 text-slate-600 hover:bg-slate-100 cursor-pointer">
         <i class="fa-solid fa-circle-check"></i>
         <span>งานที่ยืนยันแล้วของฉัน</span>
-        <span id="badgeConfirmedCount" class="bg-emerald-100 text-emerald-900 dark:bg-emerald-900/60 dark:text-emerald-200 text-xs px-2 py-0.5 rounded-full font-bold">0</span>
+        <span id="badgeConfirmedCount" class="bg-emerald-100 text-emerald-800 text-xs px-2 py-0.5 rounded-full font-bold">0</span>
       </button>
-    </nav>
+    </div>
 
-    <!-- Vehicle Categories (2 Rows x 4 Columns = 8 Categories) & Search/Status Filters -->
-    <section id="filterSection" class="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 shadow-xs border border-slate-200 dark:border-slate-800 mb-6 space-y-4">
+    <!-- Vehicle Category Menu (2 Rows / 8 Categories) & Filters -->
+    <div id="filterSection" class="bg-white rounded-xl p-4 shadow-sm border border-slate-200 mb-6 space-y-4">
       <div>
-        <div class="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-3 flex items-center justify-between">
-          <span><i class="fa-solid fa-layer-group mr-1.5 text-sky-600 dark:text-sky-400"></i> เลือกหมวดหมู่ประเภทยานพาหนะ</span>
-          <span id="activeCategoryText" class="text-sky-700 dark:text-sky-400 font-semibold">แสดง: ทั้งหมด</span>
+        <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2.5 flex items-center justify-between">
+          <span><i class="fa-solid fa-layer-group mr-1 text-blue-600"></i> เลือกหมวดหมู่ประเภทยานพาหนะ</span>
+          <span id="activeCategoryText" class="text-blue-600 font-medium">แสดง: ทั้งหมด</span>
         </div>
-        <div id="categoryGrid" class="grid grid-cols-2 sm:grid-cols-4 gap-2.5"></div>
+        <div id="categoryGrid" class="grid grid-cols-2 sm:grid-cols-4 gap-2"></div>
       </div>
 
-      <div class="pt-3.5 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row gap-3 items-center justify-between">
-        <div class="relative w-full sm:w-96">
+      <div class="pt-3 border-t border-slate-100 flex flex-col sm:flex-row gap-3 items-center justify-between">
+        <div class="relative w-full sm:w-80">
           <i class="fa-solid fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
-          <input type="text" id="searchInput" oninput="renderThreads()" placeholder="ค้นหาเส้นทาง, จังหวัด, รายละเอียดงาน..." class="w-full pl-9 pr-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white dark:focus:bg-slate-800 transition">
+          <input type="text" id="searchInput" oninput="renderThreads()" placeholder="ค้นหาเส้นทาง, จังหวัด, รายละเอียด..." class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition">
         </div>
         <div id="statusFilterWrapper" class="flex items-center gap-2 w-full sm:w-auto justify-end">
-          <span class="text-xs font-medium text-slate-600 dark:text-slate-400 whitespace-nowrap">สถานะงาน:</span>
-          <select id="statusFilter" onchange="renderThreads()" class="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-800 dark:text-slate-100 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer">
+          <span class="text-xs text-slate-500 whitespace-nowrap">สถานะงาน:</span>
+          <select id="statusFilter" onchange="renderThreads()" class="bg-slate-50 border border-slate-200 rounded-lg text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
             <option value="ALL">ทุกสถานะ</option>
             <option value="OPEN">🟢 กำลังเปิดรับเสนอราคา</option>
             <option value="CONFIRMED">🔒 ยืนยันผู้ให้บริการแล้ว</option>
           </select>
         </div>
       </div>
-    </section>
+    </div>
 
     <!-- Thread List Container -->
-    <section id="threadListContainer" class="space-y-4"></section>
+    <div id="threadListContainer" class="space-y-4"></div>
 
   </main>
 
-  <!-- ==================== FOOTER ==================== -->
-  <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 mt-12 py-6 text-center text-xs text-slate-600 dark:text-slate-400">
-    <div class="max-w-6xl mx-auto px-4 space-y-1">
-      <p class="font-semibold text-slate-800 dark:text-slate-200">ThaiMove Forum - กระดานกลางประกาศและเสนอราคาบริการยานพาหนะ</p>
+  <!-- Footer -->
+  <footer class="bg-white border-t border-slate-200 mt-12 py-6 text-center text-xs text-slate-500">
+    <div class="max-w-6xl mx-auto px-4">
+      <p class="font-medium text-slate-700 mb-1">ThaiMove Forum - กระดานกลางประกาศและเสนอราคาบริการยานพาหนะ</p>
       <p>พื้นที่สื่อกลางเชื่อมต่อผู้ว่าจ้างและผู้ให้บริการยานพาหนะ โปรดตรวจสอบเอกสารและตกลงเงื่อนไขก่อนเริ่มงานทุกครั้ง</p>
     </div>
   </footer>
@@ -201,178 +253,148 @@
   <!-- ==================== MODALS ==================== -->
 
   <!-- 1. Auth Modal (Login / Register) -->
-  <div id="authModal" class="fixed inset-0 bg-slate-900/65 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
-    <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-lg w-full shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden animate-fade-in">
-      <div class="px-6 py-4 bg-slate-50 dark:bg-slate-800/70 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
-        <h3 class="font-bold text-lg text-slate-900 dark:text-white" id="authModalTitle">เข้าสู่ระบบ / สมัครสมาชิก</h3>
-        <button onclick="closeModal('authModal')" class="text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-slate-200/70 dark:hover:bg-slate-700 cursor-pointer">
+  <div id="authModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden animate-fade-in">
+      <div class="px-6 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+        <h3 class="font-bold text-lg text-slate-800" id="authModalTitle">เข้าสู่ระบบ / สมัครสมาชิก</h3>
+        <button onclick="closeModal('authModal')" class="text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full flex items-center justify-center hover:bg-slate-200/60 cursor-pointer">
           <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
 
-      <div class="grid grid-cols-2 border-b border-slate-200 dark:border-slate-800 text-sm font-semibold">
-        <button id="tabLoginBtn" onclick="switchAuthTab('login')" class="py-3 text-sky-700 dark:text-sky-400 border-b-2 border-sky-600 bg-sky-50/60 dark:bg-sky-950/40 cursor-pointer">เข้าสู่ระบบ</button>
-        <button id="tabRegisterBtn" onclick="switchAuthTab('register')" class="py-3 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white cursor-pointer">สมัครสมาชิกใหม่</button>
+      <div class="grid grid-cols-2 border-b border-slate-200 text-sm font-semibold">
+        <button id="tabLoginBtn" onclick="switchAuthTab('login')" class="py-3 text-blue-600 border-b-2 border-blue-600 bg-blue-50/40 cursor-pointer">เข้าสู่ระบบ</button>
+        <button id="tabRegisterBtn" onclick="switchAuthTab('register')" class="py-3 text-slate-500 hover:text-slate-700 cursor-pointer">สมัครสมาชิกใหม่</button>
       </div>
 
       <!-- Login Form -->
       <form id="loginForm" onsubmit="handleLogin(event)" class="p-6 space-y-4">
         <div>
-          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">อีเมล (Email)</label>
-          <input type="email" id="loginEmail" required placeholder="example@email.com" class="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-sky-500 focus:outline-none">
+          <label class="block text-xs font-semibold text-slate-700 mb-1">อีเมล (Email)</label>
+          <input type="email" id="loginEmail" required placeholder="example@email.com" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
         </div>
         <div>
-          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">รหัสผ่าน (Password)</label>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">รหัสผ่าน (Password)</label>
           <div class="relative">
-            <input type="password" id="loginPassword" required placeholder="••••••••" class="w-full pl-3.5 pr-10 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-sky-500 focus:outline-none">
-            <button type="button" onclick="togglePasswordVisibility('loginPassword', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white focus:outline-none cursor-pointer p-1" title="แสดง/ซ่อนรหัสผ่าน">
+            <input type="password" id="loginPassword" required placeholder="••••••••" class="w-full pl-3.5 pr-10 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            <button type="button" onclick="togglePasswordVisibility('loginPassword', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer" title="แสดง/ซ่อนรหัสผ่าน">
               <i class="fa-solid fa-eye"></i>
             </button>
           </div>
         </div>
-        <button type="submit" id="loginSubmitBtn" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2.5 rounded-xl shadow-md transition cursor-pointer">
+        <button type="submit" id="loginSubmitBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-xl shadow-md transition cursor-pointer">
           เข้าสู่ระบบ
         </button>
       </form>
 
       <!-- Register Form -->
-      <form id="registerForm" onsubmit="handleRegister(event)" class="p-6 space-y-4 hidden max-h-[80vh] overflow-y-auto custom-scrollbar">
+      <form id="registerForm" onsubmit="handleRegister(event)" class="p-6 space-y-3.5 hidden max-h-[82vh] overflow-y-auto custom-scrollbar">
         <div>
-          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-2">เลือกประเภทบัญชีผู้ใช้งาน *</label>
-          <div class="grid grid-cols-2 gap-3">
-            <!-- Customer Role Card -->
-            <div id="regRoleCardCustomer" onclick="selectRoleRadio('regRole', 'CUSTOMER')" class="relative p-3.5 rounded-xl border-2 border-sky-600 bg-sky-50/80 dark:bg-sky-950/50 transition text-center cursor-pointer select-none">
-              <input type="radio" name="regRole" value="CUSTOMER" checked class="sr-only">
-              <span id="regBadgeCustomer" class="inline-block text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-600 text-white mb-1.5">✓ เลือกอยู่</span>
-              <i class="fa-solid fa-user text-sky-600 dark:text-sky-400 text-xl mb-1 block"></i>
-              <div class="text-xs font-bold text-slate-900 dark:text-white">ผู้ใช้งานทั่วไป</div>
-              <div class="text-[11px] text-slate-600 dark:text-slate-400">โพสต์ประกาศหารถ</div>
-            </div>
-
-            <!-- Provider Role Card -->
-            <div id="regRoleCardProvider" onclick="selectRoleRadio('regRole', 'PROVIDER')" class="relative p-3.5 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 hover:border-emerald-400 transition text-center cursor-pointer select-none">
-              <input type="radio" name="regRole" value="PROVIDER" class="sr-only">
-              <span id="regBadgeProvider" class="hidden text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-600 text-white mb-1.5">✓ เลือกอยู่</span>
-              <i class="fa-solid fa-truck-pickup text-emerald-600 dark:text-emerald-400 text-xl mb-1 block"></i>
-              <div class="text-xs font-bold text-slate-900 dark:text-white">ผู้ให้บริการรถ</div>
-              <div class="text-[11px] text-slate-600 dark:text-slate-400">เสนอราคารับงาน</div>
-            </div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1.5">เลือกประเภทบัญชีผู้ใช้งาน *</label>
+          <div class="grid grid-cols-2 gap-2.5">
+            <label class="cursor-pointer">
+              <input type="radio" name="regRole" value="CUSTOMER" checked onchange="toggleProviderFields()" class="peer sr-only">
+              <div id="regRoleCardCustomer" class="p-3 rounded-xl border-2 border-blue-600 bg-blue-50 ring-2 ring-blue-500/20 transition text-center relative">
+                <span id="regRoleBadgeCustomer" class="inline-block bg-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full mb-1">✓ เลือกอยู่</span>
+                <i class="fa-solid fa-user text-blue-600 text-lg mb-1 block"></i>
+                <div class="text-xs font-bold text-slate-800">ผู้ใช้งานทั่วไป</div>
+                <div class="text-[10px] text-slate-500">โพสต์ประกาศหารถ</div>
+              </div>
+            </label>
+            <label class="cursor-pointer">
+              <input type="radio" name="regRole" value="PROVIDER" onchange="toggleProviderFields()" class="peer sr-only">
+              <div id="regRoleCardProvider" class="p-3 rounded-xl border-2 border-slate-200 opacity-75 hover:opacity-100 transition text-center relative">
+                <span id="regRoleBadgeProvider" class="hidden bg-emerald-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full mb-1">✓ เลือกอยู่</span>
+                <i class="fa-solid fa-truck-pickup text-emerald-600 text-lg mb-1 block"></i>
+                <div class="text-xs font-bold text-slate-800">ผู้ให้บริการรถ</div>
+                <div class="text-[10px] text-slate-500">เสนอราคารับงาน</div>
+              </div>
+            </label>
           </div>
         </div>
 
         <div>
-          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">ชื่อผู้ติดต่อ / ชื่อบริษัทหรือทีมงาน *</label>
-          <input type="text" id="regName" required placeholder="เช่น คุณสมชาย หรือ หจก. ขนส่งด่วนใจ" class="w-full px-3.5 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-sky-500 focus:outline-none">
+          <label class="block text-xs font-semibold text-slate-700 mb-1">ชื่อผู้ติดต่อ / ชื่อบริษัทหรือทีมงาน *</label>
+          <input type="text" id="regName" required placeholder="เช่น คุณสมชาย หรือ หจก. ขนส่งด่วนใจ" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">เบอร์โทรศัพท์ติดต่อ *</label>
-            <input type="tel" id="regPhone" required placeholder="08X-XXX-XXXX" class="w-full px-3.5 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-sky-500 focus:outline-none">
+            <label class="block text-xs font-semibold text-slate-700 mb-1">เบอร์โทรศัพท์ติดต่อ *</label>
+            <input type="tel" id="regPhone" required placeholder="08X-XXX-XXXX" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
           </div>
           <div>
-            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">อีเมล *</label>
-            <input type="email" id="regEmail" required placeholder="email@domain.com" class="w-full px-3.5 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-sky-500 focus:outline-none">
+            <label class="block text-xs font-semibold text-slate-700 mb-1">อีเมล *</label>
+            <input type="email" id="regEmail" required placeholder="email@domain.com" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
           </div>
         </div>
 
         <div>
-          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">รหัสผ่าน (อย่างน้อย 6 ตัวอักษร) *</label>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">รหัสผ่าน (อย่างน้อย 6 ตัวอักษร) *</label>
           <div class="relative">
-            <input type="password" id="regPassword" required minlength="6" placeholder="ตั้งรหัสผ่าน" class="w-full pl-3.5 pr-10 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-sky-500 focus:outline-none">
-            <button type="button" onclick="togglePasswordVisibility('regPassword', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white focus:outline-none cursor-pointer p-1" title="แสดง/ซ่อนรหัสผ่าน">
+            <input type="password" id="regPassword" required minlength="6" placeholder="ตั้งรหัสผ่าน" class="w-full pl-3.5 pr-10 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            <button type="button" onclick="togglePasswordVisibility('regPassword', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer" title="แสดง/ซ่อนรหัสผ่าน">
               <i class="fa-solid fa-eye"></i>
             </button>
           </div>
         </div>
 
-        <!-- Provider Extra Fields + Vehicle Photo Upload -->
-        <div id="providerExtraFields" class="hidden space-y-3.5 pt-3 border-t border-slate-200 dark:border-slate-800">
-          <div class="text-xs font-bold text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5">
+        <!-- Provider Extra Fields -->
+        <div id="providerExtraFields" class="hidden space-y-3 pt-2 border-t border-slate-200">
+          <div class="text-xs font-bold text-emerald-700 flex items-center gap-1.5">
             <i class="fa-solid fa-id-card"></i> ข้อมูลเฉพาะผู้ให้บริการยานพาหนะ
           </div>
           <div>
-            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">ประเภทรถที่ให้บริการหลัก *</label>
-            <input type="text" id="regVehicleType" placeholder="เช่น รถกระบะตู้ทึบ, รถตู้ VIP 10 ที่นั่ง, รถ 6 ล้อ" class="w-full px-3.5 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+            <label class="block text-xs font-semibold text-slate-700 mb-1">ประเภทรถที่ให้บริการหลัก *</label>
+            <input type="text" id="regVehicleType" placeholder="เช่น รถกระบะตู้ทึบ, รถตู้ VIP 10 ที่นั่ง, รถ 6 ล้อ" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
           </div>
           <div>
-            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">พื้นที่ให้บริการ / รายละเอียดเพิ่มเติม</label>
-            <input type="text" id="regServiceArea" placeholder="เช่น กรุงเทพฯ-ปริมณฑล และวิ่งต่างจังหวัดทั่วไทย" class="w-full px-3.5 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+            <label class="block text-xs font-semibold text-slate-700 mb-1">พื้นที่ให้บริการ / รายละเอียดเพิ่มเติม</label>
+            <input type="text" id="regServiceArea" placeholder="เช่น กรุงเทพฯ-ปริมณฑล และวิ่งต่างจังหวัดทั่วไทย" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
           </div>
 
-          <!-- Vehicle Photo Upload with 30-45 Degree SVG Guide -->
-          <div class="bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/70 rounded-xl p-3.5 space-y-3">
-            <div class="flex items-center justify-between">
-              <span class="text-xs font-bold text-emerald-900 dark:text-emerald-300">
-                <i class="fa-solid fa-camera mr-1"></i> รูปถ่ายรถที่ให้บริการ (แนะนำเพื่อเพิ่มความน่าเชื่อถือ)
-              </span>
-            </div>
-
-            <!-- Visual Guide SVG (30-45 deg front-side angle + visible license plate) -->
-            <div class="flex flex-col sm:flex-row items-center gap-3 bg-white dark:bg-slate-900 p-2.5 rounded-xl border border-emerald-200/80 dark:border-slate-700">
-              <svg viewBox="0 0 220 110" class="w-40 h-20 shrink-0 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700" aria-label="ตัวอย่างมุมถ่ายรูปรถ 30-45 องศาเห็นป้ายทะเบียนหน้า">
-                <!-- Ground / Road perspective -->
-                <polygon points="10,95 210,95 190,72 30,72" fill="#cbd5e1" opacity="0.5"/>
-                <!-- Angle Indicator Arc -->
-                <path d="M 24 85 A 30 30 0 0 1 45 64" fill="none" stroke="#0284c7" stroke-width="2" stroke-dasharray="3,2"/>
-                <text x="14" y="58" font-size="9" font-weight="bold" fill="#0284c7">30°–45°</text>
-                <!-- Vehicle Body (3/4 Front-Side View) -->
-                <g transform="translate(38, 22)">
-                  <!-- Cargo Box / Cabin Side -->
-                  <polygon points="52,12 142,6 142,48 52,56" fill="#0ea5e9" stroke="#0369a1" stroke-width="1.5"/>
-                  <!-- Front Cab Hood & Windshield -->
-                  <polygon points="12,34 52,12 52,56 12,58" fill="#38bdf8" stroke="#0369a1" stroke-width="1.5"/>
-                  <polygon points="22,32 48,16 48,34 22,36" fill="#e0f2fe" stroke="#0369a1" stroke-width="1.2"/>
-                  <!-- Front Grille & Headlights -->
-                  <rect x="6" y="38" width="16" height="18" rx="3" fill="#f8fafc" stroke="#0369a1" stroke-width="1.5"/>
-                  <rect x="8" y="41" width="4" height="4" rx="1" fill="#facc15"/>
-                  <rect x="16" y="41" width="4" height="4" rx="1" fill="#facc15"/>
-                  <!-- Front License Plate (Highlighted) -->
-                  <rect x="7" y="49" width="14" height="6" rx="1" fill="#fef08a" stroke="#ca8a04" stroke-width="1.2"/>
-                  <line x1="9" y1="52" x2="19" y2="52" stroke="#854d0e" stroke-width="1"/>
-                  <!-- Wheels -->
-                  <circle cx="34" cy="58" r="10" fill="#1e293b" stroke="#0f172a" stroke-width="2"/>
-                  <circle cx="34" cy="58" r="4" fill="#94a3b8"/>
-                  <circle cx="118" cy="51" r="10" fill="#1e293b" stroke="#0f172a" stroke-width="2"/>
-                  <circle cx="118" cy="51" r="4" fill="#94a3b8"/>
-                </g>
-                <!-- Callout pointer to License Plate -->
-                <line x1="45" y1="74" x2="26" y2="96" stroke="#dc2626" stroke-width="1.2"/>
-                <rect x="4" y="92" width="76" height="14" rx="3" fill="#fef2f2" stroke="#dc2626" stroke-width="0.8"/>
-                <text x="8" y="102" font-size="8.5" font-weight="bold" fill="#b91c1c">เห็นป้ายทะเบียนหน้าชัด</text>
-              </svg>
-              <div class="text-[11px] text-slate-700 dark:text-slate-300 space-y-1 leading-relaxed">
-                <p class="font-bold text-slate-900 dark:text-white">คำแนะนำการถ่ายรูปรถ:</p>
-                <p>• ถ่ายมุมเฉียงด้านหน้า-ข้าง (<strong>30–45 องศา</strong>) ให้เห็นตัวรถเต็มคันตั้งแต่หน้ารถถึงท้ายรถ</p>
-                <p>• ต้องเห็น <strong>ป้ายทะเบียนหน้ารถชัดเจน</strong> เพื่อให้ผู้ว่าจ้างตรวจสอบข้อมูลก่อนยืนยันราคา</p>
+          <!-- อัปโหลดรูปถ่ายรถของผู้ให้บริการ พร้อมภาพประกอบตัวอย่างมุม 30 องศา -->
+          <div class="pt-1 space-y-2">
+            <label class="block text-xs font-semibold text-slate-700">
+              รูปถ่ายรถที่ให้บริการ (แสดงในสไลด์หน้าแรกและรายการเสนอราคา)
+            </label>
+            <div class="p-2.5 rounded-xl bg-emerald-50/80 border border-emerald-200 flex flex-col sm:flex-row items-center gap-2.5">
+              <div class="w-full sm:w-36 shrink-0 bg-white rounded-lg border border-emerald-200 p-1.5 text-center">
+                <svg viewBox="0 0 220 110" class="w-full h-auto" aria-label="ตัวอย่างมุมถ่ายรูปรถ 30 องศา">
+                  <ellipse cx="110" cy="96" rx="92" ry="8" fill="#E2E8F0" />
+                  <path d="M22 66 L26 52 L58 48 L84 26 L136 26 L136 46 L196 46 L198 76 L22 76 Z" fill="#0EA5E9" stroke="#0F172A" stroke-width="2" stroke-linejoin="round" />
+                  <polygon points="62,48 86,30 105,30 98,48" fill="#E0F2FE" stroke="#0F172A" stroke-width="1.5" />
+                  <polygon points="109,30 132,30 132,48 103,48" fill="#BAE6FD" stroke="#0F172A" stroke-width="1.5" />
+                  <polygon points="24,56 36,54 34,63 23,64" fill="#FEF08A" stroke="#0F172A" stroke-width="1.5" />
+                  <circle cx="62" cy="78" r="14" fill="#1E293B" stroke="#0F172A" stroke-width="2" />
+                  <circle cx="62" cy="78" r="6" fill="#CBD5E1" />
+                  <circle cx="164" cy="78" r="14" fill="#1E293B" stroke="#0F172A" stroke-width="2" />
+                  <circle cx="164" cy="78" r="6" fill="#CBD5E1" />
+                  <rect x="26" y="66" width="24" height="9" rx="2" fill="#FFFFFF" stroke="#EF4444" stroke-width="2" />
+                  <line x1="30" y1="70.5" x2="46" y2="70.5" stroke="#0F172A" stroke-width="1.5" />
+                  <text x="110" y="15" text-anchor="middle" font-size="9" font-weight="bold" fill="#065F46">มุมเฉียง 30° เห็นทั้งคัน</text>
+                  <text x="48" y="106" text-anchor="middle" font-size="8.5" font-weight="bold" fill="#DC2626">เห็นป้ายทะเบียนหน้าชัดเจน</text>
+                </svg>
+              </div>
+              <div class="text-[11px] text-slate-600 leading-relaxed">
+                <strong class="text-emerald-800 block mb-0.5"><i class="fa-solid fa-camera mr-1"></i>คำแนะนำรูปถ่ายรถ:</strong>
+                ถ่ายด้านข้างซ้ายหรือขวา มุมเฉียง <strong>30 องศา</strong> ให้เห็นรถทั้งคันและ<strong>เห็นป้ายทะเบียนหน้ารถชัดเจน</strong>
               </div>
             </div>
 
-            <!-- Upload Input & Preview -->
-            <div>
-              <input type="file" id="regVehiclePhotoInput" accept="image/jpeg,image/png,image/webp" onchange="handleVehiclePhotoSelect(event, 'reg')" class="hidden">
-              <div id="regVehiclePhotoEmpty">
-                <label for="regVehiclePhotoInput" class="flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl border-2 border-dashed border-emerald-400 dark:border-emerald-700 bg-white dark:bg-slate-900 hover:bg-emerald-50 dark:hover:bg-slate-800 text-emerald-700 dark:text-emerald-300 text-xs font-semibold cursor-pointer transition">
-                  <i class="fa-solid fa-cloud-arrow-up text-base"></i>
-                  <span>เลือกรูปถ่ายรถของคุณ (JPG, PNG, WEBP)</span>
-                </label>
-              </div>
-              <div id="regVehiclePhotoPreviewBox" class="hidden relative rounded-xl overflow-hidden border border-emerald-300 dark:border-emerald-700 bg-slate-900">
-                <img id="regVehiclePhotoImg" src="" alt="ตัวอย่างรูปรถ" onclick="openLightbox(this.src)" class="w-full h-40 object-cover cursor-zoom-in">
-                <div class="absolute top-2 right-2 flex items-center gap-1.5">
-                  <label for="regVehiclePhotoInput" class="px-2.5 py-1 rounded-lg bg-slate-900/80 hover:bg-slate-900 text-white text-[11px] font-semibold cursor-pointer backdrop-blur-xs">
-                    <i class="fa-solid fa-rotate mr-1"></i>เปลี่ยนรูป
-                  </label>
-                  <button type="button" onclick="clearVehiclePhoto('reg')" class="px-2.5 py-1 rounded-lg bg-rose-600/90 hover:bg-rose-600 text-white text-[11px] font-semibold cursor-pointer">
-                    <i class="fa-solid fa-trash"></i>
-                  </button>
-                </div>
-              </div>
+            <div class="border-2 border-dashed border-slate-300 rounded-xl p-3 text-center hover:border-emerald-500 transition bg-slate-50">
+              <input type="file" id="regVehiclePhoto" accept="image/*" onchange="previewProviderVehiclePhoto(event, 'regVehiclePhotoPreview', 'register')" class="hidden">
+              <label for="regVehiclePhoto" class="cursor-pointer flex flex-col items-center">
+                <i class="fa-solid fa-image text-xl text-emerald-600 mb-1"></i>
+                <span class="text-xs font-semibold text-slate-700">คลิกเพื่ออัปโหลดรูปถ่ายรถของคุณ</span>
+                <span class="text-[10px] text-slate-400">รองรับไฟล์ JPG, PNG, WEBP</span>
+              </label>
+              <div id="regVehiclePhotoPreview" class="mt-2 hidden"></div>
             </div>
           </div>
         </div>
 
-        <button type="submit" id="regSubmitBtn" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2.5 rounded-xl shadow-md transition cursor-pointer mt-2">
+        <button type="submit" id="regSubmitBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-xl shadow-md transition cursor-pointer mt-2">
           ยืนยันการสมัครสมาชิก
         </button>
       </form>
@@ -380,98 +402,77 @@
   </div>
 
   <!-- 2. Edit Profile Modal -->
-  <div id="editProfileModal" class="fixed inset-0 bg-slate-900/65 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
-    <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-lg w-full shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden animate-fade-in flex flex-col max-h-[90vh]">
-      <div class="px-6 py-4 bg-slate-50 dark:bg-slate-800/70 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between shrink-0">
-        <div class="flex items-center gap-2">
-          <i class="fa-solid fa-user-pen text-sky-600 dark:text-sky-400"></i>
-          <h3 class="font-bold text-lg text-slate-900 dark:text-white">แก้ไขข้อมูลสมาชิก</h3>
-        </div>
-        <button onclick="closeModal('editProfileModal')" class="text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-slate-200/70 dark:hover:bg-slate-700 cursor-pointer">
+  <div id="editProfileModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden animate-fade-in">
+      <div class="px-6 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+        <h3 class="font-bold text-lg text-slate-800 flex items-center gap-2">
+          <i class="fa-solid fa-user-pen text-blue-600"></i> แก้ไขข้อมูลสมาชิก
+        </h3>
+        <button onclick="closeModal('editProfileModal')" class="text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full flex items-center justify-center hover:bg-slate-200/60 cursor-pointer">
           <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
 
-      <form onsubmit="handleEditProfileSubmit(event)" class="p-6 space-y-4 overflow-y-auto custom-scrollbar">
+      <form onsubmit="handleSaveProfile(event)" class="p-6 space-y-3.5 max-h-[82vh] overflow-y-auto custom-scrollbar">
         <div>
-          <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">อีเมลบัญชี (ไม่สามารถแก้ไขได้)</label>
-          <input type="email" id="editEmail" disabled class="w-full px-3.5 py-2 bg-slate-100 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-500 dark:text-slate-400 cursor-not-allowed">
+          <label class="block text-xs font-semibold text-slate-700 mb-1">อีเมลบัญชี (ไม่สามารถแก้ไขได้)</label>
+          <input type="email" id="editEmail" readonly class="w-full px-3.5 py-2 bg-slate-100 border border-slate-200 rounded-xl text-sm text-slate-500 cursor-not-allowed">
         </div>
 
         <div>
-          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-2">ประเภทบัญชีผู้ใช้งาน *</label>
-          <div class="grid grid-cols-2 gap-3">
-            <div id="editRoleCardCustomer" onclick="selectRoleRadio('editRole', 'CUSTOMER')" class="relative p-3 rounded-xl border-2 border-sky-600 bg-sky-50/80 dark:bg-sky-950/50 transition text-center cursor-pointer select-none">
-              <input type="radio" name="editRole" value="CUSTOMER" class="sr-only">
-              <span id="editBadgeCustomer" class="inline-block text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-600 text-white mb-1">✓ เลือกอยู่</span>
-              <i class="fa-solid fa-user text-sky-600 dark:text-sky-400 text-lg mb-0.5 block"></i>
-              <div class="text-xs font-bold text-slate-900 dark:text-white">ผู้ใช้งานทั่วไป</div>
-            </div>
-
-            <div id="editRoleCardProvider" onclick="selectRoleRadio('editRole', 'PROVIDER')" class="relative p-3 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 hover:border-emerald-400 transition text-center cursor-pointer select-none">
-              <input type="radio" name="editRole" value="PROVIDER" class="sr-only">
-              <span id="editBadgeProvider" class="hidden text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-600 text-white mb-1">✓ เลือกอยู่</span>
-              <i class="fa-solid fa-truck-pickup text-emerald-600 dark:text-emerald-400 text-lg mb-0.5 block"></i>
-              <div class="text-xs font-bold text-slate-900 dark:text-white">ผู้ให้บริการรถ</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div>
-            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">ชื่อผู้ติดต่อ / ชื่อบริษัท *</label>
-            <input type="text" id="editName" required class="w-full px-3.5 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-sky-500 focus:outline-none">
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">เบอร์โทรศัพท์ติดต่อ *</label>
-            <input type="tel" id="editPhone" required class="w-full px-3.5 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-sky-500 focus:outline-none">
-          </div>
-        </div>
-
-        <!-- Edit Provider Fields -->
-        <div id="editProviderExtraFields" class="hidden space-y-3.5 pt-3 border-t border-slate-200 dark:border-slate-800">
-          <div class="text-xs font-bold text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5">
-            <i class="fa-solid fa-truck"></i> ข้อมูลรถและการให้บริการ
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">ประเภทรถที่ให้บริการหลัก *</label>
-            <input type="text" id="editVehicleType" placeholder="เช่น รถกระบะตู้ทึบ, รถตู้ VIP 10 ที่นั่ง" class="w-full px-3.5 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none">
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">พื้นที่ให้บริการ / รายละเอียดเพิ่มเติม</label>
-            <input type="text" id="editServiceArea" placeholder="เช่น กรุงเทพฯ-ปริมณฑล และทั่วประเทศ" class="w-full px-3.5 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none">
-          </div>
-
-          <!-- Vehicle Photo Upload in Edit Profile -->
-          <div class="bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/70 rounded-xl p-3.5 space-y-2.5">
-            <div class="text-xs font-bold text-emerald-900 dark:text-emerald-300">
-              <i class="fa-solid fa-camera mr-1"></i> รูปถ่ายรถที่ให้บริการ (มุมเฉียง 30–45 องศา เห็นป้ายทะเบียนหน้าชัดเจน)
-            </div>
-            <input type="file" id="editVehiclePhotoInput" accept="image/jpeg,image/png,image/webp" onchange="handleVehiclePhotoSelect(event, 'edit')" class="hidden">
-            <div id="editVehiclePhotoEmpty">
-              <label for="editVehiclePhotoInput" class="flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl border-2 border-dashed border-emerald-400 dark:border-emerald-700 bg-white dark:bg-slate-900 hover:bg-emerald-50 dark:hover:bg-slate-800 text-emerald-700 dark:text-emerald-300 text-xs font-semibold cursor-pointer transition">
-                <i class="fa-solid fa-cloud-arrow-up text-base"></i>
-                <span>อัปโหลดรูปถ่ายรถของคุณ (JPG, PNG, WEBP)</span>
-              </label>
-            </div>
-            <div id="editVehiclePhotoPreviewBox" class="hidden relative rounded-xl overflow-hidden border border-emerald-300 dark:border-emerald-700 bg-slate-900">
-              <img id="editVehiclePhotoImg" src="" alt="รูปรถผู้ให้บริการ" onclick="openLightbox(this.src)" class="w-full h-40 object-cover cursor-zoom-in">
-              <div class="absolute top-2 right-2 flex items-center gap-1.5">
-                <label for="editVehiclePhotoInput" class="px-2.5 py-1 rounded-lg bg-slate-900/80 hover:bg-slate-900 text-white text-[11px] font-semibold cursor-pointer backdrop-blur-xs">
-                  <i class="fa-solid fa-rotate mr-1"></i>เปลี่ยนรูป
-                </label>
-                <button type="button" onclick="clearVehiclePhoto('edit')" class="px-2.5 py-1 rounded-lg bg-rose-600/90 hover:bg-rose-600 text-white text-[11px] font-semibold cursor-pointer">
-                  <i class="fa-solid fa-trash"></i>
-                </button>
+          <label class="block text-xs font-semibold text-slate-700 mb-1.5">ประเภทบัญชีผู้ใช้งาน *</label>
+          <div class="grid grid-cols-2 gap-2.5">
+            <label class="cursor-pointer">
+              <input type="radio" name="editRole" value="CUSTOMER" onchange="toggleEditProviderFields()" class="peer sr-only">
+              <div class="p-2.5 rounded-xl border-2 border-slate-200 peer-checked:border-blue-600 peer-checked:bg-blue-50 transition text-center">
+                <div class="text-xs font-bold text-slate-800">ผู้ใช้งานทั่วไป</div>
               </div>
+            </label>
+            <label class="cursor-pointer">
+              <input type="radio" name="editRole" value="PROVIDER" onchange="toggleEditProviderFields()" class="peer sr-only">
+              <div class="p-2.5 rounded-xl border-2 border-slate-200 peer-checked:border-emerald-600 peer-checked:bg-emerald-50 transition text-center">
+                <div class="text-xs font-bold text-slate-800">ผู้ให้บริการรถ</div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">ชื่อผู้ติดต่อ / ชื่อบริษัทหรือทีมงาน *</label>
+          <input type="text" id="editName" required class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">เบอร์โทรศัพท์ติดต่อ *</label>
+          <input type="tel" id="editPhone" required class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+        </div>
+
+        <div id="editProviderExtraFields" class="hidden space-y-3 pt-2 border-t border-slate-200">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">ประเภทรถที่ให้บริการหลัก *</label>
+            <input type="text" id="editVehicleType" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">พื้นที่ให้บริการ</label>
+            <input type="text" id="editServiceArea" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">รูปถ่ายรถ (มุมเฉียง 30° เห็นป้ายทะเบียนหน้า)</label>
+            <div class="border-2 border-dashed border-slate-300 rounded-xl p-3 text-center hover:border-emerald-500 transition bg-slate-50">
+              <input type="file" id="editVehiclePhoto" accept="image/*" onchange="previewProviderVehiclePhoto(event, 'editVehiclePhotoPreview', 'edit')" class="hidden">
+              <label for="editVehiclePhoto" class="cursor-pointer flex flex-col items-center">
+                <i class="fa-solid fa-camera text-lg text-emerald-600 mb-1"></i>
+                <span class="text-xs font-semibold text-slate-700">เปลี่ยน / อัปโหลดรูปถ่ายรถใหม่</span>
+              </label>
+              <div id="editVehiclePhotoPreview" class="mt-2 hidden"></div>
             </div>
           </div>
         </div>
 
-        <div class="pt-2 flex items-center justify-end gap-2 border-t border-slate-100 dark:border-slate-800">
-          <button type="button" onclick="closeModal('editProfileModal')" class="px-4 py-2 rounded-xl text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer">ยกเลิก</button>
-          <button type="submit" class="px-5 py-2 rounded-xl text-sm font-semibold bg-sky-600 hover:bg-sky-700 text-white shadow-sm transition cursor-pointer">
-            <i class="fa-solid fa-floppy-disk mr-1"></i> บันทึกการแก้ไข
+        <div class="pt-2 flex items-center justify-end gap-2 border-t border-slate-100">
+          <button type="button" onclick="closeModal('editProfileModal')" class="px-4 py-2 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 cursor-pointer">ยกเลิก</button>
+          <button type="submit" id="saveProfileBtn" class="px-5 py-2 rounded-xl text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition cursor-pointer">
+            บันทึกข้อมูล
           </button>
         </div>
       </form>
@@ -479,68 +480,68 @@
   </div>
 
   <!-- 3. Create New Thread Modal -->
-  <div id="newThreadModal" class="fixed inset-0 bg-slate-900/65 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
-    <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-2xl w-full shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden animate-fade-in flex flex-col max-h-[90vh]">
-      <div class="px-6 py-4 bg-sky-600 text-white flex items-center justify-between shrink-0">
+  <div id="newThreadModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-2xl w-full shadow-2xl overflow-hidden animate-fade-in flex flex-col max-h-[90vh]">
+      <div class="px-6 py-4 bg-blue-600 text-white flex items-center justify-between shrink-0">
         <div class="flex items-center gap-2">
           <i class="fa-solid fa-pen-to-square"></i>
           <h3 class="font-bold text-lg">ตั้งกระทู้ประกาศหาบริการยานพาหนะ</h3>
         </div>
-        <button onclick="closeModal('newThreadModal')" class="text-white/85 hover:text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-white/15 cursor-pointer">
+        <button onclick="closeModal('newThreadModal')" class="text-white/80 hover:text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-white/10 cursor-pointer">
           <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
 
       <form onsubmit="handleCreateThread(event)" class="p-6 space-y-4 overflow-y-auto custom-scrollbar">
         <div>
-          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">หัวข้อประกาศ *</label>
-          <input type="text" id="threadTitle" required placeholder="เช่น ต้องการรถกระบะตู้ทึบ ขนย้ายของหอพักจากลาดพร้าวไปบางนา" class="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-sky-500 focus:outline-none">
+          <label class="block text-xs font-semibold text-slate-700 mb-1">หัวข้อประกาศ *</label>
+          <input type="text" id="threadTitle" required placeholder="เช่น ต้องการรถกระบะตู้ทึบ ขนย้ายของหอพักจากลาดพร้าวไปบางนา" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">หมวดหมู่ประเภทรถที่ต้องการ *</label>
-            <select id="threadCategory" required class="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-sky-500 focus:outline-none"></select>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">หมวดหมู่ประเภทรถที่ต้องการ *</label>
+            <select id="threadCategory" required class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none"></select>
           </div>
           <div>
-            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">วันและเวลาที่ต้องการใช้บริการ *</label>
-            <input type="text" id="threadServiceDate" required placeholder="เช่น พรุ่งนี้ 09:00 น. หรือ 28 พ.ย. 2569" class="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-sky-500 focus:outline-none">
+            <label class="block text-xs font-semibold text-slate-700 mb-1">วันและเวลาที่ต้องการใช้บริการ *</label>
+            <input type="text" id="threadServiceDate" required placeholder="เช่น พรุ่งนี้ 09:00 น. หรือ 28 พ.ย. 2569" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
           </div>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">จุดรับ / ต้นทาง *</label>
-            <input type="text" id="threadOrigin" required placeholder="เช่น ซอยลาดพร้าว 101 กรุงเทพฯ" class="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-sky-500 focus:outline-none">
+            <label class="block text-xs font-semibold text-slate-700 mb-1">จุดรับ / ต้นทาง *</label>
+            <input type="text" id="threadOrigin" required placeholder="เช่น ซอยลาดพร้าว 101 กรุงเทพฯ" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
           </div>
           <div>
-            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">จุดส่ง / ปลายทาง *</label>
-            <input type="text" id="threadDestination" required placeholder="เช่น อ.บางพลี จ.สมุทรปราการ" class="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-sky-500 focus:outline-none">
+            <label class="block text-xs font-semibold text-slate-700 mb-1">จุดส่ง / ปลายทาง *</label>
+            <input type="text" id="threadDestination" required placeholder="เช่น อ.บางพลี จ.สมุทรปราการ" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
           </div>
         </div>
 
         <div>
-          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">รายละเอียดงาน สิ่งของ หรือจำนวนผู้โดยสาร *</label>
-          <textarea id="threadDescription" rows="4" required placeholder="ระบุรายละเอียดให้ชัดเจน เช่น มีตู้เย็น 1 เครื่อง, กล่องลัง 10 ใบ, ต้องการคนช่วยยกของด้วยหรือไม่..." class="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-sky-500 focus:outline-none"></textarea>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">รายละเอียดงาน สิ่งของ หรือจำนวนผู้โดยสาร *</label>
+          <textarea id="threadDescription" rows="4" required placeholder="ระบุรายละเอียดให้ชัดเจน เช่น มีตู้เย็น 1 เครื่อง, กล่องลัง 10 ใบ, ต้องการคนช่วยยกของด้วยหรือไม่..." class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
         </div>
 
         <!-- Image Upload -->
         <div>
-          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">แนบรูปภาพประกอบ (รูปสิ่งของ หน้างาน หรือจุดจอดรถ)</label>
-          <div class="border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-xl p-4 text-center hover:border-sky-500 transition bg-slate-50/70 dark:bg-slate-800/40">
+          <label class="block text-xs font-semibold text-slate-700 mb-1">แนบรูปภาพประกอบ (รูปสิ่งของ หน้างาน หรือจุดจอดรถ)</label>
+          <div class="border-2 border-dashed border-slate-300 rounded-xl p-4 text-center hover:border-blue-500 transition bg-slate-50/60">
             <input type="file" id="threadImages" accept="image/*" multiple onchange="previewSelectedImages(event)" class="hidden">
             <label for="threadImages" class="cursor-pointer flex flex-col items-center">
-              <i class="fa-solid fa-cloud-arrow-up text-2xl text-sky-600 dark:text-sky-400 mb-1"></i>
-              <span class="text-xs font-semibold text-slate-800 dark:text-slate-200">คลิกเพื่อเลือกรูปภาพ (สูงสุด 4 รูป)</span>
-              <span class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">รองรับไฟล์ JPG, PNG, WEBP</span>
+              <i class="fa-solid fa-cloud-arrow-up text-2xl text-blue-600 mb-1"></i>
+              <span class="text-xs font-semibold text-slate-700">คลิกเพื่อเลือกรูปภาพ (สูงสุด 4 รูป)</span>
+              <span class="text-[11px] text-slate-400 mt-0.5">รองรับไฟล์ JPG, PNG, WEBP</span>
             </label>
             <div id="imagePreviewGrid" class="grid grid-cols-4 gap-2 mt-3 empty:hidden"></div>
           </div>
         </div>
 
-        <div class="pt-2 flex items-center justify-end gap-3 border-t border-slate-100 dark:border-slate-800">
-          <button type="button" onclick="closeModal('newThreadModal')" class="px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer">ยกเลิก</button>
-          <button type="submit" id="createThreadSubmitBtn" class="px-6 py-2.5 rounded-xl text-sm font-semibold bg-sky-600 hover:bg-sky-700 text-white shadow-md transition cursor-pointer">
+        <div class="pt-2 flex items-center justify-end gap-3 border-t border-slate-100">
+          <button type="button" onclick="closeModal('newThreadModal')" class="px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 cursor-pointer">ยกเลิก</button>
+          <button type="submit" id="createThreadSubmitBtn" style="background-color: #FBBF24; color: #0F172A;" class="px-6 py-2.5 rounded-xl text-sm font-bold hover:brightness-105 shadow-md transition cursor-pointer">
             <i class="fa-solid fa-paper-plane mr-1"></i> โพสต์ประกาศทันที
           </button>
         </div>
@@ -549,14 +550,14 @@
   </div>
 
   <!-- 4. Thread Detail & Bidding Modal -->
-  <div id="threadDetailModal" class="fixed inset-0 bg-slate-900/65 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
-    <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-3xl w-full shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden animate-fade-in flex flex-col max-h-[92vh]">
-      <div class="px-6 py-4 bg-slate-50 dark:bg-slate-800/70 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between shrink-0">
+  <div id="threadDetailModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-3xl w-full shadow-2xl overflow-hidden animate-fade-in flex flex-col max-h-[92vh]">
+      <div class="px-6 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between shrink-0">
         <div class="flex items-center gap-2">
-          <span class="bg-sky-100 text-sky-800 dark:bg-sky-900/60 dark:text-sky-300 text-xs font-bold px-2.5 py-1 rounded-md">รายละเอียดประกาศ</span>
-          <span id="detailThreadIdBadge" class="text-xs text-slate-500 dark:text-slate-400"></span>
+          <span class="bg-blue-100 text-blue-700 text-xs font-bold px-2.5 py-1 rounded-md">รายละเอียดประกาศ</span>
+          <span id="detailThreadIdBadge" class="text-xs text-slate-400"></span>
         </div>
-        <button onclick="closeModal('threadDetailModal')" class="text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-slate-200/70 dark:hover:bg-slate-700 cursor-pointer">
+        <button onclick="closeModal('threadDetailModal')" class="text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full flex items-center justify-center hover:bg-slate-200/60 cursor-pointer">
           <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
@@ -566,78 +567,65 @@
   </div>
 
   <!-- 5. Firebase Config Modal (Admin Only) -->
-  <div id="firebaseConfigModal" class="fixed inset-0 bg-slate-900/65 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
-    <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-lg w-full shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden animate-fade-in">
+  <div id="firebaseConfigModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl overflow-hidden animate-fade-in">
       <div class="px-6 py-4 bg-slate-900 text-white flex items-center justify-between">
         <div class="flex items-center gap-2">
           <i class="fa-solid fa-fire text-amber-400"></i>
-          <h3 class="font-bold text-base">ตั้งค่าเชื่อมต่อ Firebase Real-time (แอดมิน)</h3>
+          <h3 class="font-bold text-base">ตั้งค่าเชื่อมต่อ Firebase Real-time</h3>
         </div>
         <button onclick="closeModal('firebaseConfigModal')" class="text-slate-400 hover:text-white w-8 h-8 rounded-full flex items-center justify-center cursor-pointer">
           <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
       <form onsubmit="saveFirebaseConfigFromUI(event)" class="p-6 space-y-4">
-        <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-          วางโค้ด <strong>firebaseConfig</strong> (เฉพาะส่วนในวงเล็บปีกกา <code>{ ... }</code> หรือก๊อปปี้มาทั้งก้อนก็ได้) จากหน้า Project Settings ของ Firebase Console
+        <p class="text-xs text-slate-600 leading-relaxed">
+          วางโค้ด <strong>firebaseConfig</strong> (เฉพาะส่วนในวงเล็บปีกกา <code>{ ... }</code> หรือก๊อปปี้มาทั้งก้อนก็ได้)
         </p>
         <div>
-          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Firebase Config *</label>
-          <textarea id="firebaseConfigInput" rows="7" required placeholder='{
-  apiKey: "AIzaSy...",
-  authDomain: "thaimove-forum.firebaseapp.com",
-  projectId: "thaimove-forum",
-  storageBucket: "thaimove-forum.firebasestorage.app",
-  messagingSenderId: "815181452783",
-  appId: "1:815181452783:web:..."
-}' class="w-full p-3 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-mono bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-sky-500 focus:outline-none"></textarea>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Firebase Config *</label>
+          <textarea id="firebaseConfigInput" rows="7" required class="w-full p-3 border border-slate-300 rounded-xl text-xs font-mono bg-slate-50 focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
         </div>
-        <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
-          <button type="button" onclick="closeModal('firebaseConfigModal')" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer">ยกเลิก</button>
+        <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+          <button type="button" onclick="closeModal('firebaseConfigModal')" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 cursor-pointer">ยกเลิก</button>
           <button type="submit" class="px-5 py-2 rounded-xl text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm transition cursor-pointer">
-            <i class="fa-solid fa-plug mr-1"></i> บันทึกและเชื่อมต่อ
+            <i class="fa-solid fa-plug mr-1"></i> บันทึกและสลับไปโหมด Firebase
           </button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- 6. Custom Confirmation Modal (แทน confirm() เพื่อความปลอดภัยในทุกเบราว์เซอร์) -->
-  <div id="confirmActionModal" class="fixed inset-0 bg-slate-900/65 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
-    <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-md w-full shadow-2xl border border-slate-200 dark:border-slate-800 p-6 space-y-4 animate-fade-in">
-      <div class="flex items-start gap-3">
-        <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 dark:bg-emerald-900/60 dark:text-emerald-300 flex items-center justify-center shrink-0 text-lg">
-          <i class="fa-solid fa-circle-check"></i>
-        </div>
-        <div>
-          <h4 id="confirmModalTitle" class="font-bold text-base text-slate-900 dark:text-white">ยืนยันการทำรายการ</h4>
-          <p id="confirmModalMessage" class="text-xs text-slate-600 dark:text-slate-300 mt-1 leading-relaxed"></p>
-        </div>
-      </div>
-      <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
-        <button type="button" onclick="closeModal('confirmActionModal')" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer">ยกเลิก</button>
-        <button type="button" id="confirmModalOkBtn" class="px-5 py-2 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm cursor-pointer">ยืนยันตกลง</button>
-      </div>
-    </div>
+  <!-- 6. Lightbox Image Modal -->
+  <div id="lightboxModal" onclick="closeModal('lightboxModal')" class="fixed inset-0 bg-black/85 z-50 hidden items-center justify-center p-4 cursor-zoom-out">
+    <img id="lightboxImage" src="" alt="Preview" class="max-w-full max-h-[90vh] rounded-xl shadow-2xl object-contain">
   </div>
 
-  <!-- 7. Toast Notification Banner (แทน alert()) -->
-  <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none px-4 sm:px-0"></div>
-
-  <!-- 8. Lightbox Image Modal -->
-  <div id="lightboxModal" onclick="closeModal('lightboxModal')" class="fixed inset-0 bg-black/85 z-50 hidden items-center justify-center p-4 cursor-zoom-out">
-    <img id="lightboxImage" src="" alt="ภาพขยาย" class="max-w-full max-h-[90vh] rounded-xl shadow-2xl object-contain">
+  <!-- 7. Custom System Dialog Modal (แทนที่ alert และ confirm ของเบราว์เซอร์) -->
+  <div id="systemDialogModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-[60] hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden animate-fade-in border border-slate-200">
+      <div class="p-5 space-y-3">
+        <div class="flex items-center gap-3">
+          <div id="systemDialogIcon" class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-lg shrink-0">
+            <i class="fa-solid fa-circle-info"></i>
+          </div>
+          <h3 id="systemDialogTitle" class="font-bold text-base text-slate-900">แจ้งเตือน</h3>
+        </div>
+        <p id="systemDialogMessage" class="text-sm text-slate-600 whitespace-pre-line leading-relaxed"></p>
+      </div>
+      <div id="systemDialogActions" class="px-5 py-3.5 bg-slate-50 border-t border-slate-200 flex items-center justify-end gap-2"></div>
+    </div>
   </div>
 
   <!-- ==================== APPLICATION SCRIPT ==================== -->
   <script type="module">
-    import { initializeApp, getApps, deleteApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getFirestore, collection, doc, setDoc, getDoc, addDoc, updateDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getFirestore, collection, doc, setDoc, getDoc, addDoc, updateDoc, deleteDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
     import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
     // =========================================================================
-    // ค่า Firebase Config ของโปรเจกต์ thaimove-forum
+    // ค่า Firebase Config ของโปรเจกต์ thaimove-forum (เชื่อมต่อ Real-time อัตโนมัติ)
     // =========================================================================
     const DEFAULT_FIREBASE_CONFIG = {
       apiKey: "AIzaSyBDTU3hDb7OfKw8upnJ-TUWuQXsUYzhGpg",
@@ -660,14 +648,29 @@
       { id: 'CRANE', name: 'รถเฮี๊ยบ / เครน', icon: 'fa-trailer' }
     ];
 
-    const DEMO_USERS = [
+    const DEFAULT_PROVIDER_SHOWCASE = [
       {
-        uid: 'demo_cust_1',
-        name: 'คุณสมชาย ใจดี',
-        email: 'somchai@demo.com',
-        phone: '081-234-5678',
-        role: 'CUSTOMER'
+        name: 'หจก. ขนส่งด่วนใจ',
+        vehicle: 'รถกระบะตู้ทึบสูง 2.1 เมตร',
+        area: 'กทม. - ปริมณฑล และทั่วไทย',
+        image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=700&q=80'
       },
+      {
+        name: 'พี่เอก รถตู้ VIP',
+        vehicle: 'Toyota Commuter VIP 10 ที่นั่ง',
+        area: 'ภาคกลาง ภาคตะวันออก ภาคเหนือ',
+        image: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=700&q=80'
+      },
+      {
+        name: 'ทีมงาน 6 ล้อด่วนทั่วไทย',
+        vehicle: 'รถบรรทุก 6 ล้อตู้ทึบ ยาว 6.5 เมตร',
+        area: 'นิคมอุตสาหกรรมและส่งสินค้าทั่วประเทศ',
+        image: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=700&q=80'
+      }
+    ];
+
+    const DEMO_USERS = [
+      { uid: 'demo_cust_1', name: 'คุณสมชาย ใจดี', email: 'somchai@demo.com', phone: '081-234-5678', role: 'CUSTOMER' },
       {
         uid: 'demo_prov_1',
         name: 'หจก. ขนส่งด่วนใจ',
@@ -676,7 +679,7 @@
         role: 'PROVIDER',
         vehicleType: 'รถกระบะตู้ทึบ & รถ 6 ล้อ',
         serviceArea: 'กทม. และทั่วประเทศ',
-        vehiclePhoto: 'https://images.unsplash.com/photo-1519003722824-194d4455a60c?auto=format&fit=crop&w=800&q=80'
+        vehiclePhoto: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=700&q=80'
       },
       {
         uid: 'demo_prov_2',
@@ -686,7 +689,7 @@
         role: 'PROVIDER',
         vehicleType: 'รถตู้ Commuter VIP 10 ที่นั่ง',
         serviceArea: 'ภาคกลาง ภาคตะวันออก ภาคเหนือ',
-        vehiclePhoto: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=800&q=80'
+        vehiclePhoto: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=700&q=80'
       }
     ];
 
@@ -703,7 +706,7 @@
         authorId: 'demo_cust_1',
         authorName: 'คุณสมชาย ใจดี',
         authorPhone: '081-234-5678',
-        createdAt: '27 พ.ย. 2569 10:15 น.',
+        createdAt: '26 พ.ย. 2569 10:15 น.',
         status: 'OPEN',
         confirmedBidId: null,
         bids: [
@@ -713,10 +716,10 @@
             providerName: 'หจก. ขนส่งด่วนใจ',
             providerPhone: '089-876-5432',
             vehicleDetail: 'รถกระบะตู้ทึบสูง 2.1 เมตร (กันฝน 100%)',
-            vehiclePhoto: 'https://images.unsplash.com/photo-1519003722824-194d4455a60c?auto=format&fit=crop&w=800&q=80',
+            vehiclePhoto: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=700&q=80',
             price: 1200,
             note: 'ราคารวมค่าน้ำมัน ทางด่วน และคนขับช่วยยกของเรียบร้อยครับ พร้อมเข้าตรงเวลา',
-            createdAt: '27 พ.ย. 2569 10:28 น.'
+            createdAt: '26 พ.ย. 2569 10:28 น.'
           }
         ]
       },
@@ -732,7 +735,7 @@
         authorId: 'demo_cust_2',
         authorName: 'คุณนภา บริษัทเอ็นจอย',
         authorPhone: '082-333-4455',
-        createdAt: '27 พ.ย. 2569 09:40 น.',
+        createdAt: '26 พ.ย. 2569 09:40 น.',
         status: 'OPEN',
         confirmedBidId: null,
         bids: [
@@ -742,10 +745,10 @@
             providerName: 'พี่เอก รถตู้ VIP',
             providerPhone: '086-555-9988',
             vehicleDetail: 'Toyota Commuter VIP เบาะใหญ่ 10 ที่นั่ง เครื่องเสียงครบ',
-            vehiclePhoto: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=800&q=80',
+            vehiclePhoto: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=700&q=80',
             price: 3800,
             note: 'วันละ 1,900 บาท x 2 วัน (ไม่รวมน้ำมันและค่าที่พักคนขับ) รถใหม่ปี 2024 ประกันชั้น 1 ครับ',
-            createdAt: '27 พ.ย. 2569 09:55 น.'
+            createdAt: '26 พ.ย. 2569 09:55 น.'
           }
         ]
       },
@@ -755,16 +758,16 @@
         category: 'TRUCK6',
         origin: 'นิคมฯ บางชัน กรุงเทพฯ',
         destination: 'อ.ศรีราชา จ.ชลบุรี',
-        serviceDate: '28 พ.ย. 2569 เวลา 08:30 น.',
+        serviceDate: '27 พ.ย. 2569 เวลา 08:30 น.',
         description: 'สินค้าบรรจุกล่องวางบนพาเลทไม้ 6 พาเลท น้ำหนักรวมประมาณ 3.5 ตัน มีรถโฟล์คลิฟท์ตักขึ้น-ลงทั้งต้นทางและปลายทาง',
         images: ['https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=600&q=80'],
         authorId: 'demo_cust_1',
         authorName: 'คุณสมชาย ใจดี',
         authorPhone: '081-234-5678',
-        createdAt: '26 พ.ย. 2569 16:20 น.',
+        createdAt: '25 พ.ย. 2569 16:20 น.',
         status: 'CONFIRMED',
         confirmedBidId: 'BID-503',
-        confirmedAt: '26 พ.ย. 2569 17:05 น.',
+        confirmedAt: '25 พ.ย. 2569 17:05 น.',
         bids: [
           {
             id: 'BID-503',
@@ -772,40 +775,10 @@
             providerName: 'หจก. ขนส่งด่วนใจ',
             providerPhone: '089-876-5432',
             vehicleDetail: 'รถบรรทุก 6 ล้อตู้ทึบ ยาว 6.5 เมตร',
-            vehiclePhoto: 'https://images.unsplash.com/photo-1519003722824-194d4455a60c?auto=format&fit=crop&w=800&q=80',
+            vehiclePhoto: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=700&q=80',
             price: 3500,
             note: 'รถพร้อมเข้าโหลดสินค้า 08:00 น. มีเอกสารใบกำกับภาษีและประกันสินค้าครบครับ',
-            createdAt: '26 พ.ย. 2569 16:45 น.'
-          }
-        ]
-      },
-      {
-        id: 'TH-1004',
-        title: 'เรียกรถสไลด์ ยกรถเก๋งเสียจากมอเตอร์เวย์ไปอู่ย่านพระราม 9',
-        category: 'TOW',
-        origin: 'จุดพักรถมอเตอร์เวย์ กม.25',
-        destination: 'อู่ซ่อมรถ ซอยพระราม 9 ซอย 41',
-        serviceDate: 'ด่วนวันนี้ เวลา 14:00 น.',
-        description: 'รถเก๋ง Honda Civic ไดชาร์จเสีย สตาร์ทไม่ติด เกียร์ว่างเข็นได้ปกติ ต้องการรถสไลด์ถาดกองพื้น',
-        images: [],
-        authorId: 'demo_cust_3',
-        authorName: 'คุณธนา',
-        authorPhone: '085-111-2222',
-        createdAt: '27 พ.ย. 2569 11:00 น.',
-        status: 'CONFIRMED',
-        confirmedBidId: 'BID-504',
-        confirmedAt: '27 พ.ย. 2569 11:20 น.',
-        bids: [
-          {
-            id: 'BID-504',
-            providerId: 'demo_prov_2',
-            providerName: 'พี่เอก รถตู้ VIP',
-            providerPhone: '086-555-9988',
-            vehicleDetail: 'รถสไลด์ถาดกองพื้น ทีมงานพันธมิตรใกล้จุดพักรถ',
-            vehiclePhoto: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=800&q=80',
-            price: 1800,
-            note: 'ถึงจุดรับภายใน 25 นาทีครับ ดูแลปลอดภัย',
-            createdAt: '27 พ.ย. 2569 11:10 น.'
+            createdAt: '25 พ.ย. 2569 16:45 น.'
           }
         ]
       }
@@ -818,92 +791,207 @@
     let storage = null;
     let currentUser = null;
     let threads = [];
-    let allMembers = [];
     let selectedCategory = 'ALL';
     let currentMainTab = 'ALL';
     let selectedImagesBase64 = [];
     let selectedImageFiles = [];
+    let regVehiclePhotoData = '';
+    let regVehiclePhotoFile = null;
+    let editVehiclePhotoData = '';
+    let editVehiclePhotoFile = null;
     let activeDetailThreadId = null;
 
-    // Temporary vehicle photo DataURL for Register & Edit modals
-    let regVehiclePhotoDataUrl = '';
-    let editVehiclePhotoDataUrl = '';
+    // Carousel State
+    let carouselItems = [];
+    let currentSlideIndex = 0;
+    let carouselTimer = null;
 
-    // ==================== TOAST & CONFIRMATION HELPERS ====================
-    window.showToast = function(message, type = 'info') {
-      const container = document.getElementById('toastContainer');
-      if (!container) return;
-      const colors = {
-        success: 'bg-emerald-600 text-white border-emerald-500',
-        error: 'bg-rose-600 text-white border-rose-500',
-        warning: 'bg-amber-500 text-slate-950 border-amber-400',
-        info: 'bg-slate-900 text-white border-slate-700'
-      };
-      const icons = {
-        success: 'fa-circle-check',
-        error: 'fa-circle-exclamation',
-        warning: 'fa-triangle-exclamation',
-        info: 'fa-circle-info'
-      };
-      const toast = document.createElement('div');
-      toast.className = `pointer-events-auto flex items-center gap-2.5 px-4 py-3 rounded-xl shadow-xl border text-xs font-semibold animate-fade-in ${colors[type] || colors.info}`;
-      toast.innerHTML = `<i class="fa-solid ${icons[type] || icons.info} text-sm shrink-0"></i><span class="leading-snug">${escapeHtml(message)}</span>`;
-      container.appendChild(toast);
-      setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transition = 'opacity 0.25s ease';
-        setTimeout(() => toast.remove(), 260);
-      }, 3600);
-    };
+    // Presence State
+    const sessionPresenceId = 'sess_' + Math.random().toString(36).substring(2, 11);
+    let presenceHeartbeatTimer = null;
 
-    function openConfirmModal(title, message, onConfirm) {
-      document.getElementById('confirmModalTitle').textContent = title;
-      document.getElementById('confirmModalMessage').textContent = message;
-      const okBtn = document.getElementById('confirmModalOkBtn');
-      const newBtn = okBtn.cloneNode(true);
-      okBtn.parentNode.replaceChild(newBtn, okBtn);
-      newBtn.addEventListener('click', () => {
-        closeModal('confirmActionModal');
-        onConfirm();
+    // ==================== CUSTOM SYSTEM DIALOG (NO alert/confirm) ====================
+    function showSystemAlert(message, title = 'แจ้งเตือน', type = 'info') {
+      return new Promise((resolve) => {
+        const modal = document.getElementById('systemDialogModal');
+        const iconEl = document.getElementById('systemDialogIcon');
+        const titleEl = document.getElementById('systemDialogTitle');
+        const msgEl = document.getElementById('systemDialogMessage');
+        const actionsEl = document.getElementById('systemDialogActions');
+
+        titleEl.textContent = title;
+        msgEl.textContent = message;
+
+        if (type === 'error') {
+          iconEl.className = 'w-10 h-10 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center text-lg shrink-0';
+          iconEl.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i>';
+        } else if (type === 'success') {
+          iconEl.className = 'w-10 h-10 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-lg shrink-0';
+          iconEl.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
+        } else {
+          iconEl.className = 'w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-lg shrink-0';
+          iconEl.innerHTML = '<i class="fa-solid fa-circle-info"></i>';
+        }
+
+        actionsEl.innerHTML = `
+          <button type="button" id="sysDialogOkBtn" class="px-5 py-2 rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-xs transition cursor-pointer">
+            ตกลง
+          </button>
+        `;
+
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+
+        document.getElementById('sysDialogOkBtn').onclick = () => {
+          modal.classList.add('hidden');
+          modal.classList.remove('flex');
+          resolve(true);
+        };
       });
-      const modal = document.getElementById('confirmActionModal');
-      modal.classList.remove('hidden');
-      modal.classList.add('flex');
+    }
+
+    function showSystemConfirm(message, title = 'ยืนยันการทำรายการ') {
+      return new Promise((resolve) => {
+        const modal = document.getElementById('systemDialogModal');
+        const iconEl = document.getElementById('systemDialogIcon');
+        const titleEl = document.getElementById('systemDialogTitle');
+        const msgEl = document.getElementById('systemDialogMessage');
+        const actionsEl = document.getElementById('systemDialogActions');
+
+        titleEl.textContent = title;
+        msgEl.textContent = message;
+        iconEl.className = 'w-10 h-10 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-lg shrink-0';
+        iconEl.innerHTML = '<i class="fa-solid fa-handshake"></i>';
+
+        actionsEl.innerHTML = `
+          <button type="button" id="sysDialogCancelBtn" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-200/70 transition cursor-pointer">
+            ยกเลิก
+          </button>
+          <button type="button" id="sysDialogConfirmBtn" class="px-5 py-2 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs transition cursor-pointer">
+            ยืนยันตกลง
+          </button>
+        `;
+
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+
+        document.getElementById('sysDialogCancelBtn').onclick = () => {
+          modal.classList.add('hidden');
+          modal.classList.remove('flex');
+          resolve(false);
+        };
+        document.getElementById('sysDialogConfirmBtn').onclick = () => {
+          modal.classList.add('hidden');
+          modal.classList.remove('flex');
+          resolve(true);
+        };
+      });
     }
 
     // ==================== THEME (LIGHT / DARK MODE) ====================
-    function initTheme() {
+    function applySavedTheme() {
       const savedTheme = localStorage.getItem('thaimove_theme') || 'light';
-      applyTheme(savedTheme);
-    }
-
-    function applyTheme(theme) {
-      const html = document.documentElement;
       const icon = document.getElementById('themeToggleIcon');
-      if (theme === 'dark') {
-        html.classList.add('dark');
-        html.classList.remove('light');
-        if (icon) {
-          icon.classList.remove('fa-moon');
-          icon.classList.add('fa-sun');
-        }
+      if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark');
+        if (icon) icon.className = 'fa-solid fa-sun text-amber-400';
       } else {
-        html.classList.remove('dark');
-        html.classList.add('light');
-        if (icon) {
-          icon.classList.remove('fa-sun');
-          icon.classList.add('fa-moon');
-        }
+        document.documentElement.classList.remove('dark');
+        if (icon) icon.className = 'fa-solid fa-moon';
       }
-      localStorage.setItem('thaimove_theme', theme);
     }
 
     window.toggleTheme = function() {
-      const isDark = document.documentElement.classList.contains('dark');
-      applyTheme(isDark ? 'light' : 'dark');
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('thaimove_theme', isDark ? 'dark' : 'light');
+      applySavedTheme();
     };
 
-    // ==================== ADMIN BAR VISIBILITY (?admin=1 & Ctrl+Shift+A) ====================
+    // ==================== DYNAMIC PROVIDER VEHICLE CAROUSEL (LEFT TO RIGHT) ====================
+    function initProviderCarousel(customVehicles = []) {
+      const track = document.getElementById('providerCarouselTrack');
+      const dotsContainer = document.getElementById('providerCarouselDots');
+      if (!track || !dotsContainer) return;
+
+      carouselItems = customVehicles.length > 0 ? customVehicles : DEFAULT_PROVIDER_SHOWCASE;
+      const reversedItems = [...carouselItems].reverse();
+
+      track.innerHTML = reversedItems.map((item) => `
+        <div onclick="openLightbox('${item.image}')"
+             class="w-full shrink-0 h-44 relative cursor-zoom-in group">
+          <img src="${item.image}" alt="${escapeHtml(item.vehicle)}"
+               class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+          <div class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-900/25 to-transparent"></div>
+          <div class="absolute bottom-7 left-3 right-3 text-left">
+            <div class="text-xs font-bold text-white truncate">${escapeHtml(item.vehicle)}</div>
+            <div class="text-[11px] text-sky-200 truncate">
+              <i class="fa-solid fa-circle-check text-emerald-400 mr-1"></i>${escapeHtml(item.name)} • ${escapeHtml(item.area)}
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      dotsContainer.innerHTML = carouselItems.map((_, idx) => `
+        <button type="button"
+                onclick="goToProviderSlide(${idx})"
+                aria-label="ดูรูปรถคันที่ ${idx + 1}"
+                class="h-2 rounded-full transition-all duration-300 cursor-pointer ${idx === 0 ? 'w-5 bg-amber-400' : 'w-2 bg-white/50 hover:bg-white/80'}">
+        </button>
+      `).join('');
+
+      currentSlideIndex = 0;
+      updateCarouselTransform(false);
+      startProviderCarousel();
+    }
+
+    function updateCarouselTransform(animate = true) {
+      const track = document.getElementById('providerCarouselTrack');
+      const dotsContainer = document.getElementById('providerCarouselDots');
+      if (!track || !dotsContainer || carouselItems.length === 0) return;
+
+      const total = carouselItems.length;
+      const trackPosition = (total - 1) - currentSlideIndex;
+
+      track.style.transition = animate ? 'transform 500ms ease-out' : 'none';
+      track.style.transform = `translateX(-${trackPosition * 100}%)`;
+
+      Array.from(dotsContainer.children).forEach((dot, idx) => {
+        if (idx === currentSlideIndex) {
+          dot.className = 'h-2 w-5 rounded-full bg-amber-400 transition-all duration-300 cursor-pointer';
+        } else {
+          dot.className = 'h-2 w-2 rounded-full bg-white/50 hover:bg-white/80 transition-all duration-300 cursor-pointer';
+        }
+      });
+    }
+
+    window.goToProviderSlide = function(index) {
+      currentSlideIndex = index;
+      updateCarouselTransform(true);
+      startProviderCarousel();
+    };
+
+    function nextProviderSlideLeftToRight() {
+      if (carouselItems.length <= 1) return;
+      currentSlideIndex = (currentSlideIndex + 1) % carouselItems.length;
+      updateCarouselTransform(true);
+    }
+
+    function startProviderCarousel() {
+      stopProviderCarousel();
+      carouselTimer = setInterval(nextProviderSlideLeftToRight, 3500);
+    }
+
+    function stopProviderCarousel() {
+      if (carouselTimer) {
+        clearInterval(carouselTimer);
+        carouselTimer = null;
+      }
+    }
+
+    window.pauseProviderCarousel = stopProviderCarousel;
+    window.resumeProviderCarousel = startProviderCarousel;
+
+    // ==================== ADMIN BAR VISIBILITY (URL & SHORTCUT) ====================
     function setupAdminBarVisibility() {
       const topBar = document.getElementById('topStatusBar');
       if (!topBar) return;
@@ -922,10 +1010,8 @@
           const isHidden = topBar.classList.toggle('hidden');
           if (isHidden) {
             sessionStorage.removeItem('thaimove_admin_bar');
-            showToast('ซ่อนแถบควบคุมแอดมินแล้ว', 'info');
           } else {
             sessionStorage.setItem('thaimove_admin_bar', '1');
-            showToast('เปิดแถบควบคุมแอดมินแล้ว (Ctrl+Shift+A)', 'info');
           }
         }
       });
@@ -948,45 +1034,9 @@
       }
     };
 
-    // ==================== ROLE RADIO CARD SELECTION & HIGHLIGHT ====================
-    window.selectRoleRadio = function(groupName, roleValue) {
-      const radios = document.querySelectorAll(`input[name="${groupName}"]`);
-      radios.forEach(r => {
-        r.checked = (r.value === roleValue);
-      });
-
-      const prefix = groupName === 'regRole' ? 'reg' : 'edit';
-      const custCard = document.getElementById(`${prefix}RoleCardCustomer`);
-      const provCard = document.getElementById(`${prefix}RoleCardProvider`);
-      const custBadge = document.getElementById(`${prefix}BadgeCustomer`);
-      const provBadge = document.getElementById(`${prefix}BadgeProvider`);
-      const extraFields = document.getElementById(`${prefix === 'reg' ? 'providerExtraFields' : 'editProviderExtraFields'}`);
-      const vehicleInput = document.getElementById(`${prefix}VehicleType`);
-
-      if (roleValue === 'CUSTOMER') {
-        custCard.className = 'relative p-3.5 rounded-xl border-2 border-sky-600 bg-sky-50/90 dark:bg-sky-950/60 transition text-center cursor-pointer select-none shadow-xs';
-        provCard.className = 'relative p-3.5 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 hover:border-emerald-400 transition text-center cursor-pointer select-none';
-        custBadge.classList.remove('hidden');
-        custBadge.classList.add('inline-block');
-        provBadge.classList.add('hidden');
-        provBadge.classList.remove('inline-block');
-        if (extraFields) extraFields.classList.add('hidden');
-        if (vehicleInput) vehicleInput.required = false;
-      } else {
-        provCard.className = 'relative p-3.5 rounded-xl border-2 border-emerald-600 bg-emerald-50/90 dark:bg-emerald-950/60 transition text-center cursor-pointer select-none shadow-xs';
-        custCard.className = 'relative p-3.5 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 hover:border-sky-400 transition text-center cursor-pointer select-none';
-        provBadge.classList.remove('hidden');
-        provBadge.classList.add('inline-block');
-        custBadge.classList.add('hidden');
-        custBadge.classList.remove('inline-block');
-        if (extraFields) extraFields.classList.remove('hidden');
-        if (vehicleInput) vehicleInput.required = true;
-      }
-    };
-
-    // ==================== VEHICLE PHOTO COMPRESSION & PREVIEW ====================
-    function compressImageFile(file, maxWidth = 900, quality = 0.8) {
-      return new Promise((resolve, reject) => {
+    // ==================== VEHICLE PHOTO PREVIEW & COMPRESSION ====================
+    function compressImageToDataURL(file, maxWidth = 800, quality = 0.78) {
+      return new Promise((resolve) => {
         const reader = new FileReader();
         reader.onload = (e) => {
           const img = new Image();
@@ -1004,126 +1054,87 @@
             ctx.drawImage(img, 0, 0, width, height);
             resolve(canvas.toDataURL('image/jpeg', quality));
           };
-          img.onerror = reject;
           img.src = e.target.result;
         };
-        reader.onerror = reject;
         reader.readAsDataURL(file);
       });
     }
 
-    window.handleVehiclePhotoSelect = async function(event, prefix) {
+    window.previewProviderVehiclePhoto = async function(event, previewContainerId, targetMode) {
       const file = event.target.files[0];
-      if (!file) return;
-      try {
-        const compressedDataUrl = await compressImageFile(file, 960, 0.82);
-        if (prefix === 'reg') {
-          regVehiclePhotoDataUrl = compressedDataUrl;
-        } else {
-          editVehiclePhotoDataUrl = compressedDataUrl;
-        }
-        setVehiclePhotoPreviewUI(prefix, compressedDataUrl);
-      } catch (err) {
-        showToast('ไม่สามารถอ่านไฟล์รูปภาพได้ กรุณาลองใหม่อีกครั้ง', 'error');
+      const container = document.getElementById(previewContainerId);
+      if (!file || !container) return;
+
+      const compressed = await compressImageToDataURL(file);
+      if (targetMode === 'register') {
+        regVehiclePhotoData = compressed;
+        regVehiclePhotoFile = file;
+      } else {
+        editVehiclePhotoData = compressed;
+        editVehiclePhotoFile = file;
+      }
+
+      container.classList.remove('hidden');
+      container.innerHTML = `
+        <div class="relative inline-block">
+          <img src="${compressed}" alt="ตัวอย่างรูปรถผู้ให้บริการ" class="h-24 w-auto object-cover rounded-lg border border-emerald-300 shadow-xs mx-auto">
+          <button type="button" onclick="clearProviderVehiclePhoto('${event.target.id}', '${previewContainerId}', '${targetMode}')" class="mt-1 block mx-auto text-[11px] text-rose-600 hover:underline font-semibold cursor-pointer">
+            <i class="fa-solid fa-trash-can mr-1"></i> ลบรูปภาพนี้
+          </button>
+        </div>
+      `;
+    };
+
+    window.clearProviderVehiclePhoto = function(inputId, previewContainerId, targetMode) {
+      if (targetMode === 'register') {
+        regVehiclePhotoData = '';
+        regVehiclePhotoFile = null;
+      } else {
+        editVehiclePhotoData = '';
+        editVehiclePhotoFile = null;
+      }
+      const input = document.getElementById(inputId);
+      const container = document.getElementById(previewContainerId);
+      if (input) input.value = '';
+      if (container) {
+        container.innerHTML = '';
+        container.classList.add('hidden');
       }
     };
 
-    function setVehiclePhotoPreviewUI(prefix, dataUrl) {
-      const emptyBox = document.getElementById(`${prefix}VehiclePhotoEmpty`);
-      const previewBox = document.getElementById(`${prefix}VehiclePhotoPreviewBox`);
-      const imgEl = document.getElementById(`${prefix}VehiclePhotoImg`);
-      if (!emptyBox || !previewBox || !imgEl) return;
-
-      if (dataUrl) {
-        imgEl.src = dataUrl;
-        emptyBox.classList.add('hidden');
-        previewBox.classList.remove('hidden');
-      } else {
-        imgEl.src = '';
-        emptyBox.classList.remove('hidden');
-        previewBox.classList.add('hidden');
-      }
-    }
-
-    window.clearVehiclePhoto = function(prefix) {
-      if (prefix === 'reg') {
-        regVehiclePhotoDataUrl = '';
-        const inp = document.getElementById('regVehiclePhotoInput');
-        if (inp) inp.value = '';
-      } else {
-        editVehiclePhotoDataUrl = '';
-        const inp = document.getElementById('editVehiclePhotoInput');
-        if (inp) inp.value = '';
-      }
-      setVehiclePhotoPreviewUI(prefix, '');
-    };
-
-    // ==================== FIREBASE CONFIG & APP INITIALIZATION ====================
+    // ==================== INITIALIZATION & MODE SWITCHING ====================
     function getActiveFirebaseConfig() {
+      if (DEFAULT_FIREBASE_CONFIG && DEFAULT_FIREBASE_CONFIG.apiKey) {
+        return DEFAULT_FIREBASE_CONFIG;
+      }
       try {
         const saved = JSON.parse(localStorage.getItem('thaimove_firebase_config'));
-        if (saved && saved.apiKey) return saved;
-      } catch {}
-      return DEFAULT_FIREBASE_CONFIG && DEFAULT_FIREBASE_CONFIG.apiKey ? DEFAULT_FIREBASE_CONFIG : null;
+        return saved && saved.apiKey ? saved : null;
+      } catch {
+        return null;
+      }
     }
 
-    window.toggleAppMode = function(targetMode) {
-      localStorage.setItem('thaimove_mode', targetMode);
-      location.reload();
-    };
-
-    window.openFirebaseConfigModal = function() {
-      const currentCfg = getActiveFirebaseConfig();
-      if (currentCfg) {
-        document.getElementById('firebaseConfigInput').value = JSON.stringify(currentCfg, null, 2);
-      }
-      const modal = document.getElementById('firebaseConfigModal');
-      modal.classList.remove('hidden');
-      modal.classList.add('flex');
-    };
-
-    window.saveFirebaseConfigFromUI = function(e) {
-      e.preventDefault();
-      const raw = document.getElementById('firebaseConfigInput').value.trim();
-      try {
-        // Parse JSON or JS Object literal safely
-        const match = raw.match(/\{[\s\S]*\}/);
-        if (!match) throw new Error('รูปแบบ Config ไม่ถูกต้อง');
-        const parsed = Function('"use strict";return (' + match[0] + ')')();
-        if (!parsed || !parsed.apiKey || !parsed.projectId) {
-          throw new Error('ไม่พบ apiKey หรือ projectId ใน Config');
-        }
-        localStorage.setItem('thaimove_firebase_config', JSON.stringify(parsed));
-        localStorage.setItem('thaimove_mode', 'FIREBASE');
-        closeModal('firebaseConfigModal');
-        showToast('บันทึก Firebase Config เรียบร้อย กำลังเชื่อมต่อ...', 'success');
-        setTimeout(() => location.reload(), 600);
-      } catch (err) {
-        showToast('รูปแบบ Firebase Config ไม่ถูกต้อง: ' + err.message, 'error');
-      }
-    };
-
     function initApp() {
-      initTheme();
+      applySavedTheme();
       setupAdminBarVisibility();
       renderCategoryMenu();
+      initProviderCarousel();
 
-      // Default to DEMO if running inside sandboxed preview without network/auth or if user chose DEMO,
-      // otherwise connect to Firebase Real-time automatically when DEFAULT_FIREBASE_CONFIG is present.
-      const preferredMode = localStorage.getItem('thaimove_mode') || 'FIREBASE';
+      const preferredMode = localStorage.getItem('thaimove_mode') || 'AUTO';
       const fbConfig = getActiveFirebaseConfig();
 
       if (preferredMode !== 'DEMO' && fbConfig) {
         try {
-          const existingApps = getApps();
-          const app = existingApps.length > 0 ? existingApps[0] : initializeApp(fbConfig);
+          const app = initializeApp(fbConfig);
           auth = getAuth(app);
           db = getFirestore(app);
           storage = getStorage(app);
           isFirebaseMode = true;
           setupFirebaseListeners();
         } catch (err) {
-          console.warn('Firebase Init Fallback to Demo Mode:', err);
+          console.error('Firebase Init Error:', err);
+          localStorage.setItem('thaimove_mode', 'DEMO');
           initDemoMode();
         }
       } else {
@@ -1131,87 +1142,125 @@
       }
     }
 
+    window.toggleAppMode = function(mode) {
+      if (mode === 'FIREBASE') {
+        const cfg = getActiveFirebaseConfig();
+        if (!cfg) {
+          openFirebaseConfigModal();
+          return;
+        }
+        localStorage.setItem('thaimove_mode', 'FIREBASE');
+      } else {
+        localStorage.setItem('thaimove_mode', 'DEMO');
+      }
+      window.location.reload();
+    };
+
+    window.openFirebaseConfigModal = function() {
+      const cfg = getActiveFirebaseConfig();
+      if (cfg) {
+        document.getElementById('firebaseConfigInput').value = JSON.stringify(cfg, null, 2);
+      }
+      const modal = document.getElementById('firebaseConfigModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    };
+
+    window.saveFirebaseConfigFromUI = async function(e) {
+      e.preventDefault();
+      let raw = document.getElementById('firebaseConfigInput').value.trim();
+      try {
+        const firstBrace = raw.indexOf('{');
+        const lastBrace = raw.lastIndexOf('}');
+        if (firstBrace !== -1 && lastBrace !== -1) {
+          raw = raw.substring(firstBrace, lastBrace + 1);
+        }
+        const parsed = Function('"use strict";return (' + raw + ')')();
+        if (!parsed || !parsed.apiKey) throw new Error('ไม่พบ apiKey ใน Config');
+        localStorage.setItem('thaimove_firebase_config', JSON.stringify(parsed));
+        localStorage.setItem('thaimove_mode', 'FIREBASE');
+        window.location.reload();
+      } catch (err) {
+        await showSystemAlert('รูปแบบ Firebase Config ไม่ถูกต้อง: ' + err.message, 'ข้อผิดพลาด', 'error');
+      }
+    };
+
     function initDemoMode() {
       isFirebaseMode = false;
       try {
-        const savedUsers = JSON.parse(localStorage.getItem('thaimove_demo_users_v3'));
-        allMembers = Array.isArray(savedUsers) && savedUsers.length > 0 ? savedUsers : JSON.parse(JSON.stringify(DEMO_USERS));
-      } catch {
-        allMembers = JSON.parse(JSON.stringify(DEMO_USERS));
-      }
-
-      try {
-        const savedThreads = JSON.parse(localStorage.getItem('thaimove_threads_v3'));
+        const savedThreads = JSON.parse(localStorage.getItem('thaimove_threads_v2'));
         threads = Array.isArray(savedThreads) && savedThreads.length > 0 ? savedThreads : JSON.parse(JSON.stringify(DEMO_THREADS));
       } catch {
         threads = JSON.parse(JSON.stringify(DEMO_THREADS));
       }
 
       try {
-        const savedUser = JSON.parse(localStorage.getItem('thaimove_user_v3'));
-        if (savedUser === null && localStorage.getItem('thaimove_user_v3') === 'null') {
-          currentUser = null;
-        } else {
-          currentUser = savedUser || allMembers[0];
-        }
+        const savedUser = JSON.parse(localStorage.getItem('thaimove_user_v2'));
+        currentUser = savedUser || DEMO_USERS[0];
       } catch {
-        currentUser = allMembers[0];
+        currentUser = DEMO_USERS[0];
       }
 
+      const demoVehicles = DEMO_USERS
+        .filter(u => u.role === 'PROVIDER' && u.vehiclePhoto)
+        .map(u => ({
+          name: u.name,
+          vehicle: u.vehicleType || 'บริการยานพาหนะ',
+          area: u.serviceArea || 'ให้บริการทั่วไทย',
+          image: u.vehiclePhoto
+        }));
+      initProviderCarousel(demoVehicles);
+
+      updateDemoStats();
       saveDemoState();
       renderTopBar();
       renderNavbar();
-      updateMemberStats();
       updateTabCounts();
       renderThreads();
+    }
+
+    function updateDemoStats() {
+      const custCount = DEMO_USERS.filter(u => u.role === 'CUSTOMER').length;
+      const provCount = DEMO_USERS.filter(u => u.role === 'PROVIDER').length;
+      document.getElementById('statCustomers').textContent = custCount;
+      document.getElementById('statProviders').textContent = provCount;
+      document.getElementById('statTotalMembers').textContent = DEMO_USERS.length;
+      document.getElementById('statOnlineCount').textContent = currentUser ? 1 : 0;
     }
 
     function saveDemoState() {
       if (isFirebaseMode) return;
       try {
-        localStorage.setItem('thaimove_demo_users_v3', JSON.stringify(allMembers));
-        localStorage.setItem('thaimove_threads_v3', JSON.stringify(threads));
-        localStorage.setItem('thaimove_user_v3', JSON.stringify(currentUser));
+        localStorage.setItem('thaimove_threads_v2', JSON.stringify(threads));
+        localStorage.setItem('thaimove_user_v2', JSON.stringify(currentUser));
       } catch (e) {
         console.warn('LocalStorage quota exceeded:', e);
       }
     }
 
+    // ==================== FIREBASE REAL-TIME LISTENERS ====================
     function setupFirebaseListeners() {
       renderTopBar();
 
       onAuthStateChanged(auth, async (user) => {
         if (user) {
-          try {
-            const userSnap = await getDoc(doc(db, 'users', user.uid));
-            if (userSnap.exists()) {
-              currentUser = { uid: user.uid, ...userSnap.data() };
-            } else {
-              currentUser = { uid: user.uid, name: user.email.split('@')[0], email: user.email, role: 'CUSTOMER', phone: '-' };
-            }
-          } catch {
+          const userSnap = await getDoc(doc(db, 'users', user.uid));
+          if (userSnap.exists()) {
+            currentUser = { uid: user.uid, ...userSnap.data() };
+          } else {
             currentUser = { uid: user.uid, name: user.email.split('@')[0], email: user.email, role: 'CUSTOMER', phone: '-' };
           }
         } else {
           currentUser = null;
         }
         renderNavbar();
-        updateMemberStats();
         updateTabCounts();
         renderThreads();
       });
 
-      // Listen to Users collection for live member statistics
-      onSnapshot(collection(db, 'users'), (snap) => {
-        allMembers = snap.docs.map(d => ({ uid: d.id, ...d.data() }));
-        updateMemberStats();
-      }, (err) => {
-        console.warn('Firestore users listener fallback:', err);
-      });
-
-      // Listen to Threads collection in real-time
-      const q = query(collection(db, 'threads'), orderBy('timestamp', 'desc'));
-      onSnapshot(q, (snapshot) => {
+      // 1. Real-time Threads Listener
+      const qThreads = query(collection(db, 'threads'), orderBy('timestamp', 'desc'));
+      onSnapshot(qThreads, (snapshot) => {
         threads = snapshot.docs.map(d => ({ id: d.id, ...d.data(), bids: d.data().bids || [] }));
         updateTabCounts();
         renderThreads();
@@ -1219,27 +1268,87 @@
           renderThreadDetailModal(activeDetailThreadId);
         }
       }, (err) => {
-        console.warn('Firestore threads listener error, switching to Demo fallback:', err);
-        showToast('ไม่สามารถเชื่อมต่อ Firestore ได้ ระบบสลับเป็นโหมดทดสอบชั่วคราว', 'warning');
-        initDemoMode();
+        console.warn('Firestore threads listener fallback to demo data:', err);
+        if (threads.length === 0) {
+          threads = JSON.parse(JSON.stringify(DEMO_THREADS));
+          updateTabCounts();
+          renderThreads();
+        }
+      });
+
+      // 2. Real-time Users & Provider Vehicles Carousel Listener
+      onSnapshot(collection(db, 'users'), (snapshot) => {
+        let custCount = 0;
+        let provCount = 0;
+        const realVehicles = [];
+
+        snapshot.forEach((docSnap) => {
+          const data = docSnap.data();
+          if (data.role === 'PROVIDER') {
+            provCount++;
+            if (data.vehiclePhoto && String(data.vehiclePhoto).trim() !== '') {
+              realVehicles.push({
+                name: data.name || 'ผู้ให้บริการรถรับจ้าง',
+                vehicle: data.vehicleType || 'บริการยานพาหนะ',
+                area: data.serviceArea || 'ให้บริการทั่วไทย',
+                image: data.vehiclePhoto
+              });
+            }
+          } else {
+            custCount++;
+          }
+        });
+
+        document.getElementById('statCustomers').textContent = custCount;
+        document.getElementById('statProviders').textContent = provCount;
+        document.getElementById('statTotalMembers').textContent = custCount + provCount;
+
+        initProviderCarousel(realVehicles);
+      }, (err) => {
+        console.warn('Firestore users listener warning:', err);
+        initProviderCarousel([]);
+      });
+
+      // 3. Real-time Online Presence Tracking
+      startFirebasePresenceTracking();
+    }
+
+    function startFirebasePresenceTracking() {
+      if (!db) return;
+      const presenceRef = doc(db, 'presence', sessionPresenceId);
+
+      const pingPresence = async () => {
+        try {
+          await setDoc(presenceRef, {
+            lastSeen: Date.now(),
+            uid: currentUser ? currentUser.uid : 'guest'
+          });
+        } catch (e) {}
+      };
+
+      pingPresence();
+      presenceHeartbeatTimer = setInterval(pingPresence, 30000);
+
+      window.addEventListener('beforeunload', () => {
+        deleteDoc(presenceRef).catch(() => {});
+      });
+
+      onSnapshot(collection(db, 'presence'), (snapshot) => {
+        const now = Date.now();
+        let activeCount = 0;
+        snapshot.forEach((d) => {
+          const data = d.data();
+          if (data.lastSeen && (now - data.lastSeen) < 90000) {
+            activeCount++;
+          }
+        });
+        document.getElementById('statOnlineCount').textContent = Math.max(1, activeCount);
+      }, () => {
+        document.getElementById('statOnlineCount').textContent = 1;
       });
     }
 
-    // ==================== MEMBER STATISTICS BADGES ====================
-    function updateMemberStats() {
-      const list = allMembers.length > 0 ? allMembers : DEMO_USERS;
-      const customers = list.filter(u => u.role === 'CUSTOMER').length;
-      const providers = list.filter(u => u.role === 'PROVIDER').length;
-      const total = list.length;
-      const online = Math.max(1, currentUser ? Math.min(total, 2) : 1);
-
-      document.getElementById('statCustomers').textContent = customers;
-      document.getElementById('statProviders').textContent = providers;
-      document.getElementById('statTotal').textContent = total;
-      document.getElementById('statOnline').textContent = online;
-    }
-
-    // ==================== TOP BAR (ADMIN) & NAVBAR ====================
+    // ==================== TOP BAR & NAVBAR ====================
     function renderTopBar() {
       const statusArea = document.getElementById('connectionStatusArea');
       const switchArea = document.getElementById('demoQuickSwitchArea');
@@ -1247,30 +1356,29 @@
       if (isFirebaseMode) {
         statusArea.innerHTML = `
           <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-          <span class="text-emerald-300 font-semibold">โหมดออนไลน์ Firebase Real-time (thaimove-forum)</span>
+          <span class="text-emerald-300 font-medium">โหมดออนไลน์ Firebase Real-time (${DEFAULT_FIREBASE_CONFIG.projectId})</span>
           <button onclick="openFirebaseConfigModal()" class="ml-2 px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] border border-slate-600 cursor-pointer">
             <i class="fa-solid fa-gear mr-1"></i>แก้ไข Config
           </button>
         `;
         switchArea.innerHTML = `
           <button onclick="toggleAppMode('DEMO')" class="px-2.5 py-1 rounded-md bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-[11px] font-semibold transition cursor-pointer">
-            <i class="fa-solid fa-flask mr-1"></i> สลับไปโหมดทดสอบ (Demo)
+            <i class="fa-solid fa-flask mr-1"></i> สลับกลับโหมดทดสอบ (Demo)
           </button>
         `;
       } else {
         statusArea.innerHTML = `
           <span class="w-2 h-2 rounded-full bg-amber-400"></span>
-          <span class="text-amber-300 font-semibold">โหมดทดสอบ (Demo Mode)</span>
+          <span class="text-amber-300 font-medium">โหมดทดสอบ (Demo Mode)</span>
           <button onclick="toggleAppMode('FIREBASE')" class="ml-2 px-2.5 py-0.5 rounded-md bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-semibold transition cursor-pointer">
             <i class="fa-solid fa-cloud mr-1"></i> สลับไปโหมด Firebase Real-time
           </button>
         `;
-        const switchUsers = allMembers.length > 0 ? allMembers : DEMO_USERS;
         switchArea.innerHTML = `
           <span class="text-slate-400 mr-1">สลับบัญชีทดสอบ:</span>
-          ${switchUsers.map(u => `
-            <button onclick="switchDemoUser('${u.uid}')" class="px-2 py-0.5 rounded text-[11px] font-medium transition cursor-pointer ${currentUser && currentUser.uid === u.uid ? 'bg-sky-600 text-white' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'}">
-              ${u.role === 'CUSTOMER' ? '👤' : '🚚'} ${escapeHtml(u.name)}
+          ${DEMO_USERS.map(u => `
+            <button onclick="switchDemoUser('${u.uid}')" class="px-2 py-0.5 rounded text-[11px] font-medium transition cursor-pointer ${currentUser && currentUser.uid === u.uid ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'}">
+              ${u.role === 'CUSTOMER' ? '👤' : '🚚'} ${u.name}
             </button>
           `).join('')}
         `;
@@ -1278,17 +1386,14 @@
     }
 
     window.switchDemoUser = function(uid) {
-      const list = allMembers.length > 0 ? allMembers : DEMO_USERS;
-      const found = list.find(u => u.uid === uid);
+      const found = DEMO_USERS.find(u => u.uid === uid);
       if (found) {
         currentUser = found;
         saveDemoState();
         renderTopBar();
         renderNavbar();
-        updateMemberStats();
         updateTabCounts();
         renderThreads();
-        showToast(`สลับบัญชีทดสอบเป็น "${found.name}"`, 'info');
       }
     };
 
@@ -1304,40 +1409,35 @@
 
       if (!currentUser) {
         navArea.innerHTML = `
-          <button onclick="openAuthModal('login')" class="px-3.5 py-2 text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200 hover:text-sky-600 dark:hover:text-sky-400 transition cursor-pointer">เข้าสู่ระบบ</button>
-          <button onclick="openAuthModal('register')" class="px-4 py-2 text-xs sm:text-sm font-semibold bg-sky-600 hover:bg-sky-700 text-white rounded-xl shadow-xs transition cursor-pointer">สมัครสมาชิก</button>
+          <button onclick="openAuthModal('login')" class="px-4 py-2 text-sm font-semibold text-slate-700 hover:text-blue-600 transition cursor-pointer">เข้าสู่ระบบ</button>
+          <button onclick="openAuthModal('register')" class="px-4 py-2 text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-xs transition cursor-pointer">สมัครสมาชิก</button>
         `;
         return;
       }
 
       const isProvider = currentUser.role === 'PROVIDER';
       navArea.innerHTML = `
-        <div class="flex items-center gap-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2.5 py-1.5 rounded-xl">
-          ${isProvider && currentUser.vehiclePhoto ? `
-            <img src="${currentUser.vehiclePhoto}" alt="รูปรถ" onclick="openLightbox('${currentUser.vehiclePhoto}')" class="w-8 h-8 rounded-lg object-cover border border-emerald-400 cursor-zoom-in shrink-0" title="คลิกดูรูปรถ">
-          ` : `
-            <div class="w-8 h-8 rounded-lg ${isProvider ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/60 dark:text-emerald-300' : 'bg-sky-100 text-sky-700 dark:bg-sky-900/60 dark:text-sky-300'} flex items-center justify-center font-bold text-sm shrink-0">
-              <i class="fa-solid ${isProvider ? 'fa-truck-pickup' : 'fa-user'}"></i>
-            </div>
-          `}
-          <div class="hidden md:block text-left pr-1">
-            <div class="text-xs font-bold text-slate-900 dark:text-white leading-tight">${escapeHtml(currentUser.name)}</div>
-            <div class="text-[10px] font-semibold ${isProvider ? 'text-emerald-700 dark:text-emerald-400' : 'text-sky-700 dark:text-sky-400'}">
-              ${isProvider ? 'ผู้ให้บริการรถ' : 'ผู้ใช้งานทั่วไป'}
+        <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-xl">
+          <div class="w-8 h-8 rounded-lg ${isProvider ? 'bg-emerald-100 text-emerald-700' : 'bg-blue-100 text-blue-700'} flex items-center justify-center font-bold text-sm">
+            <i class="fa-solid ${isProvider ? 'fa-truck-pickup' : 'fa-user'}"></i>
+          </div>
+          <div class="hidden sm:block text-left">
+            <div class="text-xs font-bold text-slate-800 leading-tight">${escapeHtml(currentUser.name)}</div>
+            <div class="text-[10px] font-medium ${isProvider ? 'text-emerald-600' : 'text-blue-600'}">
+              ${isProvider ? 'ผู้ให้บริการยานพาหนะ' : 'ผู้ใช้งานทั่วไป'}
             </div>
           </div>
-          <button onclick="openEditProfileModal()" title="แก้ไขข้อมูลสมาชิก" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-600 hover:bg-sky-50 dark:hover:bg-slate-600 hover:text-sky-700 transition cursor-pointer flex items-center gap-1">
-            <i class="fa-solid fa-user-pen"></i>
-            <span class="hidden sm:inline">แก้ไขข้อมูล</span>
+          <button onclick="openEditProfileModal()" title="แก้ไขข้อมูลสมาชิก" class="ml-1 text-slate-500 hover:text-blue-600 px-2 py-1 rounded-lg hover:bg-blue-50 text-xs font-medium transition cursor-pointer flex items-center gap-1">
+            <i class="fa-solid fa-user-pen"></i><span class="hidden md:inline">แก้ไขข้อมูล</span>
           </button>
-          <button onclick="handleLogout()" title="ออกจากระบบ" class="text-slate-500 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400 p-1.5 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/50 transition cursor-pointer">
+          <button onclick="handleLogout()" title="ออกจากระบบ" class="text-slate-400 hover:text-rose-600 p-1.5 rounded-lg hover:bg-rose-50 transition cursor-pointer">
             <i class="fa-solid fa-right-from-bracket"></i>
           </button>
         </div>
       `;
     }
 
-    // ==================== CATEGORY MENU (2 ROWS x 4 COLUMNS) ====================
+    // ==================== CATEGORY MENU ====================
     function renderCategoryMenu() {
       const grid = document.getElementById('categoryGrid');
       const select = document.getElementById('threadCategory');
@@ -1345,8 +1445,8 @@
       grid.innerHTML = CATEGORIES.map(cat => {
         const active = selectedCategory === cat.id;
         return `
-          <button onclick="selectCategory('${cat.id}')" class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl border text-left transition cursor-pointer ${active ? 'bg-sky-600 text-white border-sky-600 shadow-xs' : 'bg-slate-50/80 dark:bg-slate-800/70 text-slate-800 dark:text-slate-200 border-slate-200 dark:border-slate-700 hover:bg-sky-50 dark:hover:bg-slate-800 hover:border-sky-300'}">
-            <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${active ? 'bg-white/20 text-white' : 'bg-white dark:bg-slate-700 text-sky-600 dark:text-sky-400 shadow-2xs'}">
+          <button onclick="selectCategory('${cat.id}')" class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl border text-left transition cursor-pointer ${active ? 'bg-blue-600 text-white border-blue-600 shadow-xs' : 'bg-slate-50/70 text-slate-700 border-slate-200 hover:bg-blue-50/60 hover:border-blue-300'}">
+            <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${active ? 'bg-white/20 text-white' : 'bg-white text-blue-600 shadow-2xs'}">
               <i class="fa-solid ${cat.icon} text-xs"></i>
             </div>
             <span class="text-xs font-semibold truncate">${cat.name}</span>
@@ -1388,9 +1488,9 @@
 
       Object.keys(tabs).forEach(key => {
         if (key === tabName) {
-          tabs[key].className = 'flex-1 min-w-[160px] py-2.5 px-4 rounded-xl text-sm font-semibold transition flex items-center justify-center gap-2 bg-sky-600 text-white shadow-xs cursor-pointer';
+          tabs[key].className = 'flex-1 min-w-[150px] py-2.5 px-4 rounded-lg text-sm font-semibold transition flex items-center justify-center gap-2 bg-blue-600 text-white shadow-sm cursor-pointer';
         } else {
-          tabs[key].className = 'flex-1 min-w-[160px] py-2.5 px-4 rounded-xl text-sm font-semibold transition flex items-center justify-center gap-2 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer';
+          tabs[key].className = 'flex-1 min-w-[150px] py-2.5 px-4 rounded-lg text-sm font-semibold transition flex items-center justify-center gap-2 text-slate-600 hover:bg-slate-100 cursor-pointer';
         }
       });
 
@@ -1428,7 +1528,7 @@
       document.getElementById('badgeConfirmedCount').textContent = getMyConfirmedThreads().length;
     }
 
-    // ==================== RENDER THREAD LIST ====================
+    // ==================== RENDER THREADS ====================
     window.renderThreads = function() {
       const container = document.getElementById('threadListContainer');
       const searchTerm = document.getElementById('searchInput').value.trim().toLowerCase();
@@ -1436,13 +1536,13 @@
 
       if ((currentMainTab === 'MY_PROPOSALS' || currentMainTab === 'MY_CONFIRMED') && !currentUser) {
         container.innerHTML = `
-          <div class="bg-white dark:bg-slate-900 rounded-2xl p-10 text-center border border-slate-200 dark:border-slate-800 shadow-xs">
-            <div class="w-14 h-14 bg-sky-50 dark:bg-sky-950 text-sky-600 dark:text-sky-400 rounded-2xl flex items-center justify-center mx-auto mb-3 text-2xl">
+          <div class="bg-white rounded-2xl p-10 text-center border border-slate-200 shadow-xs">
+            <div class="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-3 text-2xl">
               <i class="fa-solid fa-lock"></i>
             </div>
-            <h3 class="font-bold text-slate-900 dark:text-white text-lg mb-1">กรุณาเข้าสู่ระบบเพื่อดูรายการของคุณ</h3>
-            <p class="text-sm text-slate-600 dark:text-slate-400 mb-4">เข้าสู่ระบบด้วยบัญชีผู้ใช้งานทั่วไปหรือผู้ให้บริการรถเพื่อติดตามสถานะงาน</p>
-            <button onclick="openAuthModal('login')" class="bg-sky-600 hover:bg-sky-700 text-white font-semibold px-5 py-2.5 rounded-xl text-sm transition cursor-pointer">
+            <h3 class="font-bold text-slate-800 text-lg mb-1">กรุณาเข้าสู่ระบบเพื่อดูรายการของคุณ</h3>
+            <p class="text-sm text-slate-500 mb-4">เข้าสู่ระบบด้วยบัญชีผู้ใช้งานทั่วไปหรือผู้ให้บริการเพื่อติดตามสถานะงาน</p>
+            <button onclick="openAuthModal('login')" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-2.5 rounded-xl text-sm transition cursor-pointer">
               เข้าสู่ระบบ / สมัครสมาชิก
             </button>
           </div>
@@ -1485,17 +1585,17 @@
             : 'กระทู้ของคุณที่มีผู้เสนอราคาเข้ามาและยังไม่ได้กดยืนยันจะแสดงที่นี่';
         } else if (currentMainTab === 'MY_CONFIRMED') {
           emptyTitle = 'ยังไม่มีงานที่ได้รับการยืนยัน';
-          emptyDesc = 'เมื่อมีการตกลงยืนยันราคาเรียบร้อยแล้ว ข้อมูลคู่สัญญา เบอร์ติดต่อ และรูปถ่ายรถจะแสดงที่นี่';
+          emptyDesc = 'เมื่อมีการตกลงยืนยันราคาเรียบร้อยแล้ว ข้อมูลคู่สัญญาและเบอร์ติดต่อจะแสดงที่นี่';
         }
 
         container.innerHTML = `
-          <div class="bg-white dark:bg-slate-900 rounded-2xl p-12 text-center border border-slate-200 dark:border-slate-800 shadow-xs">
-            <div class="w-16 h-16 bg-slate-100 dark:bg-slate-800 text-slate-400 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl">
+          <div class="bg-white rounded-2xl p-12 text-center border border-slate-200 shadow-xs">
+            <div class="w-16 h-16 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl">
               <i class="fa-solid fa-folder-open"></i>
             </div>
-            <h3 class="font-bold text-slate-800 dark:text-slate-200 text-base mb-1">${emptyTitle}</h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">${emptyDesc}</p>
-            ${currentMainTab !== 'ALL' ? `<button onclick="switchMainTab('ALL')" class="px-4 py-2 bg-sky-50 dark:bg-sky-950 text-sky-700 dark:text-sky-300 hover:bg-sky-100 font-semibold rounded-xl text-xs transition cursor-pointer">ดูประกาศทั้งหมดในกระดาน</button>` : ''}
+            <h3 class="font-bold text-slate-700 text-base mb-1">${emptyTitle}</h3>
+            <p class="text-xs text-slate-500 mb-4">${emptyDesc}</p>
+            ${currentMainTab !== 'ALL' ? `<button onclick="switchMainTab('ALL')" class="px-4 py-2 bg-blue-50 text-blue-600 hover:bg-blue-100 font-semibold rounded-xl text-xs transition cursor-pointer">ดูประกาศทั้งหมดในกระดาน</button>` : ''}
           </div>
         `;
         return;
@@ -1512,38 +1612,33 @@
         if (currentMainTab === 'MY_CONFIRMED' && isConfirmed && winningBid) {
           if (currentUser.role === 'CUSTOMER') {
             confirmedSummaryCard = `
-              <div class="mt-3 p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div class="flex items-start gap-3">
-                  ${winningBid.vehiclePhoto ? `
-                    <img src="${winningBid.vehiclePhoto}" alt="รูปถ่ายรถผู้ให้บริการ" onclick="openLightbox('${winningBid.vehiclePhoto}')" class="w-20 h-16 rounded-lg object-cover border border-emerald-300 dark:border-emerald-700 cursor-zoom-in shrink-0" title="คลิกขยายดูรูปถ่ายรถ">
-                  ` : ''}
-                  <div class="space-y-1">
-                    <div class="text-xs font-bold text-emerald-800 dark:text-emerald-300 flex items-center gap-1.5">
-                      <i class="fa-solid fa-handshake"></i> ข้อมูลผู้ให้บริการที่ได้รับเลือก
-                    </div>
-                    <div class="text-sm font-bold text-slate-900 dark:text-white">${escapeHtml(winningBid.providerName)} <span class="text-xs font-normal text-slate-600 dark:text-slate-300">(${escapeHtml(winningBid.vehicleDetail)})</span></div>
-                    <div class="text-xs text-emerald-800 dark:text-emerald-300 font-semibold"><i class="fa-solid fa-phone mr-1"></i> เบอร์ติดต่อ: <a href="tel:${escapeHtml(winningBid.providerPhone)}" class="underline">${escapeHtml(winningBid.providerPhone)}</a></div>
+              <div class="mt-3 p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div class="space-y-1">
+                  <div class="text-xs font-bold text-emerald-800 flex items-center gap-1.5">
+                    <i class="fa-solid fa-handshake"></i> ข้อมูลผู้ให้บริการที่ได้รับเลือก
                   </div>
+                  <div class="text-sm font-bold text-slate-900">${escapeHtml(winningBid.providerName)} <span class="text-xs font-normal text-slate-600">(${escapeHtml(winningBid.vehicleDetail)})</span></div>
+                  <div class="text-xs text-emerald-700 font-semibold"><i class="fa-solid fa-phone mr-1"></i> เบอร์ติดต่อ: <a href="tel:${escapeHtml(winningBid.providerPhone)}" class="underline">${escapeHtml(winningBid.providerPhone)}</a></div>
                 </div>
                 <div class="text-left sm:text-right shrink-0">
-                  <div class="text-[11px] text-slate-600 dark:text-slate-400">ราคาที่ตกลงยืนยัน</div>
-                  <div class="text-lg font-bold text-emerald-700 dark:text-emerald-400">฿${Number(winningBid.price).toLocaleString()}</div>
+                  <div class="text-[11px] text-slate-500">ราคาที่ตกลงยืนยัน</div>
+                  <div class="text-lg font-bold text-emerald-700">฿${Number(winningBid.price).toLocaleString()}</div>
                 </div>
               </div>
             `;
           } else {
             confirmedSummaryCard = `
-              <div class="mt-3 p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div class="mt-3 p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div class="space-y-1">
-                  <div class="text-xs font-bold text-emerald-800 dark:text-emerald-300 flex items-center gap-1.5">
+                  <div class="text-xs font-bold text-emerald-800 flex items-center gap-1.5">
                     <i class="fa-solid fa-user-check"></i> ข้อมูลผู้ว่าจ้าง (ลูกค้าอนุมัติราคาของคุณแล้ว)
                   </div>
-                  <div class="text-sm font-bold text-slate-900 dark:text-white">${escapeHtml(thread.authorName)}</div>
-                  <div class="text-xs text-emerald-800 dark:text-emerald-300 font-semibold"><i class="fa-solid fa-phone mr-1"></i> เบอร์โทรลูกค้า: <a href="tel:${escapeHtml(thread.authorPhone || '-')}" class="underline">${escapeHtml(thread.authorPhone || '-')}</a></div>
+                  <div class="text-sm font-bold text-slate-900">${escapeHtml(thread.authorName)}</div>
+                  <div class="text-xs text-emerald-700 font-semibold"><i class="fa-solid fa-phone mr-1"></i> เบอร์โทรลูกค้า: <a href="tel:${escapeHtml(thread.authorPhone || '-')}" class="underline">${escapeHtml(thread.authorPhone || '-')}</a></div>
                 </div>
                 <div class="text-left sm:text-right shrink-0">
-                  <div class="text-[11px] text-slate-600 dark:text-slate-400">ราคาที่ได้รับอนุมัติ</div>
-                  <div class="text-lg font-bold text-emerald-700 dark:text-emerald-400">฿${Number(winningBid.price).toLocaleString()}</div>
+                  <div class="text-[11px] text-slate-500">ราคาที่ได้รับอนุมัติ</div>
+                  <div class="text-lg font-bold text-emerald-700">฿${Number(winningBid.price).toLocaleString()}</div>
                 </div>
               </div>
             `;
@@ -1553,58 +1648,58 @@
         let proposalBadge = '';
         if (currentMainTab === 'MY_PROPOSALS' && myBid) {
           proposalBadge = `
-            <div class="mt-3 p-3 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 flex flex-wrap items-center justify-between gap-2 text-xs">
-              <span class="font-semibold text-amber-900 dark:text-amber-200"><i class="fa-solid fa-clock mr-1"></i> คุณเสนอราคาไว้: <strong>฿${Number(myBid.price).toLocaleString()}</strong> (เมื่อ ${escapeHtml(myBid.createdAt)})</span>
-              <span class="px-2.5 py-0.5 rounded-full bg-amber-200 text-amber-950 font-bold">รอผู้โพสต์พิจารณา</span>
+            <div class="mt-3 p-3 rounded-xl bg-amber-50 border border-amber-200 flex flex-wrap items-center justify-between gap-2 text-xs">
+              <span class="font-semibold text-amber-800"><i class="fa-solid fa-clock mr-1"></i> คุณเสนอราคาไว้: <strong>฿${Number(myBid.price).toLocaleString()}</strong> (เมื่อ ${escapeHtml(myBid.createdAt)})</span>
+              <span class="px-2.5 py-0.5 rounded-full bg-amber-200/70 text-amber-900 font-bold">รอผู้โพสต์พิจารณา</span>
             </div>
           `;
         }
 
         return `
-          <article class="bg-white dark:bg-slate-900 rounded-2xl p-5 shadow-xs border ${isConfirmed ? 'border-emerald-300 dark:border-emerald-800' : 'border-slate-200 dark:border-slate-800'} hover:shadow-md transition">
+          <div class="bg-white rounded-2xl p-5 shadow-xs border ${isConfirmed ? 'border-emerald-200' : 'border-slate-200'} hover:shadow-md transition">
             <div class="flex flex-col md:flex-row gap-4 justify-between">
               <div class="flex-grow space-y-2.5">
                 <div class="flex flex-wrap items-center gap-2">
-                  <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-sky-50 text-sky-800 dark:bg-sky-950 dark:text-sky-300">
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-blue-50 text-blue-700">
                     <i class="fa-solid ${catObj.icon}"></i> ${catObj.name}
                   </span>
                   ${isConfirmed
-                    ? `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-100 text-emerald-900 dark:bg-emerald-900/70 dark:text-emerald-200"><i class="fa-solid fa-circle-check"></i> ยืนยันผู้ให้บริการแล้ว</span>`
-                    : `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold bg-amber-100 text-amber-900 dark:bg-amber-900/70 dark:text-amber-200"><i class="fa-solid fa-hourglass-half"></i> เปิดรับเสนอราคา</span>`
+                    ? `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-100 text-emerald-800"><i class="fa-solid fa-circle-check"></i> ยืนยันผู้ให้บริการแล้ว</span>`
+                    : `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold bg-amber-100 text-amber-800"><i class="fa-solid fa-hourglass-half"></i> เปิดรับเสนอราคา</span>`
                   }
-                  <span class="text-xs text-slate-500 dark:text-slate-400"><i class="fa-regular fa-clock mr-1"></i>${escapeHtml(thread.createdAt)}</span>
+                  <span class="text-xs text-slate-400"><i class="fa-regular fa-clock mr-1"></i>${escapeHtml(thread.createdAt)}</span>
                 </div>
 
-                <h2 onclick="openThreadDetail('${thread.id}')" class="text-base sm:text-lg font-bold text-slate-900 dark:text-white hover:text-sky-600 dark:hover:text-sky-400 transition cursor-pointer leading-snug">
+                <h2 onclick="openThreadDetail('${thread.id}')" class="text-base sm:text-lg font-bold text-slate-900 hover:text-blue-600 transition cursor-pointer leading-snug">
                   ${escapeHtml(thread.title)}
                 </h2>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs bg-slate-50 dark:bg-slate-800/70 p-3 rounded-xl border border-slate-100 dark:border-slate-800">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs bg-slate-50 p-3 rounded-xl border border-slate-100">
                   <div class="flex items-start gap-2">
-                    <i class="fa-solid fa-location-dot text-sky-600 dark:text-sky-400 mt-0.5"></i>
-                    <div><span class="text-slate-500 dark:text-slate-400 block text-[10px]">ต้นทาง:</span><span class="font-semibold text-slate-800 dark:text-slate-100">${escapeHtml(thread.origin)}</span></div>
+                    <i class="fa-solid fa-location-dot text-blue-600 mt-0.5"></i>
+                    <div><span class="text-slate-400 block text-[10px]">ต้นทาง:</span><span class="font-semibold text-slate-700">${escapeHtml(thread.origin)}</span></div>
                   </div>
                   <div class="flex items-start gap-2">
                     <i class="fa-solid fa-flag-checkered text-rose-500 mt-0.5"></i>
-                    <div><span class="text-slate-500 dark:text-slate-400 block text-[10px]">ปลายทาง:</span><span class="font-semibold text-slate-800 dark:text-slate-100">${escapeHtml(thread.destination)}</span></div>
+                    <div><span class="text-slate-400 block text-[10px]">ปลายทาง:</span><span class="font-semibold text-slate-700">${escapeHtml(thread.destination)}</span></div>
                   </div>
                 </div>
 
-                <p class="text-xs sm:text-sm text-slate-700 dark:text-slate-300 line-clamp-2">${escapeHtml(thread.description)}</p>
+                <p class="text-xs sm:text-sm text-slate-600 line-clamp-2">${escapeHtml(thread.description)}</p>
 
                 ${confirmedSummaryCard}
                 ${proposalBadge}
 
-                <div class="pt-2.5 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 dark:border-slate-800 text-xs text-slate-600 dark:text-slate-400">
-                  <div class="flex flex-wrap items-center gap-3">
-                    <span><i class="fa-solid fa-user-circle text-slate-400 mr-1"></i>โพสต์โดย: <strong class="text-slate-800 dark:text-slate-200">${escapeHtml(thread.authorName)}</strong></span>
-                    <span><i class="fa-solid fa-calendar-day text-sky-600 dark:text-sky-400 mr-1"></i>ใช้รถ: <strong class="text-slate-800 dark:text-slate-200">${escapeHtml(thread.serviceDate)}</strong></span>
+                <div class="pt-2 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 text-xs text-slate-500">
+                  <div class="flex items-center gap-3">
+                    <span><i class="fa-solid fa-user-circle text-slate-400 mr-1"></i>โพสต์โดย: <strong class="text-slate-700">${escapeHtml(thread.authorName)}</strong></span>
+                    <span><i class="fa-solid fa-calendar-day text-blue-500 mr-1"></i>ใช้รถ: <strong class="text-slate-700">${escapeHtml(thread.serviceDate)}</strong></span>
                   </div>
                   <div class="flex items-center gap-2">
-                    <span class="bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-semibold px-2.5 py-1 rounded-lg">
-                      <i class="fa-solid fa-tags text-sky-600 dark:text-sky-400 mr-1"></i>${bids.length} ข้อเสนอราคา
+                    <span class="bg-slate-100 text-slate-700 font-semibold px-2.5 py-1 rounded-lg">
+                      <i class="fa-solid fa-tags text-blue-600 mr-1"></i>${bids.length} ข้อเสนอราคา
                     </span>
-                    <button onclick="openThreadDetail('${thread.id}')" class="px-4 py-1.5 rounded-xl font-semibold transition cursor-pointer ${!isConfirmed && currentUser && currentUser.role === 'PROVIDER' ? 'bg-emerald-600 hover:bg-emerald-700 text-white' : 'bg-sky-600 hover:bg-sky-700 text-white'}">
+                    <button onclick="openThreadDetail('${thread.id}')" class="px-4 py-1.5 rounded-lg font-semibold transition cursor-pointer ${!isConfirmed && currentUser && currentUser.role === 'PROVIDER' ? 'bg-emerald-600 hover:bg-emerald-700 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white'}">
                       ${!isConfirmed && currentUser && currentUser.role === 'PROVIDER' ? 'ดูรายละเอียด / เสนอราคา' : 'เปิดดูกระทู้'}
                     </button>
                   </div>
@@ -1612,13 +1707,13 @@
               </div>
 
               ${thread.images && thread.images.length > 0 ? `
-                <div class="shrink-0 w-full md:w-44 h-36 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 relative group cursor-pointer" onclick="openLightbox('${thread.images[0]}')">
+                <div class="shrink-0 w-full md:w-40 h-36 rounded-xl overflow-hidden border border-slate-200 relative group cursor-pointer" onclick="openLightbox('${thread.images[0]}')">
                   <img src="${thread.images[0]}" alt="รูปประกอบงาน" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
-                  ${thread.images.length > 1 ? `<span class="absolute bottom-2 right-2 bg-black/75 text-white text-[10px] font-semibold px-2 py-0.5 rounded-md">+${thread.images.length - 1} รูป</span>` : ''}
+                  ${thread.images.length > 1 ? `<span class="absolute bottom-2 right-2 bg-black/70 text-white text-[10px] font-semibold px-2 py-0.5 rounded-md">+${thread.images.length - 1} รูป</span>` : ''}
                 </div>
               ` : ''}
             </div>
-          </article>
+          </div>
         `;
       }).join('');
     };
@@ -1626,10 +1721,6 @@
     // ==================== AUTH & EDIT PROFILE HANDLERS ====================
     window.openAuthModal = function(tab = 'login') {
       switchAuthTab(tab);
-      if (tab === 'register') {
-        selectRoleRadio('regRole', 'CUSTOMER');
-        clearVehiclePhoto('reg');
-      }
       const modal = document.getElementById('authModal');
       modal.classList.remove('hidden');
       modal.classList.add('flex');
@@ -1644,13 +1735,43 @@
       if (tab === 'login') {
         loginForm.classList.remove('hidden');
         registerForm.classList.add('hidden');
-        tabLoginBtn.className = 'py-3 text-sky-700 dark:text-sky-400 border-b-2 border-sky-600 bg-sky-50/60 dark:bg-sky-950/40 cursor-pointer';
-        tabRegisterBtn.className = 'py-3 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white cursor-pointer';
+        tabLoginBtn.className = 'py-3 text-blue-600 border-b-2 border-blue-600 bg-blue-50/40 cursor-pointer';
+        tabRegisterBtn.className = 'py-3 text-slate-500 hover:text-slate-700 cursor-pointer';
       } else {
         loginForm.classList.add('hidden');
         registerForm.classList.remove('hidden');
-        tabRegisterBtn.className = 'py-3 text-sky-700 dark:text-sky-400 border-b-2 border-sky-600 bg-sky-50/60 dark:bg-sky-950/40 cursor-pointer';
-        tabLoginBtn.className = 'py-3 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white cursor-pointer';
+        tabRegisterBtn.className = 'py-3 text-blue-600 border-b-2 border-blue-600 bg-blue-50/40 cursor-pointer';
+        tabLoginBtn.className = 'py-3 text-slate-500 hover:text-slate-700 cursor-pointer';
+      }
+    };
+
+    window.toggleProviderFields = function() {
+      const role = document.querySelector('input[name="regRole"]:checked').value;
+      const extra = document.getElementById('providerExtraFields');
+      const vehicleInput = document.getElementById('regVehicleType');
+      const custCard = document.getElementById('regRoleCardCustomer');
+      const provCard = document.getElementById('regRoleCardProvider');
+      const custBadge = document.getElementById('regRoleBadgeCustomer');
+      const provBadge = document.getElementById('regRoleBadgeProvider');
+
+      if (role === 'PROVIDER') {
+        extra.classList.remove('hidden');
+        vehicleInput.required = true;
+        provCard.className = 'p-3 rounded-xl border-2 border-emerald-600 bg-emerald-50 ring-2 ring-emerald-500/20 transition text-center relative';
+        custCard.className = 'p-3 rounded-xl border-2 border-slate-200 opacity-75 hover:opacity-100 transition text-center relative';
+        provBadge.classList.remove('hidden');
+        provBadge.classList.add('inline-block');
+        custBadge.classList.add('hidden');
+        custBadge.classList.remove('inline-block');
+      } else {
+        extra.classList.add('hidden');
+        vehicleInput.required = false;
+        custCard.className = 'p-3 rounded-xl border-2 border-blue-600 bg-blue-50 ring-2 ring-blue-500/20 transition text-center relative';
+        provCard.className = 'p-3 rounded-xl border-2 border-slate-200 opacity-75 hover:opacity-100 transition text-center relative';
+        custBadge.classList.remove('hidden');
+        custBadge.classList.add('inline-block');
+        provBadge.classList.add('hidden');
+        provBadge.classList.remove('inline-block');
       }
     };
 
@@ -1663,13 +1784,11 @@
         try {
           await signInWithEmailAndPassword(auth, email, password);
           closeModal('authModal');
-          showToast('เข้าสู่ระบบสำเร็จ', 'success');
         } catch (err) {
-          showToast('เข้าสู่ระบบไม่สำเร็จ: ' + err.message, 'error');
+          await showSystemAlert('เข้าสู่ระบบไม่สำเร็จ: ' + err.message, 'เข้าสู่ระบบไม่สำเร็จ', 'error');
         }
       } else {
-        const list = allMembers.length > 0 ? allMembers : DEMO_USERS;
-        const demoFound = list.find(u => u.email.toLowerCase() === email.toLowerCase());
+        const demoFound = DEMO_USERS.find(u => u.email.toLowerCase() === email.toLowerCase());
         currentUser = demoFound || {
           uid: 'demo_' + Date.now(),
           name: email.split('@')[0],
@@ -1677,20 +1796,22 @@
           phone: '080-000-0000',
           role: 'CUSTOMER'
         };
-        if (!demoFound) allMembers.push(currentUser);
         saveDemoState();
+        updateDemoStats();
         renderTopBar();
         renderNavbar();
-        updateMemberStats();
         updateTabCounts();
         renderThreads();
         closeModal('authModal');
-        showToast(`ยินดีต้อนรับ ${currentUser.name}`, 'success');
       }
     };
 
     window.handleRegister = async function(e) {
       e.preventDefault();
+      const btn = document.getElementById('regSubmitBtn');
+      btn.disabled = true;
+      btn.textContent = 'กำลังบันทึกข้อมูล...';
+
       const role = document.querySelector('input[name="regRole"]:checked').value;
       const name = document.getElementById('regName').value.trim();
       const phone = document.getElementById('regPhone').value.trim();
@@ -1699,39 +1820,68 @@
       const vehicleType = document.getElementById('regVehicleType').value.trim();
       const serviceArea = document.getElementById('regServiceArea').value.trim();
 
-      const profileData = {
-        name,
-        phone,
-        email,
-        role,
-        vehicleType: role === 'PROVIDER' ? vehicleType : '',
-        serviceArea: role === 'PROVIDER' ? serviceArea : '',
-        vehiclePhoto: role === 'PROVIDER' ? regVehiclePhotoDataUrl : ''
-      };
+      let finalVehiclePhoto = role === 'PROVIDER' ? regVehiclePhotoData : '';
 
-      if (isFirebaseMode) {
-        try {
+      try {
+        if (isFirebaseMode) {
           const cred = await createUserWithEmailAndPassword(auth, email, password);
+          if (role === 'PROVIDER' && regVehiclePhotoFile && storage) {
+            try {
+              const storageRef = ref(storage, `vehicles/${cred.user.uid}_${Date.now()}.jpg`);
+              await uploadBytes(storageRef, regVehiclePhotoFile);
+              finalVehiclePhoto = await getDownloadURL(storageRef);
+            } catch (uploadErr) {
+              console.warn('Storage fallback to compressed image:', uploadErr);
+            }
+          }
+          const profileData = {
+            name,
+            phone,
+            email,
+            role,
+            vehicleType: role === 'PROVIDER' ? vehicleType : '',
+            serviceArea: role === 'PROVIDER' ? serviceArea : '',
+            vehiclePhoto: finalVehiclePhoto
+          };
           await setDoc(doc(db, 'users', cred.user.uid), profileData);
           currentUser = { uid: cred.user.uid, ...profileData };
           renderNavbar();
           closeModal('authModal');
-          showToast('สมัครสมาชิกเรียบร้อยแล้ว', 'success');
-        } catch (err) {
-          showToast('สมัครสมาชิกไม่สำเร็จ: ' + err.message, 'error');
+        } else {
+          const newUser = {
+            uid: 'user_' + Date.now(),
+            name,
+            phone,
+            email,
+            role,
+            vehicleType: role === 'PROVIDER' ? vehicleType : '',
+            serviceArea: role === 'PROVIDER' ? serviceArea : '',
+            vehiclePhoto: finalVehiclePhoto
+          };
+          DEMO_USERS.push(newUser);
+          currentUser = newUser;
+          const demoVehicles = DEMO_USERS
+            .filter(u => u.role === 'PROVIDER' && u.vehiclePhoto)
+            .map(u => ({
+              name: u.name,
+              vehicle: u.vehicleType || 'บริการยานพาหนะ',
+              area: u.serviceArea || 'ให้บริการทั่วไทย',
+              image: u.vehiclePhoto
+            }));
+          initProviderCarousel(demoVehicles);
+          saveDemoState();
+          updateDemoStats();
+          renderTopBar();
+          renderNavbar();
+          updateTabCounts();
+          renderThreads();
+          closeModal('authModal');
         }
-      } else {
-        const newUser = { uid: 'user_' + Date.now(), ...profileData };
-        allMembers.push(newUser);
-        currentUser = newUser;
-        saveDemoState();
-        renderTopBar();
-        renderNavbar();
-        updateMemberStats();
-        updateTabCounts();
-        renderThreads();
-        closeModal('authModal');
-        showToast('สมัครสมาชิกเรียบร้อยแล้ว', 'success');
+      } catch (err) {
+        await showSystemAlert('สมัครสมาชิกไม่สำเร็จ: ' + err.message, 'สมัครสมาชิกไม่สำเร็จ', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'ยืนยันการสมัครสมาชิก';
       }
     };
 
@@ -1743,64 +1893,119 @@
       document.getElementById('editVehicleType').value = currentUser.vehicleType || '';
       document.getElementById('editServiceArea').value = currentUser.serviceArea || '';
 
-      editVehiclePhotoDataUrl = currentUser.vehiclePhoto || '';
-      setVehiclePhotoPreviewUI('edit', editVehiclePhotoDataUrl);
+      const roleRadios = document.querySelectorAll('input[name="editRole"]');
+      roleRadios.forEach(r => { r.checked = r.value === currentUser.role; });
 
-      selectRoleRadio('editRole', currentUser.role || 'CUSTOMER');
+      editVehiclePhotoData = currentUser.vehiclePhoto || '';
+      editVehiclePhotoFile = null;
+      const previewContainer = document.getElementById('editVehiclePhotoPreview');
+      if (editVehiclePhotoData) {
+        previewContainer.classList.remove('hidden');
+        previewContainer.innerHTML = `
+          <div class="relative inline-block">
+            <img src="${editVehiclePhotoData}" alt="รูปรถปัจจุบัน" class="h-24 w-auto object-cover rounded-lg border border-emerald-300 shadow-xs mx-auto">
+            <button type="button" onclick="clearProviderVehiclePhoto('editVehiclePhoto', 'editVehiclePhotoPreview', 'edit')" class="mt-1 block mx-auto text-[11px] text-rose-600 hover:underline font-semibold cursor-pointer">
+              <i class="fa-solid fa-trash-can mr-1"></i> ลบรูปภาพนี้
+            </button>
+          </div>
+        `;
+      } else {
+        previewContainer.classList.add('hidden');
+        previewContainer.innerHTML = '';
+      }
 
+      toggleEditProviderFields();
       const modal = document.getElementById('editProfileModal');
       modal.classList.remove('hidden');
       modal.classList.add('flex');
     };
 
-    window.handleEditProfileSubmit = async function(e) {
+    window.toggleEditProviderFields = function() {
+      const role = document.querySelector('input[name="editRole"]:checked').value;
+      const extra = document.getElementById('editProviderExtraFields');
+      const vehicleInput = document.getElementById('editVehicleType');
+      if (role === 'PROVIDER') {
+        extra.classList.remove('hidden');
+        vehicleInput.required = true;
+      } else {
+        extra.classList.add('hidden');
+        vehicleInput.required = false;
+      }
+    };
+
+    window.handleSaveProfile = async function(e) {
       e.preventDefault();
       if (!currentUser) return;
+
+      const btn = document.getElementById('saveProfileBtn');
+      btn.disabled = true;
+      btn.textContent = 'กำลังบันทึก...';
 
       const role = document.querySelector('input[name="editRole"]:checked').value;
       const name = document.getElementById('editName').value.trim();
       const phone = document.getElementById('editPhone').value.trim();
-      const vehicleType = document.getElementById('editVehicleType').value.trim();
-      const serviceArea = document.getElementById('editServiceArea').value.trim();
+      const vehicleType = role === 'PROVIDER' ? document.getElementById('editVehicleType').value.trim() : '';
+      const serviceArea = role === 'PROVIDER' ? document.getElementById('editServiceArea').value.trim() : '';
+      let finalVehiclePhoto = role === 'PROVIDER' ? editVehiclePhotoData : '';
 
-      const updatedFields = {
-        role,
-        name,
-        phone,
-        vehicleType: role === 'PROVIDER' ? vehicleType : '',
-        serviceArea: role === 'PROVIDER' ? serviceArea : '',
-        vehiclePhoto: role === 'PROVIDER' ? editVehiclePhotoDataUrl : ''
-      };
-
-      if (isFirebaseMode) {
-        try {
-          await setDoc(doc(db, 'users', currentUser.uid), {
-            email: currentUser.email,
-            ...updatedFields
-          }, { merge: true });
+      try {
+        if (isFirebaseMode) {
+          if (role === 'PROVIDER' && editVehiclePhotoFile && storage) {
+            try {
+              const storageRef = ref(storage, `vehicles/${currentUser.uid}_${Date.now()}.jpg`);
+              await uploadBytes(storageRef, editVehiclePhotoFile);
+              finalVehiclePhoto = await getDownloadURL(storageRef);
+            } catch (uploadErr) {
+              console.warn('Storage fallback:', uploadErr);
+            }
+          }
+          const updatedFields = {
+            role,
+            name,
+            phone,
+            vehicleType,
+            serviceArea,
+            vehiclePhoto: finalVehiclePhoto
+          };
+          await setDoc(doc(db, 'users', currentUser.uid), updatedFields, { merge: true });
           currentUser = { ...currentUser, ...updatedFields };
-          renderNavbar();
-          updateTabCounts();
-          renderThreads();
-          closeModal('editProfileModal');
-          showToast('บันทึกการแก้ไขข้อมูลสมาชิกเรียบร้อยแล้ว', 'success');
-        } catch (err) {
-          showToast('บันทึกข้อมูลไม่สำเร็จ: ' + err.message, 'error');
+        } else {
+          currentUser = {
+            ...currentUser,
+            role,
+            name,
+            phone,
+            vehicleType,
+            serviceArea,
+            vehiclePhoto: finalVehiclePhoto
+          };
+          const idx = DEMO_USERS.findIndex(u => u.uid === currentUser.uid);
+          if (idx !== -1) {
+            DEMO_USERS[idx] = { ...currentUser };
+          }
+          const demoVehicles = DEMO_USERS
+            .filter(u => u.role === 'PROVIDER' && u.vehiclePhoto)
+            .map(u => ({
+              name: u.name,
+              vehicle: u.vehicleType || 'บริการยานพาหนะ',
+              area: u.serviceArea || 'ให้บริการทั่วไทย',
+              image: u.vehiclePhoto
+            }));
+          initProviderCarousel(demoVehicles);
+          saveDemoState();
+          updateDemoStats();
+          renderTopBar();
         }
-      } else {
-        currentUser = { ...currentUser, ...updatedFields };
-        const idx = allMembers.findIndex(u => u.uid === currentUser.uid);
-        if (idx !== -1) {
-          allMembers[idx] = currentUser;
-        }
-        saveDemoState();
-        renderTopBar();
         renderNavbar();
-        updateMemberStats();
         updateTabCounts();
         renderThreads();
         closeModal('editProfileModal');
-        showToast('บันทึกการแก้ไขข้อมูลสมาชิกเรียบร้อยแล้ว', 'success');
+        await showSystemAlert('บันทึกข้อมูลสมาชิกเรียบร้อยแล้ว', 'บันทึกสำเร็จ', 'success');
+      } catch (err) {
+        await showSystemAlert('บันทึกข้อมูลไม่สำเร็จ: ' + err.message, 'ข้อผิดพลาด', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'บันทึกข้อมูล';
       }
     };
 
@@ -1810,18 +2015,17 @@
       }
       currentUser = null;
       saveDemoState();
+      if (!isFirebaseMode) updateDemoStats();
       renderTopBar();
       renderNavbar();
-      updateMemberStats();
       updateTabCounts();
       renderThreads();
-      showToast('ออกจากระบบแล้ว', 'info');
     };
 
     // ==================== CREATE THREAD ====================
-    window.handleOpenNewThreadModal = function() {
+    window.handleOpenNewThreadModal = async function() {
       if (!currentUser) {
-        showToast('กรุณาเข้าสู่ระบบหรือสมัครสมาชิกก่อนตั้งกระทู้ประกาศครับ', 'warning');
+        await showSystemAlert('กรุณาเข้าสู่ระบบหรือสมัครสมาชิกก่อนตั้งกระทู้ประกาศครับ', 'จำเป็นต้องเข้าสู่ระบบ', 'info');
         openAuthModal('login');
         return;
       }
@@ -1841,14 +2045,12 @@
       grid.innerHTML = '';
 
       for (const file of files) {
-        try {
-          const compressed = await compressImageFile(file, 900, 0.8);
-          selectedImagesBase64.push(compressed);
-          const img = document.createElement('img');
-          img.src = compressed;
-          img.className = 'w-full h-16 object-cover rounded-lg border border-slate-200 dark:border-slate-700';
-          grid.appendChild(img);
-        } catch {}
+        const compressed = await compressImageToDataURL(file);
+        selectedImagesBase64.push(compressed);
+        const img = document.createElement('img');
+        img.src = compressed;
+        img.className = 'w-full h-16 object-cover rounded-lg border border-slate-200';
+        grid.appendChild(img);
       }
     };
 
@@ -1904,9 +2106,9 @@
         }
         e.target.reset();
         closeModal('newThreadModal');
-        showToast('โพสต์ประกาศหาบริการเรียบร้อยแล้ว', 'success');
+        await showSystemAlert('โพสต์ประกาศหาบริการเรียบร้อยแล้ว', 'โพสต์สำเร็จ', 'success');
       } catch (err) {
-        showToast('เกิดข้อผิดพลาดในการโพสต์: ' + err.message, 'error');
+        await showSystemAlert('เกิดข้อผิดพลาดในการโพสต์: ' + err.message, 'ข้อผิดพลาด', 'error');
       } finally {
         btn.disabled = false;
         btn.innerHTML = '<i class="fa-solid fa-paper-plane mr-1"></i> โพสต์ประกาศทันที';
@@ -1936,7 +2138,7 @@
       const imagesHtml = (thread.images && thread.images.length > 0) ? `
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-2">
           ${thread.images.map(img => `
-            <img src="${img}" onclick="openLightbox('${img}')" class="w-full h-28 object-cover rounded-xl border border-slate-200 dark:border-slate-700 cursor-zoom-in hover:opacity-90 transition">
+            <img src="${img}" onclick="openLightbox('${img}')" class="w-full h-28 object-cover rounded-xl border border-slate-200 cursor-zoom-in hover:opacity-90 transition">
           `).join('')}
         </div>
       ` : '';
@@ -1945,34 +2147,23 @@
       if (!isConfirmed) {
         if (isProvider) {
           bidFormHtml = `
-            <form onsubmit="handleBidSubmit(event, '${thread.id}')" class="bg-emerald-50/80 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 rounded-2xl p-4 space-y-3">
-              <div class="flex flex-wrap items-center justify-between gap-2">
-                <div class="text-sm font-bold text-emerald-900 dark:text-emerald-300 flex items-center gap-2">
-                  <i class="fa-solid fa-hand-holding-dollar"></i> เสนอราคาสำหรับงานนี้ (ในนาม: ${escapeHtml(currentUser.name)})
-                </div>
-                ${currentUser.vehiclePhoto ? `
-                  <span class="text-[11px] font-semibold text-emerald-700 dark:text-emerald-300 flex items-center gap-1">
-                    <i class="fa-solid fa-image"></i> แนบรูปถ่ายรถจากโปรไฟล์อัตโนมัติ
-                  </span>
-                ` : `
-                  <button type="button" onclick="closeModal('threadDetailModal'); openEditProfileModal();" class="text-[11px] font-semibold text-sky-700 dark:text-sky-400 underline cursor-pointer">
-                    + เพิ่มรูปถ่ายรถในโปรไฟล์
-                  </button>
-                `}
+            <form onsubmit="handleBidSubmit(event, '${thread.id}')" class="bg-emerald-50/70 border border-emerald-200 rounded-2xl p-4 space-y-3">
+              <div class="text-sm font-bold text-emerald-800 flex items-center gap-2">
+                <i class="fa-solid fa-hand-holding-dollar"></i> เสนอราคาสำหรับงานนี้ (ในนาม: ${escapeHtml(currentUser.name)})
               </div>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">ประเภทรถที่ให้บริการ *</label>
-                  <input type="text" id="bidVehicleDetail" required value="${escapeHtml(currentUser.vehicleType || '')}" placeholder="เช่น รถกระบะตู้ทึบ 2.1 เมตร" class="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                  <label class="block text-xs font-semibold text-slate-700 mb-1">ประเภทรถที่ให้บริการ *</label>
+                  <input type="text" id="bidVehicleDetail" required value="${escapeHtml(currentUser.vehicleType || '')}" placeholder="เช่น รถกระบะตู้ทึบ 2.1 เมตร" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
                 </div>
                 <div>
-                  <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">ราคาเสนอสุทธิ (บาท) *</label>
-                  <input type="number" id="bidPrice" required min="1" placeholder="เช่น 1500" class="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-sm font-bold text-emerald-700 dark:text-emerald-400 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                  <label class="block text-xs font-semibold text-slate-700 mb-1">ราคาเสนอสุทธิ (บาท) *</label>
+                  <input type="number" id="bidPrice" required min="1" placeholder="เช่น 1500" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-sm font-bold text-emerald-700 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
                 </div>
               </div>
               <div>
-                <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">เงื่อนไขเพิ่มเติม / สิ่งที่รวมในราคา *</label>
-                <textarea id="bidNote" rows="2" required placeholder="เช่น รวมค่าน้ำมัน ทางด่วน และคนขับช่วยยกของแล้ว พร้อมเข้าตามเวลา..." class="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none"></textarea>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">เงื่อนไขเพิ่มเติม / สิ่งที่รวมในราคา *</label>
+                <textarea id="bidNote" rows="2" required placeholder="เช่น รวมค่าน้ำมัน ทางด่วน และคนขับช่วยยกของแล้ว พร้อมเข้าตามเวลา..." class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"></textarea>
               </div>
               <div class="text-right">
                 <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-5 py-2.5 rounded-xl text-sm shadow-sm transition cursor-pointer">
@@ -1983,48 +2174,40 @@
           `;
         } else if (!currentUser) {
           bidFormHtml = `
-            <div class="bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 rounded-xl p-4 text-center text-xs text-slate-700 dark:text-slate-300">
-              เป็นผู้ให้บริการรถรับจ้าง? <button onclick="closeModal('threadDetailModal'); openAuthModal('login');" class="text-sky-600 dark:text-sky-400 font-bold underline cursor-pointer">เข้าสู่ระบบด้วยบัญชีผู้ให้บริการ</button> เพื่อส่งราคาเสนอรับงานนี้
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 text-center text-xs text-slate-600">
+              เป็นผู้ให้บริการรถรับจ้าง? <button onclick="closeModal('threadDetailModal'); openAuthModal('login');" class="text-blue-600 font-bold underline cursor-pointer">เข้าสู่ระบบด้วยบัญชีผู้ให้บริการ</button> เพื่อส่งราคาเสนอรับงานนี้
             </div>
           `;
         }
       }
 
       const bidsListHtml = bids.length === 0 ? `
-        <div class="text-center py-8 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-dashed border-slate-200 dark:border-slate-700 text-xs text-slate-500 dark:text-slate-400">
+        <div class="text-center py-8 bg-slate-50 rounded-xl border border-dashed border-slate-200 text-xs text-slate-500">
           ยังไม่มีผู้ให้บริการเข้ามาเสนอราคาในกระทู้นี้
         </div>
       ` : bids.map(bid => {
         const isWinner = isConfirmed && thread.confirmedBidId === bid.id;
         return `
-          <div class="p-4 rounded-2xl border transition ${isWinner ? 'bg-emerald-50 dark:bg-emerald-950/50 border-emerald-400 dark:border-emerald-600 ring-2 ring-emerald-500/20' : 'bg-white dark:bg-slate-800/60 border-slate-200 dark:border-slate-700'}">
-            <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+          <div class="p-4 rounded-2xl border transition ${isWinner ? 'bg-emerald-50 border-emerald-400 ring-2 ring-emerald-500/20' : 'bg-white border-slate-200'}">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div class="flex items-start gap-3">
                 ${bid.vehiclePhoto ? `
-                  <div class="shrink-0 group relative cursor-zoom-in" onclick="openLightbox('${bid.vehiclePhoto}')" title="คลิกขยายดูรูปถ่ายรถและป้ายทะเบียน">
-                    <img src="${bid.vehiclePhoto}" alt="รูปถ่ายรถของผู้ให้บริการ" class="w-24 h-20 object-cover rounded-xl border border-slate-300 dark:border-slate-600 group-hover:opacity-90 transition">
-                    <span class="absolute bottom-1 right-1 bg-black/70 text-white text-[9px] px-1.5 py-0.5 rounded">รูปรถ</span>
-                  </div>
-                ` : `
-                  <div class="w-14 h-14 rounded-xl bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 flex items-center justify-center shrink-0 text-xl">
-                    <i class="fa-solid fa-truck-pickup"></i>
-                  </div>
-                `}
-
+                  <img src="${bid.vehiclePhoto}" onclick="openLightbox('${bid.vehiclePhoto}')" alt="รูปรถผู้ให้บริการ" class="w-16 h-14 rounded-lg object-cover border border-slate-200 shrink-0 cursor-zoom-in hover:opacity-90" title="คลิกเพื่อดูรูปถ่ายรถขยายใหญ่">
+                ` : ''}
                 <div class="space-y-1">
                   <div class="flex flex-wrap items-center gap-2">
-                    <span class="font-bold text-slate-900 dark:text-white text-sm">
-                      ${escapeHtml(bid.providerName)}
+                    <span class="font-bold text-slate-900 text-sm flex items-center gap-1.5">
+                      <i class="fa-solid fa-truck-pickup text-emerald-600"></i> ${escapeHtml(bid.providerName)}
                     </span>
                     ${isWinner ? `<span class="bg-emerald-600 text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full"><i class="fa-solid fa-check mr-1"></i>ผู้ให้บริการที่ได้รับเลือก</span>` : ''}
                   </div>
-                  <div class="text-xs text-slate-700 dark:text-slate-300 font-medium">${escapeHtml(bid.vehicleDetail)}</div>
-                  <div class="text-[11px] text-slate-500 dark:text-slate-400"><i class="fa-regular fa-clock mr-1"></i>เสนอราคาเมื่อ: ${escapeHtml(bid.createdAt)}</div>
+                  <div class="text-xs text-slate-600 font-medium">${escapeHtml(bid.vehicleDetail)}</div>
+                  <div class="text-[11px] text-slate-400"><i class="fa-regular fa-clock mr-1"></i>เสนอราคาเมื่อ: ${escapeHtml(bid.createdAt)}</div>
                 </div>
               </div>
 
               <div class="flex sm:flex-col items-center sm:items-end justify-between gap-2 shrink-0">
-                <div class="text-xl font-bold text-emerald-700 dark:text-emerald-400">฿${Number(bid.price).toLocaleString()}</div>
+                <div class="text-xl font-bold text-emerald-700">฿${Number(bid.price).toLocaleString()}</div>
                 ${(!isConfirmed && isAuthor) ? `
                   <button onclick="confirmBid('${thread.id}', '${bid.id}')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-xl text-xs shadow-sm transition flex items-center gap-1.5 cursor-pointer">
                     <i class="fa-solid fa-circle-check"></i> ยืนยันราคา ฿${Number(bid.price).toLocaleString()}
@@ -2033,12 +2216,12 @@
               </div>
             </div>
 
-            <p class="mt-3 pt-2.5 border-t border-slate-100 dark:border-slate-700 text-xs text-slate-800 dark:text-slate-200 leading-relaxed">${escapeHtml(bid.note)}</p>
+            <p class="mt-2.5 pt-2.5 border-t border-slate-100 text-xs text-slate-700 leading-relaxed">${escapeHtml(bid.note)}</p>
 
             ${isWinner && (isAuthor || (currentUser && currentUser.uid === bid.providerId)) ? `
-              <div class="mt-3 p-3 rounded-xl bg-white dark:bg-slate-900 border border-emerald-300 dark:border-emerald-700 text-xs flex flex-wrap items-center justify-between gap-2 text-emerald-900 dark:text-emerald-200">
-                <span><strong>เบอร์ผู้ให้บริการ:</strong> <a href="tel:${escapeHtml(bid.providerPhone)}" class="underline">${escapeHtml(bid.providerPhone)}</a></span>
-                <span><strong>เบอร์ผู้ว่าจ้าง:</strong> <a href="tel:${escapeHtml(thread.authorPhone || '-')}" class="underline">${escapeHtml(thread.authorPhone || '-')}</a></span>
+              <div class="mt-3 p-2.5 rounded-xl bg-white border border-emerald-200 text-xs flex flex-wrap items-center justify-between gap-2 text-emerald-900">
+                <span><strong>เบอร์ผู้ให้บริการ:</strong> ${escapeHtml(bid.providerPhone)}</span>
+                <span><strong>เบอร์ผู้ว่าจ้าง:</strong> ${escapeHtml(thread.authorPhone || '-')}</span>
               </div>
             ` : ''}
           </div>
@@ -2048,36 +2231,36 @@
       document.getElementById('threadDetailContent').innerHTML = `
         <div class="space-y-4">
           <div class="flex flex-wrap items-center gap-2">
-            <span class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-sky-50 text-sky-800 dark:bg-sky-950 dark:text-sky-300"><i class="fa-solid ${catObj.icon} mr-1"></i>${catObj.name}</span>
+            <span class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-blue-50 text-blue-700"><i class="fa-solid ${catObj.icon} mr-1"></i>${catObj.name}</span>
             ${isConfirmed
-              ? `<span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-100 text-emerald-900 dark:bg-emerald-900/70 dark:text-emerald-200">🔒 ปิดรับข้อเสนอ (ยืนยันราคาแล้ว)</span>`
-              : `<span class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-amber-100 text-amber-900 dark:bg-amber-900/70 dark:text-amber-200">🟢 กำลังเปิดรับเสนอราคา</span>`
+              ? `<span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-100 text-emerald-800">🔒 ปิดรับข้อเสนอ (ยืนยันราคาแล้ว)</span>`
+              : `<span class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-amber-100 text-amber-800">🟢 กำลังเปิดรับเสนอราคา</span>`
             }
           </div>
 
-          <h2 class="text-xl font-bold text-slate-900 dark:text-white">${escapeHtml(thread.title)}</h2>
+          <h2 class="text-xl font-bold text-slate-900">${escapeHtml(thread.title)}</h2>
 
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-slate-50 dark:bg-slate-800/70 p-3.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs">
-            <div><span class="text-slate-500 dark:text-slate-400 block">ต้นทาง:</span><strong class="text-slate-900 dark:text-white">${escapeHtml(thread.origin)}</strong></div>
-            <div><span class="text-slate-500 dark:text-slate-400 block">ปลายทาง:</span><strong class="text-slate-900 dark:text-white">${escapeHtml(thread.destination)}</strong></div>
-            <div><span class="text-slate-500 dark:text-slate-400 block">วันเวลาใช้บริการ:</span><strong class="text-sky-700 dark:text-sky-400">${escapeHtml(thread.serviceDate)}</strong></div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-slate-50 p-3.5 rounded-xl border border-slate-200 text-xs">
+            <div><span class="text-slate-400 block">ต้นทาง:</span><strong class="text-slate-800">${escapeHtml(thread.origin)}</strong></div>
+            <div><span class="text-slate-400 block">ปลายทาง:</span><strong class="text-slate-800">${escapeHtml(thread.destination)}</strong></div>
+            <div><span class="text-slate-400 block">วันเวลาใช้บริการ:</span><strong class="text-blue-700">${escapeHtml(thread.serviceDate)}</strong></div>
           </div>
 
-          <div class="text-sm text-slate-800 dark:text-slate-200 whitespace-pre-line bg-white dark:bg-slate-800/40 p-3.5 rounded-xl border border-slate-100 dark:border-slate-800">${escapeHtml(thread.description)}</div>
+          <div class="text-sm text-slate-700 whitespace-pre-line bg-white p-3.5 rounded-xl border border-slate-100">${escapeHtml(thread.description)}</div>
 
           ${imagesHtml}
 
-          <div class="text-xs text-slate-600 dark:text-slate-400 flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800">
-            <span>ผู้ประกาศ: <strong class="text-slate-900 dark:text-white">${escapeHtml(thread.authorName)}</strong></span>
+          <div class="text-xs text-slate-500 flex items-center justify-between pt-2 border-t border-slate-100">
+            <span>ผู้ประกาศ: <strong class="text-slate-800">${escapeHtml(thread.authorName)}</strong></span>
             <span>โพสต์เมื่อ: ${escapeHtml(thread.createdAt)}</span>
           </div>
         </div>
 
-        <hr class="border-slate-200 dark:border-slate-800">
+        <hr class="border-slate-200">
 
         <div class="space-y-4">
-          <h3 class="font-bold text-base text-slate-900 dark:text-white flex items-center gap-2">
-            <i class="fa-solid fa-comments-dollar text-sky-600 dark:text-sky-400"></i> รายการเสนอราคาใต้กระทู้ (${bids.length} รายการ)
+          <h3 class="font-bold text-base text-slate-900 flex items-center gap-2">
+            <i class="fa-solid fa-comments-dollar text-blue-600"></i> รายการเสนอราคาใต้กระทู้ (${bids.length} รายการ)
           </h3>
           ${bidFormHtml}
           <div class="space-y-3">${bidsListHtml}</div>
@@ -2107,56 +2290,47 @@
       const updatedBids = [...(thread.bids || []), newBid];
 
       if (isFirebaseMode) {
-        try {
-          await updateDoc(doc(db, 'threads', threadId), { bids: updatedBids });
-          showToast('ส่งข้อเสนอราคาเรียบร้อยแล้ว', 'success');
-        } catch (err) {
-          showToast('ส่งข้อเสนอไม่สำเร็จ: ' + err.message, 'error');
-        }
+        await updateDoc(doc(db, 'threads', threadId), { bids: updatedBids });
       } else {
         thread.bids = updatedBids;
         saveDemoState();
         updateTabCounts();
         renderThreads();
         renderThreadDetailModal(threadId);
-        showToast('ส่งข้อเสนอราคาเรียบร้อยแล้ว', 'success');
       }
+      await showSystemAlert('ส่งข้อเสนอราคาใต้กระทู้เรียบร้อยแล้ว', 'ส่งข้อเสนอสำเร็จ', 'success');
     };
 
-    window.confirmBid = function(threadId, bidId) {
+    window.confirmBid = async function(threadId, bidId) {
       const thread = threads.find(t => t.id === threadId);
       if (!thread) return;
       const bid = (thread.bids || []).find(b => b.id === bidId);
       if (!bid) return;
 
-      openConfirmModal(
-        'ยืนยันตกลงราคาผู้ให้บริการ',
-        `ยืนยันเลือกราคา ฿${Number(bid.price).toLocaleString()} จาก "${bid.providerName}" ใช่หรือไม่? เมื่อยืนยันแล้วระบบจะปิดรับข้อเสนออื่นและเปิดเผยเบอร์โทรศัพท์ติดต่อให้ทั้งสองฝ่ายทันที`,
-        async () => {
-          const confirmedAt = formatThaiDateTime(new Date());
-          if (isFirebaseMode) {
-            try {
-              await updateDoc(doc(db, 'threads', threadId), {
-                status: 'CONFIRMED',
-                confirmedBidId: bidId,
-                confirmedAt
-              });
-              showToast('ยืนยันผู้ให้บริการเรียบร้อยแล้ว!', 'success');
-            } catch (err) {
-              showToast('เกิดข้อผิดพลาด: ' + err.message, 'error');
-            }
-          } else {
-            thread.status = 'CONFIRMED';
-            thread.confirmedBidId = bidId;
-            thread.confirmedAt = confirmedAt;
-            saveDemoState();
-            updateTabCounts();
-            renderThreads();
-            renderThreadDetailModal(threadId);
-            showToast('ยืนยันผู้ให้บริการเรียบร้อยแล้ว!', 'success');
-          }
-        }
+      const ok = await showSystemConfirm(
+        `ยืนยันเลือกราคา ฿${Number(bid.price).toLocaleString()} จาก "${bid.providerName}" ใช่หรือไม่?\nเมื่อยืนยันแล้วระบบจะปิดรับข้อเสนออื่นและแสดงเบอร์ติดต่อให้ทั้งสองฝ่าย`,
+        'ยืนยันเลือกผู้ให้บริการ'
       );
+      if (!ok) return;
+
+      const confirmedAt = formatThaiDateTime(new Date());
+
+      if (isFirebaseMode) {
+        await updateDoc(doc(db, 'threads', threadId), {
+          status: 'CONFIRMED',
+          confirmedBidId: bidId,
+          confirmedAt
+        });
+      } else {
+        thread.status = 'CONFIRMED';
+        thread.confirmedBidId = bidId;
+        thread.confirmedAt = confirmedAt;
+        saveDemoState();
+        updateTabCounts();
+        renderThreads();
+        renderThreadDetailModal(threadId);
+      }
+      await showSystemAlert('ยืนยันผู้ให้บริการเรียบร้อยแล้ว ระบบเปิดเผยเบอร์ติดต่อของทั้งสองฝ่ายให้ทราบแล้วครับ', 'ยืนยันงานสำเร็จ', 'success');
     };
 
     // ==================== UTILITIES ====================
@@ -2172,7 +2346,6 @@
     };
 
     window.openLightbox = function(imgSrc) {
-      if (!imgSrc) return;
       document.getElementById('lightboxImage').src = imgSrc;
       const modal = document.getElementById('lightboxModal');
       modal.classList.remove('hidden');
