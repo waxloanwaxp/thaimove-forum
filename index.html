@@ -191,14 +191,13 @@
     .hover\:bg-brand\/10:hover { background-color: color-mix(in srgb, var(--brand) 10%, transparent) !important; }
     .hover\:bg-brand\/20:hover { background-color: color-mix(in srgb, var(--brand) 20%, transparent) !important; }
     .hover\:bg-slate-100:hover { background-color: var(--border) !important; }
-    .bg-white { background-color: var(--surface) !important; }
+    .bg-white:not([class*="bg-white/"]) { background-color: var(--surface) !important; }
     .bg-blue-50 { background-color: var(--brand) !important; }
     .text-blue-600 { color: var(--brand-strong) !important; }
     .text-slate-800 { color: var(--fg-base) !important; }
     .text-slate-500 { color: var(--fg-muted) !important; }
     .bg-blue-600 { background-color: var(--brand-strong) !important; }
     .hover\:bg-blue-700:hover { background-color: var(--brand) !important; }
-    .text-blue-100 { color: color-mix(in srgb, var(--fg-base) 15%, transparent) !important; }
     .text-rose-500 { color: var(--accent) !important; }
     .bg-fg-base\/80 { background-color: color-mix(in srgb, var(--fg-base) 80%, transparent) !important; }
     .bg-slate-200 { background-color: var(--border) !important; }
@@ -210,12 +209,39 @@
     .from-brand { --tw-gradient-from: var(--brand) !important; }
     .via-brand-strong { --tw-gradient-via: var(--brand-strong) !important; }
     .to-indigo-600 { --tw-gradient-to: var(--brand-strong) !important; }
+
+    /* High-contrast text overrides for Light & Dark modes */
+    .hero-banner {
+      background: linear-gradient(135deg, #0369A1 0%, #0284C7 55%, #1D4ED8 100%) !important;
+      color: #FFFFFF !important;
+    }
+    .dark .hero-banner {
+      background: linear-gradient(135deg, #0C4A6E 0%, #0369A1 55%, #1E3A8A 100%) !important;
+      color: #FFFFFF !important;
+    }
+    .hero-banner h1, .hero-banner p, .hero-banner .hero-badge {
+      color: #FFFFFF !important;
+      text-shadow: 0 1px 2px rgba(15, 23, 42, 0.25);
+    }
+    .btn-accent-contrast {
+      color: #0F172A !important;
+    }
+    .btn-white-contrast {
+      color: #FFFFFF !important;
+    }
+    input, select, textarea {
+      color: var(--fg-base);
+    }
+    input::placeholder, textarea::placeholder {
+      color: var(--fg-muted);
+      opacity: 0.75;
+    }
   </style>
 </head>
 <body class="text-fg-base antialiased min-h-screen flex flex-col bg-bg-base">
 
   <!-- Top Status & Mode Switcher Bar (ซ่อนไว้เป็นค่าเริ่มต้น เปิดด้วย ?admin=1 หรือ Ctrl+Shift+A) -->
-  <div id="topStatusBar" class="hidden bg-fg-base text-fg-muted text-caption py-2 px-4 border-b border-border-strong">
+  <div id="topStatusBar" class="hidden bg-surface text-fg-muted text-caption py-2 px-4 border-b border-border-strong">
     <div class="max-w-container mx-auto flex flex-wrap items-center justify-between gap-2">
       <div id="connectionStatusArea" class="flex items-center gap-2"></div>
       <div id="demoQuickSwitchArea" class="flex flex-wrap items-center gap-1.5"></div>
@@ -226,7 +252,7 @@
   <header class="bg-surface shadow-low sticky top-0 z-30 border-b border-border">
     <div class="max-w-container mx-auto px-4 h-16 flex items-center justify-between gap-4">
       <a href="#" onclick="resetToHome(event)" class="flex items-center gap-3 group">
-        <div class="w-10 h-10 bg-brand rounded-lg flex items-center justify-center text-white shadow-low group-hover:bg-brand-strong transition-colors duration-fast">
+        <div class="w-10 h-10 bg-brand rounded-lg flex items-center justify-center text-white btn-white-contrast shadow-low group-hover:bg-brand-strong transition-colors duration-fast">
           <i class="fa-solid fa-truck-fast text-lg"></i>
         </div>
         <div>
@@ -239,9 +265,9 @@
         <div id="navbarUserArea" class="flex items-center gap-2.5"></div>
 
         <!-- Theme Toggle -->
-        <button id="themeToggle" onclick="toggleTheme()" class="p-2 rounded-lg bg-bg-base border border-border text-fg-muted hover:bg-border hover:text-fg-base transition-colors duration-fast cursor-pointer" aria-label="สลับธีม" title="สลับธีม Light / Dark">
-          <i class="fa-solid fa-sun text-lg" id="themeIconSun"></i>
-          <i class="fa-solid fa-moon text-lg hidden" id="themeIconMoon"></i>
+        <button id="themeToggle" onclick="toggleTheme()" class="p-2 rounded-lg bg-bg-base border border-border text-fg-base hover:bg-border transition-colors duration-fast cursor-pointer" aria-label="สลับธีม" title="สลับธีม Light / Dark">
+          <i class="fa-solid fa-sun text-lg text-amber-500" id="themeIconSun"></i>
+          <i class="fa-solid fa-moon text-lg text-sky-400 hidden" id="themeIconMoon"></i>
         </button>
       </div>
     </div>
@@ -251,16 +277,16 @@
   <main class="flex-grow max-w-6xl w-full mx-auto px-4 py-6">
     
     <!-- Hero / Action Banner -->
-    <div class="bg-gradient-to-r from-brand via-brand-strong to-indigo-600 rounded-2xl p-6 md:p-8 text-white shadow-low mb-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 animate-fade-in">
+    <div class="hero-banner bg-gradient-to-r from-brand via-brand-strong to-indigo-600 rounded-2xl p-6 md:p-8 text-white shadow-low mb-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 animate-fade-in">
       <div>
-        <div class="inline-flex items-center gap-1.5 bg-white/15 backdrop-blur-sm px-3 py-1 rounded-full text-caption font-medium mb-3">
-          <i class="fa-solid fa-bolt text-accent"></i> ระบบจับคู่ผู้ว่าจ้างและผู้ให้บริการรถรับจ้างทั่วไทย
+        <div class="hero-badge inline-flex items-center gap-1.5 bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-caption font-medium mb-3 text-white">
+          <i class="fa-solid fa-bolt text-amber-300"></i> ระบบจับคู่ผู้ว่าจ้างและผู้ให้บริการรถรับจ้างทั่วไทย
         </div>
         <h1 class="text-h1 mb-2 text-white">ต้องการหารถขนส่ง เหมารถตู้ หรือบริการยานพาหนะ?</h1>
-        <p class="text-white/90 text-body max-w-xl">โพสต์รายละเอียดงานพร้อมรูปภาพ เพื่อให้ผู้ให้บริการเข้ามาเสนอราคาแข่งขันกันใต้กระทู้</p>
+        <p class="text-white/95 text-body max-w-xl">โพสต์รายละเอียดงานพร้อมรูปภาพ เพื่อให้ผู้ให้บริการเข้ามาเสนอราคาแข่งขันกันใต้กระทู้</p>
       </div>
       <div class="shrink-0 w-full md:w-auto">
-        <button onclick="handleOpenNewThreadModal()" class="w-full md:w-auto bg-accent hover:bg-accent-strong text-slate-900 font-semibold px-6 py-3 rounded-lg shadow-low transition-colors duration-fast flex items-center justify-center gap-2 cursor-pointer">
+        <button onclick="handleOpenNewThreadModal()" class="btn-accent-contrast w-full md:w-auto bg-accent hover:bg-accent-strong font-semibold px-6 py-3 rounded-lg shadow-low transition-colors duration-fast flex items-center justify-center gap-2 cursor-pointer">
           <i class="fa-solid fa-plus-circle text-lg"></i>
           <span class="text-button">ตั้งกระทู้ประกาศหาบริการ</span>
         </button>
@@ -269,7 +295,7 @@
 
     <!-- Primary Navigation Tabs -->
     <div class="bg-surface rounded-lg p-1.5 border border-border mb-5 flex flex-wrap gap-1.5" role="tablist">
-      <button id="mainTabAll" onclick="switchMainTab('ALL')" role="tab" aria-selected="true" class="flex-1 min-w-[150px] py-2.5 px-4 rounded-md text-sm font-semibold transition-colors duration-fast flex items-center justify-center gap-2 bg-brand text-white shadow-low cursor-pointer">
+      <button id="mainTabAll" onclick="switchMainTab('ALL')" role="tab" aria-selected="true" class="btn-white-contrast flex-1 min-w-[150px] py-2.5 px-4 rounded-md text-sm font-semibold transition-colors duration-fast flex items-center justify-center gap-2 bg-brand text-white shadow-low cursor-pointer">
         <i class="fa-solid fa-list-ul"></i>
         <span>กระดานประกาศทั้งหมด</span>
         <span id="badgeAllCount" class="bg-white/25 text-white text-caption px-2 py-0.5 rounded-full">0</span>
@@ -373,7 +399,7 @@
             </button>
           </div>
         </div>
-        <button type="submit" id="loginSubmitBtn" class="w-full bg-brand hover:bg-brand-strong text-white font-semibold py-2.5 rounded-md shadow-low transition-colors duration-fast cursor-pointer text-button">
+        <button type="submit" id="loginSubmitBtn" class="btn-white-contrast w-full bg-brand hover:bg-brand-strong text-white font-semibold py-2.5 rounded-md shadow-low transition-colors duration-fast cursor-pointer text-button">
           เข้าสู่ระบบ
         </button>
       </form>
@@ -443,7 +469,7 @@
           </div>
         </div>
 
-        <button type="submit" id="regSubmitBtn" class="w-full bg-brand hover:bg-brand-strong text-white font-semibold py-2.5 rounded-md shadow-low transition-colors duration-fast cursor-pointer text-button mt-2">
+        <button type="submit" id="regSubmitBtn" class="btn-white-contrast w-full bg-brand hover:bg-brand-strong text-white font-semibold py-2.5 rounded-md shadow-low transition-colors duration-fast cursor-pointer text-button mt-2">
           ยืนยันการสมัครสมาชิก
         </button>
       </form>
@@ -514,7 +540,7 @@
 
         <div class="pt-2 flex items-center justify-end gap-2 border-t border-border">
           <button type="button" onclick="closeModal('editProfileModal')" class="px-4 py-2 rounded-md text-caption font-semibold text-fg-muted hover:bg-border hover:text-fg-base transition-colors duration-fast cursor-pointer">ยกเลิก</button>
-          <button type="submit" id="saveProfileBtn" class="px-5 py-2 rounded-md text-caption font-semibold bg-brand hover:bg-brand-strong text-white shadow-low transition-colors duration-fast cursor-pointer">
+          <button type="submit" id="saveProfileBtn" class="btn-white-contrast px-5 py-2 rounded-md text-caption font-semibold bg-brand hover:bg-brand-strong text-white shadow-low transition-colors duration-fast cursor-pointer">
             <i class="fa-solid fa-floppy-disk mr-1"></i> บันทึกการเปลี่ยนแปลง
           </button>
         </div>
@@ -525,12 +551,12 @@
   <!-- 3. Create New Thread Modal -->
   <div id="newThreadModal" class="fixed inset-0 bg-overlay backdrop-blur-sm z-50 hidden items-center justify-center p-4">
     <div class="bg-surface rounded-lg max-w-2xl w-full shadow-high overflow-hidden animate-modal-in flex flex-col max-h-[90vh] border border-border">
-      <div class="px-5 py-4 bg-brand text-white flex items-center justify-between shrink-0">
+      <div class="px-5 py-4 bg-brand text-white btn-white-contrast flex items-center justify-between shrink-0">
         <div class="flex items-center gap-2">
           <i class="fa-solid fa-pen-to-square"></i>
           <h3 class="font-bold text-h3 text-white">ตั้งกระทู้ประกาศหาบริการยานพาหนะ</h3>
         </div>
-        <button onclick="closeModal('newThreadModal')" class="text-white/80 hover:text-white w-8 h-8 rounded-md flex items-center justify-center hover:bg-white/10 transition-colors duration-fast cursor-pointer">
+        <button onclick="closeModal('newThreadModal')" class="text-white/85 hover:text-white w-8 h-8 rounded-md flex items-center justify-center hover:bg-white/15 transition-colors duration-fast cursor-pointer">
           <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
@@ -584,7 +610,7 @@
 
         <div class="pt-2 flex items-center justify-end gap-3 border-t border-border">
           <button type="button" onclick="closeModal('newThreadModal')" class="px-4 py-2.5 rounded-md text-body-sm font-semibold text-fg-muted hover:bg-border hover:text-fg-base transition-colors duration-fast cursor-pointer">ยกเลิก</button>
-          <button type="submit" id="createThreadSubmitBtn" class="px-6 py-2.5 rounded-md text-body-sm font-semibold bg-accent hover:bg-accent-strong text-slate-900 shadow-low transition-colors duration-fast cursor-pointer">
+          <button type="submit" id="createThreadSubmitBtn" class="btn-accent-contrast px-6 py-2.5 rounded-md text-body-sm font-semibold bg-accent hover:bg-accent-strong shadow-low transition-colors duration-fast cursor-pointer">
             <i class="fa-solid fa-paper-plane mr-1"></i> โพสต์ประกาศทันที
           </button>
         </div>
@@ -822,7 +848,7 @@
 
         const actions = document.getElementById('systemDialogActions');
         actions.innerHTML = `
-          <button id="sysDialogOkBtn" class="px-5 py-2 rounded-md text-caption font-semibold bg-brand hover:bg-brand-strong text-white shadow-low transition-colors duration-fast cursor-pointer">ตกลง</button>
+          <button id="sysDialogOkBtn" class="btn-white-contrast px-5 py-2 rounded-md text-caption font-semibold bg-brand hover:bg-brand-strong text-white shadow-low transition-colors duration-fast cursor-pointer">ตกลง</button>
         `;
 
         modal.classList.remove('hidden');
@@ -845,7 +871,7 @@
         const actions = document.getElementById('systemDialogActions');
         actions.innerHTML = `
           <button id="sysDialogCancelBtn" class="px-4 py-2 rounded-md text-caption font-semibold text-fg-muted hover:bg-border hover:text-fg-base transition-colors duration-fast cursor-pointer">ยกเลิก</button>
-          <button id="sysDialogConfirmBtn" class="px-5 py-2 rounded-md text-caption font-semibold bg-success hover:bg-success-strong text-white shadow-low transition-colors duration-fast cursor-pointer">ยืนยันตกลง</button>
+          <button id="sysDialogConfirmBtn" class="btn-white-contrast px-5 py-2 rounded-md text-caption font-semibold bg-success hover:bg-success-strong text-white shadow-low transition-colors duration-fast cursor-pointer">ยืนยันตกลง</button>
         `;
 
         modal.classList.remove('hidden');
@@ -1030,8 +1056,7 @@
 
     function applySavedTheme() {
       const savedTheme = localStorage.getItem('thaimove_theme');
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      const isDark = savedTheme ? savedTheme === 'dark' : prefersDark;
+      const isDark = savedTheme === 'dark';
       document.documentElement.classList.toggle('dark', isDark);
       updateThemeIcons(isDark);
     }
@@ -1123,15 +1148,15 @@
       } else {
         statusArea.innerHTML = `
           <span class="w-2 h-2 rounded-full bg-accent"></span>
-          <span class="text-accent font-medium text-caption">โหมดทดสอบ (Demo Mode)</span>
-          <button onclick="toggleAppMode('FIREBASE')" class="ml-2 px-2.5 py-0.5 rounded-md bg-success hover:bg-success-strong text-white text-caption font-semibold transition-colors duration-fast cursor-pointer">
+          <span class="text-fg-base font-medium text-caption">โหมดทดสอบ (Demo Mode)</span>
+          <button onclick="toggleAppMode('FIREBASE')" class="btn-white-contrast ml-2 px-2.5 py-0.5 rounded-md bg-success hover:bg-success-strong text-white text-caption font-semibold transition-colors duration-fast cursor-pointer">
             <i class="fa-solid fa-cloud mr-1"></i> สลับไปโหมด Firebase Real-time
           </button>
         `;
         switchArea.innerHTML = `
           <span class="text-fg-muted mr-1 text-caption">สลับบัญชีทดสอบ:</span>
           ${demoUsersList.map(u => `
-            <button onclick="switchDemoUser('${u.uid}')" class="px-2 py-0.5 rounded-md text-caption font-medium transition-colors duration-fast cursor-pointer ${currentUser && currentUser.uid === u.uid ? 'bg-brand text-white' : 'bg-surface text-fg-base hover:bg-border'}">
+            <button onclick="switchDemoUser('${u.uid}')" class="px-2 py-0.5 rounded-md text-caption font-medium transition-colors duration-fast cursor-pointer ${currentUser && currentUser.uid === u.uid ? 'bg-brand text-white btn-white-contrast' : 'bg-bg-base text-fg-base border border-border hover:bg-border'}">
               ${u.role === 'CUSTOMER' ? '👤' : '🚚'} ${escapeHtml(u.name)}
             </button>
           `).join('')}
@@ -1164,7 +1189,7 @@
       if (!currentUser) {
         navArea.innerHTML = `
           <button onclick="openAuthModal('login')" class="px-4 py-2 text-body-sm font-semibold text-fg-base hover:text-brand transition-colors duration-fast cursor-pointer">เข้าสู่ระบบ</button>
-          <button onclick="openAuthModal('register')" class="px-4 py-2 text-body-sm font-semibold bg-brand hover:bg-brand-strong text-white rounded-md shadow-low transition-colors duration-fast cursor-pointer">สมัครสมาชิก</button>
+          <button onclick="openAuthModal('register')" class="btn-white-contrast px-4 py-2 text-body-sm font-semibold bg-brand hover:bg-brand-strong text-white rounded-md shadow-low transition-colors duration-fast cursor-pointer">สมัครสมาชิก</button>
         `;
         return;
       }
@@ -1293,7 +1318,7 @@
       grid.innerHTML = CATEGORIES.map(cat => {
         const active = selectedCategory === cat.id;
         return `
-          <button onclick="selectCategory('${cat.id}')" class="flex items-center gap-2.5 px-3 py-2.5 rounded-md border text-left transition-colors duration-fast cursor-pointer ${active ? 'bg-brand text-white border-brand shadow-low' : 'bg-bg-base text-fg-base border-border hover:bg-brand/5 hover:border-brand'}">
+          <button onclick="selectCategory('${cat.id}')" class="flex items-center gap-2.5 px-3 py-2.5 rounded-md border text-left transition-colors duration-fast cursor-pointer ${active ? 'bg-brand text-white btn-white-contrast border-brand shadow-low' : 'bg-bg-base text-fg-base border-border hover:bg-brand/5 hover:border-brand'}">
             <div class="w-7 h-7 rounded-md flex items-center justify-center shrink-0 ${active ? 'bg-white/25 text-white' : 'bg-surface text-brand shadow-low'}">
               <i class="fa-solid ${cat.icon} text-xs"></i>
             </div>
@@ -1336,7 +1361,7 @@
 
       Object.keys(tabs).forEach(key => {
         if (key === tabName) {
-          tabs[key].className = 'flex-1 min-w-[150px] py-2.5 px-4 rounded-md text-sm font-semibold transition-colors duration-fast flex items-center justify-center gap-2 bg-brand text-white shadow-low cursor-pointer';
+          tabs[key].className = 'btn-white-contrast flex-1 min-w-[150px] py-2.5 px-4 rounded-md text-sm font-semibold transition-colors duration-fast flex items-center justify-center gap-2 bg-brand text-white shadow-low cursor-pointer';
           tabs[key].setAttribute('aria-selected', 'true');
         } else {
           tabs[key].className = 'flex-1 min-w-[150px] py-2.5 px-4 rounded-md text-sm font-semibold transition-colors duration-fast flex items-center justify-center gap-2 text-fg-muted hover:bg-border cursor-pointer';
@@ -1392,7 +1417,7 @@
             </div>
             <h3 class="font-bold text-fg-base text-body mb-1">กรุณาเข้าสู่ระบบเพื่อดูรายการของคุณ</h3>
             <p class="text-caption text-fg-muted mb-4">เข้าสู่ระบบด้วยบัญชีผู้ใช้งานทั่วไปหรือผู้ให้บริการเพื่อติดตามสถานะงาน</p>
-            <button onclick="openAuthModal('login')" class="bg-brand hover:bg-brand-strong text-white font-semibold px-5 py-2.5 rounded-lg text-caption transition-colors duration-fast cursor-pointer">
+            <button onclick="openAuthModal('login')" class="btn-white-contrast bg-brand hover:bg-brand-strong text-white font-semibold px-5 py-2.5 rounded-lg text-caption transition-colors duration-fast cursor-pointer">
               เข้าสู่ระบบ / สมัครสมาชิก
             </button>
           </div>
@@ -1546,10 +1571,10 @@
                     <span><i class="fa-solid fa-calendar-day text-brand mr-1"></i>ใช้รถ: <strong class="text-fg-base">${escapeHtml(thread.serviceDate)}</strong></span>
                   </div>
                   <div class="flex items-center gap-2">
-                    <span class="bg-bg-base text-fg-base font-semibold px-2.5 py-1 rounded-md">
+                    <span class="bg-bg-base text-fg-base font-semibold px-2.5 py-1 rounded-md border border-border">
                       <i class="fa-solid fa-tags text-brand mr-1"></i>${bids.length} ข้อเสนอราคา
                     </span>
-                    <button onclick="openThreadDetail('${thread.id}')" class="px-4 py-1.5 rounded-md font-semibold transition-colors duration-fast cursor-pointer ${!isConfirmed && currentUser && currentUser.role === 'PROVIDER' ? 'bg-success hover:bg-success-strong text-white' : 'bg-brand hover:bg-brand-strong text-white'}">
+                    <button onclick="openThreadDetail('${thread.id}')" class="btn-white-contrast px-4 py-1.5 rounded-md font-semibold transition-colors duration-fast cursor-pointer ${!isConfirmed && currentUser && currentUser.role === 'PROVIDER' ? 'bg-success hover:bg-success-strong text-white' : 'bg-brand hover:bg-brand-strong text-white'}">
                       ${!isConfirmed && currentUser && currentUser.role === 'PROVIDER' ? 'ดูรายละเอียด / เสนอราคา' : 'เปิดดูกระทู้'}
                     </button>
                   </div>
@@ -1838,7 +1863,7 @@
                 <textarea id="bidNote" rows="2" required placeholder="เช่น รวมค่าน้ำมัน ทางด่วน และคนขับช่วยยกของแล้ว พร้อมเข้าตามเวลา..." class="w-full px-4 py-2 bg-surface border border-border rounded-md text-body-sm text-fg-base focus:outline-none focus:ring-2 focus:ring-success focus:bg-surface transition-colors duration-fast"></textarea>
               </div>
               <div class="text-right">
-                <button type="submit" class="bg-success hover:bg-success-strong text-white font-semibold px-5 py-2.5 rounded-md text-body-sm shadow-low transition-colors duration-fast cursor-pointer">
+                <button type="submit" class="btn-white-contrast bg-success hover:bg-success-strong text-white font-semibold px-5 py-2.5 rounded-md text-body-sm shadow-low transition-colors duration-fast cursor-pointer">
                   <i class="fa-solid fa-paper-plane mr-1"></i> ส่งข้อเสนอราคา
                 </button>
               </div>
@@ -1876,7 +1901,7 @@
               <div class="flex sm:flex-col items-center sm:items-end justify-between gap-2 shrink-0">
                 <div class="text-h3 font-bold text-success">฿${Number(bid.price).toLocaleString()}</div>
                 ${(!isConfirmed && isAuthor) ? `
-                  <button onclick="confirmBid('${thread.id}', '${bid.id}')" class="bg-success hover:bg-success-strong text-white font-bold px-4 py-2 rounded-md text-caption shadow-low transition-colors duration-fast flex items-center gap-1.5 cursor-pointer">
+                  <button onclick="confirmBid('${thread.id}', '${bid.id}')" class="btn-white-contrast bg-success hover:bg-success-strong text-white font-bold px-4 py-2 rounded-md text-caption shadow-low transition-colors duration-fast flex items-center gap-1.5 cursor-pointer">
                     <i class="fa-solid fa-circle-check"></i> ยืนยันราคา ฿${Number(bid.price).toLocaleString()}
                   </button>
                 ` : ''}
