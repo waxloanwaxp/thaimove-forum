@@ -250,18 +250,39 @@
 
   <!-- Main Navigation Bar -->
   <header class="bg-surface shadow-low sticky top-0 z-30 border-b border-border">
-    <div class="max-w-container mx-auto px-4 h-16 flex items-center justify-between gap-4">
-      <a href="#" onclick="resetToHome(event)" class="flex items-center gap-3 group">
-        <div class="w-10 h-10 bg-brand rounded-lg flex items-center justify-center text-white btn-white-contrast shadow-low group-hover:bg-brand-strong transition-colors duration-fast">
-          <i class="fa-solid fa-truck-fast text-lg"></i>
-        </div>
-        <div>
-          <span class="font-bold text-h3 text-fg-base tracking-tight block leading-none">ThaiMove <span class="text-brand">Forum</span></span>
-          <span class="text-caption text-fg-muted font-normal">ศูนย์กลางประกาศและเสนอราคาบริการยานพาหนะ</span>
-        </div>
-      </a>
+    <div class="max-w-container mx-auto px-4 min-h-16 py-2 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex flex-wrap items-center gap-3">
+        <a href="#" onclick="resetToHome(event)" class="flex items-center gap-3 group">
+          <div class="w-10 h-10 bg-brand rounded-lg flex items-center justify-center text-white btn-white-contrast shadow-low group-hover:bg-brand-strong transition-colors duration-fast">
+            <i class="fa-solid fa-truck-fast text-lg"></i>
+          </div>
+          <div>
+            <span class="font-bold text-h3 text-fg-base tracking-tight block leading-none">ThaiMove <span class="text-brand">Forum</span></span>
+          </div>
+        </a>
 
-      <div class="flex items-center gap-2.5">
+        <!-- Member & Online Stats Badges -->
+        <div id="memberStatsArea" class="flex flex-wrap items-center gap-1.5 text-[11px] sm:text-caption">
+          <span class="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-brand/10 text-brand font-semibold border border-brand/20" title="จำนวนสมาชิกผู้ใช้งานทั่วไป">
+            <i class="fa-solid fa-user"></i>
+            <span>ผู้ใช้งานทั่วไป: <strong id="statCustomerCount">0</strong></span>
+          </span>
+          <span class="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-success/10 text-success font-semibold border border-success/20" title="จำนวนสมาชิกผู้ให้บริการรถ">
+            <i class="fa-solid fa-truck-pickup"></i>
+            <span>ผู้ให้บริการรถ: <strong id="statProviderCount">0</strong></span>
+          </span>
+          <span class="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-bg-base text-fg-base font-semibold border border-border" title="จำนวนสมาชิกทั้งหมดในระบบ">
+            <i class="fa-solid fa-users text-fg-muted"></i>
+            <span>ทั้งหมด: <strong id="statTotalUsersCount">0</strong></span>
+          </span>
+          <span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-success-bg text-success-fg font-semibold border border-success-border" title="จำนวนผู้ใช้งานที่กำลังออนไลน์ขณะนี้">
+            <span class="w-2 h-2 rounded-full bg-success animate-pulse"></span>
+            <span>ออนไลน์: <strong id="statOnlineCount">1</strong></span>
+          </span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2.5 ml-auto">
         <div id="navbarUserArea" class="flex items-center gap-2.5"></div>
 
         <!-- Theme Toggle -->
@@ -674,7 +695,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getFirestore, collection, doc, setDoc, getDoc, addDoc, updateDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getFirestore, collection, doc, setDoc, getDoc, addDoc, updateDoc, deleteDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
     import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
     // =========================================================================
@@ -831,12 +852,80 @@
     let storage = null;
     let currentUser = null;
     let demoUsersList = [];
+    let allRegisteredUsers = [];
+    let onlineSessionsCount = 1;
+    let presenceIntervalId = null;
+    const clientSessionId = sessionStorage.getItem('thaimove_session_id') || ('sess_' + Math.random().toString(36).slice(2) + '_' + Date.now());
+    sessionStorage.setItem('thaimove_session_id', clientSessionId);
     let threads = [];
     let selectedCategory = 'ALL';
     let currentMainTab = 'ALL';
     let selectedImagesBase64 = [];
     let selectedImageFiles = [];
     let activeDetailThreadId = null;
+
+    // ==================== MEMBER & ONLINE STATS ====================
+    function updateMemberStatsUI() {
+      const custEl = document.getElementById('statCustomerCount');
+      const provEl = document.getElementById('statProviderCount');
+      const totalEl = document.getElementById('statTotalUsersCount');
+      const onlineEl = document.getElementById('statOnlineCount');
+      if (!custEl || !provEl || !totalEl || !onlineEl) return;
+
+      const sourceUsers = isFirebaseMode ? allRegisteredUsers : demoUsersList;
+      const customerCount = sourceUsers.filter(u => (u.role || 'CUSTOMER') === 'CUSTOMER').length;
+      const providerCount = sourceUsers.filter(u => u.role === 'PROVIDER').length;
+      const totalCount = sourceUsers.length;
+      const onlineCount = isFirebaseMode ? Math.max(1, onlineSessionsCount) : (currentUser ? 1 : 0);
+
+      custEl.textContent = customerCount.toLocaleString();
+      provEl.textContent = providerCount.toLocaleString();
+      totalEl.textContent = totalCount.toLocaleString();
+      onlineEl.textContent = onlineCount.toLocaleString();
+    }
+
+    function startFirebasePresenceTracking() {
+      if (!db) return;
+      const presenceDocRef = doc(db, 'presence', clientSessionId);
+
+      const sendHeartbeat = async () => {
+        try {
+          await setDoc(presenceDocRef, {
+            lastActive: Date.now(),
+            uid: currentUser ? currentUser.uid : 'guest',
+            role: currentUser ? currentUser.role : 'GUEST'
+          }, { merge: true });
+        } catch (err) {
+          console.warn('Presence heartbeat warning:', err);
+        }
+      };
+
+      sendHeartbeat();
+      if (presenceIntervalId) clearInterval(presenceIntervalId);
+      presenceIntervalId = setInterval(sendHeartbeat, 30000);
+
+      window.addEventListener('beforeunload', () => {
+        deleteDoc(presenceDocRef).catch(() => {});
+      });
+
+      onSnapshot(collection(db, 'presence'), (snapshot) => {
+        const now = Date.now();
+        const activeThreshold = 90000; // 90 วินาทีล่าสุดถือว่าออนไลน์
+        let activeCount = 0;
+        snapshot.forEach(d => {
+          const data = d.data();
+          if (data && typeof data.lastActive === 'number' && (now - data.lastActive) <= activeThreshold) {
+            activeCount++;
+          }
+        });
+        onlineSessionsCount = Math.max(1, activeCount);
+        updateMemberStatsUI();
+      }, (err) => {
+        console.warn('Presence listener warning:', err);
+        onlineSessionsCount = 1;
+        updateMemberStatsUI();
+      });
+    }
 
     // ==================== CUSTOM DIALOG (NO NATIVE ALERT / CONFIRM) ====================
     function showSystemAlert(message, title = 'แจ้งเตือนจากระบบ', iconClass = 'fa-circle-info text-brand') {
@@ -1050,6 +1139,7 @@
       saveDemoState();
       renderTopBar();
       renderNavbar();
+      updateMemberStatsUI();
       updateTabCounts();
       renderThreads();
     }
@@ -1090,6 +1180,7 @@
     function setupFirebaseListeners() {
       renderTopBar();
       renderNavbar();
+      updateMemberStatsUI();
       updateTabCounts();
       renderThreads();
 
@@ -1110,9 +1201,21 @@
           currentUser = null;
         }
         renderNavbar();
+        updateMemberStatsUI();
         updateTabCounts();
         renderThreads();
       });
+
+      // Real-time listener สำหรับนับจำนวนสมาชิกทั้งหมด แยกผู้ใช้งานทั่วไปและผู้ให้บริการรถ
+      onSnapshot(collection(db, 'users'), (snapshot) => {
+        allRegisteredUsers = snapshot.docs.map(d => ({ uid: d.id, ...d.data() }));
+        updateMemberStatsUI();
+      }, (err) => {
+        console.warn('Users stats listener warning:', err);
+      });
+
+      // Real-time listener สำหรับนับจำนวนผู้ใช้งานที่ออนไลน์อยู่ขณะนี้
+      startFirebasePresenceTracking();
 
       const q = query(collection(db, 'threads'), orderBy('timestamp', 'desc'));
       onSnapshot(q, (snapshot) => {
@@ -1171,6 +1274,7 @@
         saveDemoState();
         renderTopBar();
         renderNavbar();
+        updateMemberStatsUI();
         updateTabCounts();
         renderThreads();
       }
@@ -1298,6 +1402,7 @@
         }
 
         renderNavbar();
+        updateMemberStatsUI();
         updateTabCounts();
         renderThreads();
         closeModal('editProfileModal');
@@ -1699,6 +1804,7 @@
         saveDemoState();
         renderTopBar();
         renderNavbar();
+        updateMemberStatsUI();
         updateTabCounts();
         renderThreads();
         closeModal('authModal');
@@ -1713,6 +1819,7 @@
       saveDemoState();
       renderTopBar();
       renderNavbar();
+      updateMemberStatsUI();
       updateTabCounts();
       renderThreads();
     };
